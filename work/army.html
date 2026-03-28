@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>U.S. Army Brand &amp; Marketing · PullPin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../project.css" />
+  <style>
+    /* Hero video */
+    .project-hero__bg video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.45;
+    }
+    .project-hero__bg img { display: none; }
+
+    /* Video feed items */
+    .project-feed__item video {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.9s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .project-feed__item:hover video {
+      transform: scale(1.03);
+    }
+    /* Wider video aspect handling */
+    .project-feed__item--video {
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CUSTOM CURSOR -->
+  <div class="cursor" id="cursor">
+    <div class="cursor__dot"></div>
+    <div class="cursor__ring"></div>
+  </div>
+  <div class="cursor__label" id="cursorLabel"></div>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <a href="../index.html" class="nav__logo" data-cursor="Home">
+      <span class="nav__name">PullPin.com</span>
+      <span class="nav__role">Creative Direction</span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="../index.html#work">Work</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+    <div class="nav__status">
+      <span>YOUR CREATIVE PARTNER</span>
+    </div>
+  </nav>
+
+  <!-- PROJECT HERO -->
+  <section class="project-hero">
+    <div class="project-hero__bg">
+      <img src="../media/work/campaigns/Army/5.jpg" alt="U.S. Army" />
+      <video autoplay muted loop playsinline>
+        <source src="../media/work/campaigns/Army/7782_ARMY_MEB_web.mp4" type="video/mp4" />
+      </video>
+    </div>
+    <div class="project-hero__content">
+      <p class="project-hero__eyebrow">U.S. Army · Brand &amp; Marketing</p>
+      <h1 class="project-hero__title">Turning Gen Z<br>attention into<br><span class="outline">enlistment.</span></h1>
+      <div class="project-hero__meta">
+        <div class="project-hero__meta-item">
+          <span class="project-hero__meta-label">Client</span>
+          <span class="project-hero__meta-value">U.S. Army</span>
+        </div>
+        <div class="project-hero__meta-item">
+          <span class="project-hero__meta-label">Scope</span>
+          <span class="project-hero__meta-value">Brand · Experiential · Campaign</span>
+        </div>
+        <div class="project-hero__meta-item">
+          <span class="project-hero__meta-label">Year</span>
+          <span class="project-hero__meta-value">2024–2025</span>
+        </div>
+        <div class="project-hero__meta-item">
+          <span class="project-hero__meta-label">Category</span>
+          <span class="project-hero__meta-value">Brand · Marketing</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECT BODY -->
+  <div class="project-body">
+
+    <!-- SIDEBAR -->
+    <aside class="project-sidebar">
+      <a href="../index.html#work" class="project-sidebar__back" data-cursor="Back">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        All Work
+      </a>
+
+      <p class="project-sidebar__num">Project 02</p>
+      <h2 class="project-sidebar__title">U.S. Army Brand &amp; Marketing</h2>
+
+      <p class="project-sidebar__desc">
+        As Creative Director for TMA/TeamDDB, we led experiential innovation and national broadcast activations for the U.S. Army, creating recruitment-focused platforms including the Impossible Shot, Impossible Kick (CBS), the Army's official 2025 Rose Bowl Parade float, and so much more. These initiatives helped modernize recruiting engagement and contributed to the Army surpassing its recruitment goals.
+      </p>
+
+      <div class="project-sidebar__divider"></div>
+
+      <div class="project-sidebar__tags">
+        <span class="project-sidebar__tag">Brand Identity</span>
+        <span class="project-sidebar__tag">Experiential</span>
+        <span class="project-sidebar__tag">Campaign</span>
+        <span class="project-sidebar__tag">Video Production</span>
+        <span class="project-sidebar__tag">eSports &amp; Gaming</span>
+        <span class="project-sidebar__tag">Live Events</span>
+      </div>
+
+      <p class="project-sidebar__year">© 2024–2025 PullPin</p>
+    </aside>
+
+    <!-- MEDIA FEED -->
+    <main class="project-feed">
+
+      <!-- VIDEO 1 -->
+      <div class="project-feed__item project-feed__item--video">
+        <video autoplay muted loop playsinline>
+          <source src="../media/work/campaigns/Army/1_Army_Experiential_web.mp4" type="video/mp4" />
+        </video>
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Army Experiential</span>
+          <span class="project-feed__caption-num">01</span>
+        </div>
+      </div>
+
+      <!-- VIDEO 2 -->
+      <div class="project-feed__item project-feed__item--video">
+        <video autoplay muted loop playsinline>
+          <source src="../media/work/campaigns/Army/2_Army_Ultimate_Catch_web.mp4" type="video/mp4" />
+        </video>
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Army Ultimate Catch</span>
+          <span class="project-feed__caption-num">02</span>
+        </div>
+      </div>
+
+      <!-- IMAGE 5 -->
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/Army/5.jpg" alt="U.S. Army Campaign" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Campaign</span>
+          <span class="project-feed__caption-num">03</span>
+        </div>
+      </div>
+
+      <!-- IMAGE 6 -->
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/Army/6.jpg" alt="U.S. Army Brand" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Brand Direction</span>
+          <span class="project-feed__caption-num">04</span>
+        </div>
+      </div>
+
+      <!-- VIDEO 3 -->
+      <div class="project-feed__item project-feed__item--video">
+        <video autoplay muted loop playsinline>
+          <source src="../media/work/campaigns/Army/3_disasterville_sizzle_web.mp4" type="video/mp4" />
+        </video>
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Disasterville — Sizzle Reel</span>
+          <span class="project-feed__caption-num">05</span>
+        </div>
+      </div>
+
+      <!-- IMAGE 7 -->
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/Army/7.jpg" alt="U.S. Army Activation" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Live Activation</span>
+          <span class="project-feed__caption-num">06</span>
+        </div>
+      </div>
+
+      <!-- IMAGE 8 -->
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/Army/8.jpg" alt="U.S. Army eSports" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">eSports Identity</span>
+          <span class="project-feed__caption-num">07</span>
+        </div>
+      </div>
+
+      <!-- VIDEO 4 -->
+      <div class="project-feed__item project-feed__item--video">
+        <video autoplay muted loop playsinline>
+          <source src="../media/work/campaigns/Army/4_US_ARMY_TOR_2025_SIZZLE_web.mp4" type="video/mp4" />
+        </video>
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">TOR 2025 — Sizzle Reel</span>
+          <span class="project-feed__caption-num">08</span>
+        </div>
+      </div>
+
+      <!-- IMAGE 9 -->
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/Army/9.jpg" alt="U.S. Army Marketing" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Marketing</span>
+          <span class="project-feed__caption-num">09</span>
+        </div>
+      </div>
+
+      <!-- IMAGE 10 -->
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/Army/10.jpg" alt="U.S. Army Event" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Event Design</span>
+          <span class="project-feed__caption-num">10</span>
+        </div>
+      </div>
+
+      <!-- IMAGE 11 -->
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/Army/11.jpg" alt="U.S. Army Branding" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Branding</span>
+          <span class="project-feed__caption-num">11</span>
+        </div>
+      </div>
+
+      <!-- IMAGE 12 -->
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/Army/12.jpg" alt="U.S. Army Identity" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Identity System</span>
+          <span class="project-feed__caption-num">12</span>
+        </div>
+      </div>
+
+      <!-- IMAGE 13 -->
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/Army/13.png" alt="U.S. Army Full System" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Full Brand System</span>
+          <span class="project-feed__caption-num">13</span>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- PROJECT FOOTER -->
+  <footer class="project-footer">
+    <span class="project-footer__label">PullPin · 2024–2025</span>
+    <a href="../index.html#work" class="project-footer__back" data-cursor="Back">
+      ← Back to All Work
+    </a>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ---- NAV scroll state ---- */
+      const nav = document.getElementById('nav');
+      window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 60);
+      }, { passive: true });
+
+      /* ---- CUSTOM CURSOR ---- */
+      const cursor      = document.getElementById('cursor');
+      const cursorDot   = cursor.querySelector('.cursor__dot');
+      const cursorRing  = cursor.querySelector('.cursor__ring');
+      const cursorLabel = document.getElementById('cursorLabel');
+
+      let mx = -100, my = -100;
+      let rx = -100, ry = -100;
+
+      document.addEventListener('mousemove', e => {
+        mx = e.clientX; my = e.clientY;
+        cursorDot.style.transform = `translate3d(${mx - 3}px, ${my - 3}px, 0)`;
+      }, { passive: true });
+
+      (function animateCursor() {
+        rx += (mx - rx) * 0.12;
+        ry += (my - ry) * 0.12;
+        const tx = (rx - 18) | 0;
+        const ty = (ry - 18) | 0;
+        cursorRing.style.transform  = `translate3d(${tx}px, ${ty}px, 0)`;
+        cursorLabel.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+        requestAnimationFrame(animateCursor);
+      })();
+
+      document.querySelectorAll('[data-cursor]').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          cursor.classList.add('cursor--hover');
+          cursorLabel.textContent = el.dataset.cursor;
+        });
+        el.addEventListener('mouseleave', () => {
+          cursor.classList.remove('cursor--hover');
+          cursorLabel.textContent = '';
+        });
+      });
+
+      document.querySelectorAll('a, button').forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('cursor--hover'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('cursor--hover'));
+      });
+
+      /* ---- SCROLL REVEAL for feed items ---- */
+      const feedItems = document.querySelectorAll('.project-feed__item');
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            /* play video when it comes into view */
+            const vid = entry.target.querySelector('video');
+            if (vid) vid.play().catch(() => {});
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.06, rootMargin: '0px 0px -60px 0px' });
+
+      feedItems.forEach((el, i) => {
+        el.style.transitionDelay = `${i * 0.04}s`;
+        observer.observe(el);
+      });
+
+      /* ---- Hero bg parallax ---- */
+      const heroBg = document.querySelector('.project-hero__bg img');
+      window.addEventListener('scroll', () => {
+        if (heroBg) {
+          heroBg.style.transform = `scale(1.04) translateY(${window.scrollY * 0.12}px)`;
+        }
+      }, { passive: true });
+
+    })();
+  </script>
+
+</body>
+</html>

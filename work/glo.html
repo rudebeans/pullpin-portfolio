@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GLO, Game Like Objects — PullPin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../project.css" />
+  <style>
+    /* Hero video */
+    .project-hero__bg video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.80;
+    }
+
+    /* Richer dark overlay — game aesthetic */
+    .project-hero__bg::after {
+      background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.5) 55%, rgba(0,0,0,1) 100%) !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CUSTOM CURSOR -->
+  <div class="cursor" id="cursor">
+    <div class="cursor__dot"></div>
+    <div class="cursor__ring"></div>
+  </div>
+  <div class="cursor__label" id="cursorLabel"></div>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <a href="../index.html" class="nav__logo" data-cursor="Home">
+      <span class="nav__name">PullPin.com</span>
+      <span class="nav__role">Creative Direction</span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="../index.html#work">Work</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+    <div class="nav__status">
+      <span>YOUR CREATIVE PARTNER</span>
+    </div>
+  </nav>
+
+  <!-- PROJECT HERO -->
+  <section class="project-hero">
+    <div class="project-hero__bg">
+      <video autoplay muted loop playsinline>
+        <source src="../media/z_early_test_images/GLO_animated_bumper.mp4" type="video/mp4" />
+      </video>
+    </div>
+    <div class="project-hero__content">
+      <p class="project-hero__eyebrow">GLO · Game Dev &amp; Motion</p>
+      <h1 class="project-hero__title">Where gaming<br>culture becomes<br><span class="outline">a brand.</span></h1>
+      <div class="project-hero__meta">
+        <div class="project-hero__meta-item">
+          <span class="project-hero__meta-label">Client</span>
+          <span class="project-hero__meta-value">GLO Game Like Objects</span>
+        </div>
+        <div class="project-hero__meta-item">
+          <span class="project-hero__meta-label">Scope</span>
+          <span class="project-hero__meta-value">Brand Identity · Motion · Game Dev</span>
+        </div>
+        <div class="project-hero__meta-item">
+          <span class="project-hero__meta-label">Year</span>
+          <span class="project-hero__meta-value">2024</span>
+        </div>
+        <div class="project-hero__meta-item">
+          <span class="project-hero__meta-label">Category</span>
+          <span class="project-hero__meta-value">Gaming · Digital · Motion Design</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECT BODY -->
+  <div class="project-body">
+
+    <!-- SIDEBAR -->
+    <aside class="project-sidebar">
+      <a href="../index.html#work" class="project-sidebar__back" data-cursor="Back">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        All Work
+      </a>
+
+      <p class="project-sidebar__num">Project 09</p>
+      <h2 class="project-sidebar__title">GLO Game Like Objects</h2>
+
+      <p class="project-sidebar__desc">
+        GLO isn't just a game — it's a world. We built the brand from the ground up, crafting a visual identity and motion language that lives as comfortably in the UI as it does on a billboard. Bold geometry, electric colour, and a design system engineered to scale across every screen a player touches.
+      </p>
+
+      <p class="project-sidebar__desc">
+        From animated bumpers to in-game asset direction, every touchpoint was designed to signal one thing: this is a brand that plays at the highest level.
+      </p>
+
+      <div class="project-sidebar__divider"></div>
+
+      <div class="project-sidebar__tags">
+        <span class="project-sidebar__tag">Game Dev</span>
+        <span class="project-sidebar__tag">Brand Identity</span>
+        <span class="project-sidebar__tag">Motion Design</span>
+        <span class="project-sidebar__tag">UI / UX</span>
+        <span class="project-sidebar__tag">Art Direction</span>
+        <span class="project-sidebar__tag">Digital</span>
+      </div>
+
+      <p class="project-sidebar__year">© 2024 PullPin</p>
+    </aside>
+
+    <!-- IMAGE FEED -->
+    <main class="project-feed">
+
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/GLO/1.png" alt="GLO — 01" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Brand Identity</span>
+          <span class="project-feed__caption-num">01 / 09</span>
+        </div>
+      </div>
+
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/GLO/2.png" alt="GLO — 02" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Visual System</span>
+          <span class="project-feed__caption-num">02 / 09</span>
+        </div>
+      </div>
+
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/GLO/3.gif" alt="GLO — 03" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Motion Language</span>
+          <span class="project-feed__caption-num">03 / 09</span>
+        </div>
+      </div>
+
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/GLO/4.png" alt="GLO — 04" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Logo System</span>
+          <span class="project-feed__caption-num">04 / 09</span>
+        </div>
+      </div>
+
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/GLO/5.jpg" alt="GLO — 05" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Environment Design</span>
+          <span class="project-feed__caption-num">05 / 09</span>
+        </div>
+      </div>
+
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/GLO/6.png" alt="GLO — 06" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">UI Direction</span>
+          <span class="project-feed__caption-num">06 / 09</span>
+        </div>
+      </div>
+
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/GLO/7.png" alt="GLO — 07" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Color &amp; Typography</span>
+          <span class="project-feed__caption-num">07 / 09</span>
+        </div>
+      </div>
+
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/GLO/8.png" alt="GLO — 08" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Campaign Assets</span>
+          <span class="project-feed__caption-num">08 / 09</span>
+        </div>
+      </div>
+
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/GLO/9.png" alt="GLO — 09" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Full System</span>
+          <span class="project-feed__caption-num">09 / 09</span>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- PROJECT FOOTER -->
+  <footer class="project-footer">
+    <span class="project-footer__label">PullPin · 2024</span>
+    <a href="../index.html#work" class="project-footer__back" data-cursor="Back">
+      ← Back to All Work
+    </a>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const nav = document.getElementById('nav');
+      window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 60);
+      }, { passive: true });
+
+      const cursor      = document.getElementById('cursor');
+      const cursorDot   = cursor.querySelector('.cursor__dot');
+      const cursorRing  = cursor.querySelector('.cursor__ring');
+      const cursorLabel = document.getElementById('cursorLabel');
+
+      let mx = -100, my = -100, rx = -100, ry = -100;
+
+      document.addEventListener('mousemove', e => {
+        mx = e.clientX; my = e.clientY;
+        cursorDot.style.transform = `translate3d(${mx - 3}px, ${my - 3}px, 0)`;
+      }, { passive: true });
+
+      (function animateCursor() {
+        rx += (mx - rx) * 0.12;
+        ry += (my - ry) * 0.12;
+        const tx = (rx - 18) | 0;
+        const ty = (ry - 18) | 0;
+        cursorRing.style.transform  = `translate3d(${tx}px, ${ty}px, 0)`;
+        cursorLabel.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+        requestAnimationFrame(animateCursor);
+      })();
+
+      document.querySelectorAll('[data-cursor]').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          cursor.classList.add('cursor--hover');
+          cursorLabel.textContent = el.dataset.cursor;
+        });
+        el.addEventListener('mouseleave', () => {
+          cursor.classList.remove('cursor--hover');
+          cursorLabel.textContent = '';
+        });
+      });
+
+      document.querySelectorAll('a, button').forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('cursor--hover'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('cursor--hover'));
+      });
+
+      /* Feed scroll reveal */
+      const feedItems = document.querySelectorAll('.project-feed__item');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.06, rootMargin: '0px 0px -60px 0px' });
+
+      feedItems.forEach((el, i) => {
+        el.style.transitionDelay = `${i * 0.04}s`;
+        observer.observe(el);
+      });
+
+      /* Hero video parallax */
+      const heroBgVid = document.querySelector('.project-hero__bg video');
+      window.addEventListener('scroll', () => {
+        if (heroBgVid) heroBgVid.style.transform = `scale(1.04) translateY(${window.scrollY * 0.12}px)`;
+      }, { passive: true });
+
+    })();
+  </script>
+
+</body>
+</html>

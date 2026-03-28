@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brand Identity · PullPin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../project.css" />
+  <style>
+    /* Hero video — brighter than default */
+    .project-hero__bg video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.85;
+    }
+
+    /* Lighten the gradient overlay for video hero */
+    .project-hero__bg::after {
+      background: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.35) 60%, rgba(0,0,0,0.9) 100%) !important;
+    }
+
+    /* 2-column logo grid within the feed */
+    .feed-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+    }
+
+    .feed-grid .project-feed__item {
+      margin: 0;
+    }
+
+    /* Tighter caption for grid items */
+    .feed-grid .project-feed__caption {
+      padding: 10px 0 14px;
+    }
+
+    /* Full-width feature items */
+    .project-feed__item--feature {
+      grid-column: 1 / -1;
+    }
+
+    @media (max-width: 640px) {
+      .feed-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CUSTOM CURSOR -->
+  <div class="cursor" id="cursor">
+    <div class="cursor__dot"></div>
+    <div class="cursor__ring"></div>
+  </div>
+  <div class="cursor__label" id="cursorLabel"></div>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <a href="../index.html" class="nav__logo" data-cursor="Home">
+      <span class="nav__name">PullPin.com</span>
+      <span class="nav__role">Creative Direction</span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="../index.html#work">Work</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+    <div class="nav__status">
+      <span>YOUR CREATIVE PARTNER</span>
+    </div>
+  </nav>
+
+  <!-- PROJECT HERO -->
+  <section class="project-hero">
+    <div class="project-hero__bg">
+      <video autoplay muted loop playsinline>
+        <source src="../media/hero/PullPin_Grenade_1.mp4" type="video/mp4" />
+      </video>
+    </div>
+    <div class="project-hero__content">
+      <p class="project-hero__eyebrow">Brand Identity · Logo Design</p>
+      <h1 class="project-hero__title">From Spark<br><span class="outline">to Impact.</span></h1>
+      <div class="project-hero__meta">
+        <div class="project-hero__meta-item">
+          <span class="project-hero__meta-label">Discipline</span>
+          <span class="project-hero__meta-value">Brand Identity</span>
+        </div>
+        <div class="project-hero__meta-item">
+          <span class="project-hero__meta-label">Scope</span>
+          <span class="project-hero__meta-value">Logo · Identity · System Design</span>
+        </div>
+        <div class="project-hero__meta-item">
+          <span class="project-hero__meta-label">Volume</span>
+          <span class="project-hero__meta-value">33 Projects</span>
+        </div>
+        <div class="project-hero__meta-item">
+          <span class="project-hero__meta-label">Years</span>
+          <span class="project-hero__meta-value">2020–2025</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECT BODY -->
+  <div class="project-body">
+
+    <!-- SIDEBAR -->
+    <aside class="project-sidebar">
+      <a href="../index.html#work" class="project-sidebar__back" data-cursor="Back">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        All Work
+      </a>
+
+      <p class="project-sidebar__num">Project 10</p>
+      <h2 class="project-sidebar__title">Brand Identity</h2>
+
+      <p class="project-sidebar__desc">
+        A collection of brand identity work spanning industries — from spirits and sports to tech, food, and culture. Each mark built to work hard, last long, and feel unmistakably right.
+      </p>
+
+      <div class="project-sidebar__divider"></div>
+
+      <div class="project-sidebar__tags">
+        <span class="project-sidebar__tag">Logo Design</span>
+        <span class="project-sidebar__tag">Brand Identity</span>
+        <span class="project-sidebar__tag">Typography</span>
+        <span class="project-sidebar__tag">Color Systems</span>
+        <span class="project-sidebar__tag">Brand Guidelines</span>
+        <span class="project-sidebar__tag">Packaging</span>
+      </div>
+
+      <p class="project-sidebar__year">© 2020–2025 PullPin</p>
+    </aside>
+
+    <!-- IMAGE FEED — 2-col grid -->
+    <main class="project-feed">
+      <div class="feed-grid">
+
+        <div class="project-feed__item project-feed__item--feature">
+          <img src="../media/work/campaigns/Brand_Identity/1.jpeg" alt="Brand Identity 01" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text">Brand Identity</span>
+            <span class="project-feed__caption-num">01</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/2.png" alt="Brand Identity 02" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">02</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/3.png" alt="Brand Identity 03" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">03</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/4.png" alt="Brand Identity 04" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">04</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/5.jpeg" alt="Brand Identity 05" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">05</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item project-feed__item--feature">
+          <img src="../media/work/campaigns/Brand_Identity/6.png" alt="Brand Identity 06" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">06</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/7.jpeg" alt="Brand Identity 07" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">07</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/8.jpeg" alt="Brand Identity 08" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">08</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/9.jpeg" alt="Brand Identity 09" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">09</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/10.jpeg" alt="Brand Identity 10" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">10</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item project-feed__item--feature">
+          <img src="../media/work/campaigns/Brand_Identity/11.jpeg" alt="Brand Identity 11" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">11</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/12.jpeg" alt="Brand Identity 12" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">12</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/13.jpeg" alt="Brand Identity 13" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">13</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/14.jpeg" alt="Brand Identity 14" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">14</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/15.jpeg" alt="Brand Identity 15" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">15</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item project-feed__item--feature">
+          <img src="../media/work/campaigns/Brand_Identity/16.png" alt="Brand Identity 16" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">16</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/17.jpeg" alt="Brand Identity 17" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">17</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/18.jpeg" alt="Brand Identity 18" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">18</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/19.jpeg" alt="Brand Identity 19" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">19</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/20.jpeg" alt="Brand Identity 20" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">20</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item project-feed__item--feature">
+          <img src="../media/work/campaigns/Brand_Identity/21.jpeg" alt="Brand Identity 21" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">21</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/22.jpeg" alt="Brand Identity 22" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">22</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/23.jpeg" alt="Brand Identity 23" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">23</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/24.jpeg" alt="Brand Identity 24" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">24</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/25.jpeg" alt="Brand Identity 25" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">25</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item project-feed__item--feature">
+          <img src="../media/work/campaigns/Brand_Identity/26.jpeg" alt="Brand Identity 26" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">26</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/27.png" alt="Brand Identity 27" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">27</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/28.png" alt="Brand Identity 28" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">28</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/29.jpeg" alt="Brand Identity 29" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">29</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/30.jpeg" alt="Brand Identity 30" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">30</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item project-feed__item--feature">
+          <img src="../media/work/campaigns/Brand_Identity/31.jpeg" alt="Brand Identity 31" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">31</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/32.jpeg" alt="Brand Identity 32" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">32</span>
+          </div>
+        </div>
+
+        <div class="project-feed__item">
+          <img src="../media/work/campaigns/Brand_Identity/33.jpeg" alt="Brand Identity 33" loading="lazy" />
+          <div class="project-feed__caption">
+            <span class="project-feed__caption-text"></span>
+            <span class="project-feed__caption-num">33</span>
+          </div>
+        </div>
+
+      </div><!-- /feed-grid -->
+    </main>
+  </div>
+
+  <!-- PROJECT FOOTER -->
+  <footer class="project-footer">
+    <span class="project-footer__label">PullPin · 2020–2025</span>
+    <a href="../index.html#work" class="project-footer__back" data-cursor="Back">
+      ← Back to All Work
+    </a>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ---- NAV scroll state ---- */
+      const nav = document.getElementById('nav');
+      window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 60);
+      }, { passive: true });
+
+      /* ---- CUSTOM CURSOR ---- */
+      const cursor      = document.getElementById('cursor');
+      const cursorDot   = cursor.querySelector('.cursor__dot');
+      const cursorRing  = cursor.querySelector('.cursor__ring');
+      const cursorLabel = document.getElementById('cursorLabel');
+
+      let mx = -100, my = -100;
+      let rx = -100, ry = -100;
+
+      document.addEventListener('mousemove', e => {
+        mx = e.clientX; my = e.clientY;
+        cursorDot.style.transform = `translate3d(${mx - 3}px, ${my - 3}px, 0)`;
+      }, { passive: true });
+
+      (function animateCursor() {
+        rx += (mx - rx) * 0.12;
+        ry += (my - ry) * 0.12;
+        const tx = (rx - 18) | 0;
+        const ty = (ry - 18) | 0;
+        cursorRing.style.transform  = `translate3d(${tx}px, ${ty}px, 0)`;
+        cursorLabel.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+        requestAnimationFrame(animateCursor);
+      })();
+
+      document.querySelectorAll('[data-cursor]').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          cursor.classList.add('cursor--hover');
+          cursorLabel.textContent = el.dataset.cursor;
+        });
+        el.addEventListener('mouseleave', () => {
+          cursor.classList.remove('cursor--hover');
+          cursorLabel.textContent = '';
+        });
+      });
+
+      document.querySelectorAll('a, button').forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('cursor--hover'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('cursor--hover'));
+      });
+
+      /* ---- SCROLL REVEAL ---- */
+      const feedItems = document.querySelectorAll('.project-feed__item');
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.04, rootMargin: '0px 0px -40px 0px' });
+
+      feedItems.forEach((el, i) => {
+        el.style.transitionDelay = `${(i % 4) * 0.06}s`;
+        observer.observe(el);
+      });
+
+      /* ---- Hero bg parallax ---- */
+      const heroBg = document.querySelector('.project-hero__bg img');
+      window.addEventListener('scroll', () => {
+        if (heroBg) {
+          heroBg.style.transform = `scale(1.04) translateY(${window.scrollY * 0.12}px)`;
+        }
+      }, { passive: true });
+
+    })();
+  </script>
+
+</body>
+</html>

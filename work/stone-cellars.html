@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stone Cellars Ad Bowl · PullPin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../project.css" />
+</head>
+<body>
+
+  <!-- CUSTOM CURSOR -->
+  <div class="cursor" id="cursor">
+    <div class="cursor__dot"></div>
+    <div class="cursor__ring"></div>
+  </div>
+  <div class="cursor__label" id="cursorLabel"></div>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <a href="../index.html" class="nav__logo" data-cursor="Home">
+      <img src="../media/z_early_test_images/PullPin_Icon.svg" alt="PullPin" class="nav__icon" />
+      <span class="nav__name">PullPin.com</span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="../index.html#work">Work</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+    <div class="nav__status">
+      <span>Creative Direction</span>
+    </div>
+  </nav>
+
+  <!-- PROJECT HERO -->
+  <section class="project-hero">
+    <div class="project-hero__bg">
+      <img src="../media/work/campaigns/Stone_Cellars_Ad_Bowl/Beringer_AdBowl.jpg.webp" alt="Stone Cellars Ad Bowl" id="heroBgImg" />
+    </div>
+    <div class="project-hero__content">
+      <p class="project-hero__eyebrow">Stone Cellars · Campaign · Broadcast</p>
+      <h1 class="project-hero__title">Made for<br>the Biggest<br><span class="outline">Stage.</span></h1>
+      <div class="project-hero__meta">
+        <div class="project-hero__meta-item">
+          <span class="project-hero__meta-label">Client</span>
+          <span class="project-hero__meta-value">Stone Cellars</span>
+        </div>
+        <div class="project-hero__meta-item">
+          <span class="project-hero__meta-label">Scope</span>
+          <span class="project-hero__meta-value">Campaign · Broadcast · Art Direction</span>
+        </div>
+        <div class="project-hero__meta-item">
+          <span class="project-hero__meta-label">Category</span>
+          <span class="project-hero__meta-value">Campaign · Broadcast</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECT BODY -->
+  <div class="project-body">
+
+    <!-- SIDEBAR -->
+    <aside class="project-sidebar">
+      <a href="../index.html#work" class="project-sidebar__back" data-cursor="Back">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        All Work
+      </a>
+
+      <p class="project-sidebar__num">Stone Cellars</p>
+      <h2 class="project-sidebar__title">Ad Bowl Campaign</h2>
+
+      <p class="project-sidebar__desc">
+        A broadcast campaign built for the biggest audience of the year. Stone Cellars needed presence, personality, and a concept that would cut through on the largest stage in advertising — and actually earn its 30 seconds.
+      </p>
+
+      <div class="project-sidebar__divider"></div>
+
+      <div class="project-sidebar__tags">
+        <span class="project-sidebar__tag">Campaign</span>
+        <span class="project-sidebar__tag">Broadcast</span>
+        <span class="project-sidebar__tag">Art Direction</span>
+        <span class="project-sidebar__tag">Creative Direction</span>
+      </div>
+
+      <p class="project-sidebar__year">© PullPin</p>
+    </aside>
+
+    <!-- MEDIA FEED -->
+    <main class="project-feed">
+
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/Stone_Cellars_Ad_Bowl/Beringer_AdBowl.jpg.webp" alt="Stone Cellars Ad Bowl" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Campaign</span>
+          <span class="project-feed__caption-num">01</span>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- PROJECT FOOTER -->
+  <footer class="project-footer">
+    <span class="project-footer__label">PullPin · Stone Cellars Ad Bowl</span>
+    <a href="../index.html#work" class="project-footer__back" data-cursor="Back">
+      ← Back to All Work
+    </a>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const nav = document.getElementById('nav');
+      window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 60);
+      }, { passive: true });
+
+      /* ---- CUSTOM CURSOR ---- */
+      const cursor      = document.getElementById('cursor');
+      const cursorDot   = cursor.querySelector('.cursor__dot');
+      const cursorRing  = cursor.querySelector('.cursor__ring');
+      const cursorLabel = document.getElementById('cursorLabel');
+
+      let mx = -100, my = -100;
+      let rx = -100, ry = -100;
+
+      document.addEventListener('mousemove', e => {
+        mx = e.clientX; my = e.clientY;
+        cursorDot.style.transform = `translate3d(${mx - 3}px, ${my - 3}px, 0)`;
+      }, { passive: true });
+
+      (function animateCursor() {
+        rx += (mx - rx) * 0.12;
+        ry += (my - ry) * 0.12;
+        const tx = (rx - 18) | 0;
+        const ty = (ry - 18) | 0;
+        cursorRing.style.transform  = `translate3d(${tx}px, ${ty}px, 0)`;
+        cursorLabel.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+        requestAnimationFrame(animateCursor);
+      })();
+
+      document.querySelectorAll('[data-cursor]').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          cursor.classList.add('cursor--hover');
+          cursorLabel.textContent = el.dataset.cursor;
+        });
+        el.addEventListener('mouseleave', () => {
+          cursor.classList.remove('cursor--hover');
+          cursorLabel.textContent = '';
+        });
+      });
+
+      document.querySelectorAll('a, button').forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('cursor--hover'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('cursor--hover'));
+      });
+
+      /* ---- SCROLL REVEAL ---- */
+      const feedItems = document.querySelectorAll('.project-feed__item');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.06, rootMargin: '0px 0px -60px 0px' });
+
+      feedItems.forEach((el, i) => {
+        el.style.transitionDelay = `${i * 0.04}s`;
+        observer.observe(el);
+      });
+
+      /* ---- Hero parallax ---- */
+      const heroBg = document.querySelector('.project-hero__bg img');
+      window.addEventListener('scroll', () => {
+        if (heroBg) heroBg.style.transform = `scale(1.04) translateY(${window.scrollY * 0.12}px)`;
+      }, { passive: true });
+
+    })();
+  </script>
+
+</body>
+</html>
