@@ -8,9 +8,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
-  <!-- Three.js + GLTFLoader — self-hosted, no CDN -->
-  <script src="three.min.js"></script>
-  <script src="GLTFLoader.js"></script>
+  <!-- Preload GLB so browser fetches it immediately, in parallel with scripts -->
+  <link rel="preload" href="media/pullpin-logo.glb" as="fetch" crossorigin="anonymous" />
+  <!-- Three.js + GLTFLoader — defer so they don't block page render -->
+  <script src="three.min.js" defer></script>
+  <script src="GLTFLoader.js" defer></script>
 </head>
 <body>
 
@@ -440,7 +442,7 @@
     <div class="cursor__label" id="cursorLabel"></div>
   </div>
 
-  <script src="hero-wireframe.js"></script>
-  <script src="main.js"></script>
+  <script src="hero-wireframe.js" defer></script>
+  <script src="main.js" defer></script>
 </body>
 </html>
