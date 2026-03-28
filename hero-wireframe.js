@@ -246,7 +246,8 @@ window.PullPinWireframe = (function () {
         var cY   = (minY + maxY) * 0.5;
         var cZ   = (minZ + maxZ) * 0.5;
         var span = Math.max(maxY - minY, maxX - minX, 0.001);
-        var sc   = 2.415 / span;
+        var isMobile = window.innerWidth <= 900;
+        var sc   = (isMobile ? 2.415 : 2.898) / span;
 
         edges = raw.map(function (ed) {
           return {
