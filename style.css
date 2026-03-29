@@ -1153,12 +1153,26 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
   body, button, a { cursor: auto; }
 }
 
+/* CTA arrow — SVG keyline inherits text color */
+.hero__cta .arrow,
+.btn-outline .arrow {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
 @media (max-width: 600px) {
   .hero__title { font-size: 48px; }
   .hero__content { left: 24px; bottom: 80px; max-width: calc(100% - 48px); }
   .hero__meta { display: none; }
-  .hero__controls { left: 24px; bottom: 24px; }
-  .hero__counter { right: 24px; bottom: 32px; }
+  /* Hide scroll hint */
+  .hero__scroll-hint { display: none; }
+  /* Move controls to right, level with CTA */
+  .hero__controls { left: auto; right: 24px; bottom: 80px; }
+  /* Hide progress bar and dots — just show ← → on mobile */
+  .hero__progress, .hero__dots { display: none; }
+  /* Counter sits left of the nav buttons */
+  .hero__counter { right: 116px; bottom: 91px; }
   .cluster--d { grid-template-columns: 1fr; }
   .cluster__row { grid-template-columns: 1fr; }
   .module__info--cinema { flex-direction: column; gap: 16px; }
