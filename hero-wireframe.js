@@ -275,8 +275,9 @@ window.PullPinWireframe = (function () {
 
     var W  = canvas.width;
     var H  = canvas.height;
-    var cx = W * 0.66 - 50;
-    var cy = H * 0.54;
+    var mob = window.innerWidth <= 900;
+    var cx = mob ? W * 0.50 : W * 0.66 - 50;
+    var cy = mob ? H * 0.36 : H * 0.54;
     var focal = H * 0.50;
 
     ctx.clearRect(0, 0, W, H);
@@ -437,8 +438,9 @@ window.PullPinWireframe = (function () {
     if (Math.abs(spinVel) > SPARK_THRESHOLD && modelReady) {
       var W  = canvas.width;
       var H  = canvas.height;
-      var cx = W * 0.66 - 50;
-      var cy = H * 0.54;
+      var mob = window.innerWidth <= 900;
+      var cx = mob ? W * 0.50 : W * 0.66 - 50;
+      var cy = mob ? H * 0.36 : H * 0.54;
       var excess = Math.abs(spinVel) - SPARK_THRESHOLD;
       var count  = Math.min(7, Math.ceil(excess * 280));
       spawnParticles(cx, cy, count);
