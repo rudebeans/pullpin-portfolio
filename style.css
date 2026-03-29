@@ -1170,6 +1170,10 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
   .hero__progress, .hero__dots { display: none; }
   /* Counter sits left of the nav buttons */
   .hero__counter { right: 116px; bottom: 91px; }
+  /* All tiles full-width — reset cluster__col back to column stacking */
+  .cluster__col { flex-direction: column; }
+  .cluster__col > .module,
+  .cluster__row > .module { width: 100%; }
   .cluster--d { grid-template-columns: 1fr; }
   .cluster__row { grid-template-columns: 1fr; }
   .module__info--cinema { flex-direction: column; gap: 16px; }
