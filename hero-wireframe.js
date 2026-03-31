@@ -500,6 +500,22 @@ window.PullPinWireframe = (function () {
   }
 
   /* ============================================================
+     CANVAS SIZING — single source of truth
+     Uses getBoundingClientRect for accuracy during layout flux.
+     ============================================================ */
+  function syncCanvasSize() {
+    if (!canvas) return;
+    var hero = document.getElementById('hero');
+    var rect = hero ? hero.getBoundingClientRect() : null;
+    var W = (rect && rect.width  > 1) ? Math.round(rect.width)  : window.innerWidth;
+    var H = (rect && rect.height > 1) ? Math.round(rect.height) : window.innerHeight;
+    if (canvas.width !== W || canvas.height !== H) {
+      canvas.width  = W;
+      canvas.height = H;
+    }
+  }
+
+  /* ============================================================
      INIT
      ============================================================ */
   function doInit() {
@@ -513,11 +529,13 @@ window.PullPinWireframe = (function () {
     canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;';
     mount.appendChild(canvas);
 
-    var hero = document.getElementById('hero');
-    var W = (hero && hero.offsetWidth  > 0) ? hero.offsetWidth  : window.innerWidth;
-    var H = (hero && hero.offsetHeight > 0) ? hero.offsetHeight : window.innerHeight;
-    canvas.width  = W;
-    canvas.height = H;
+    /* Size canvas accurately — defer one rAF so layout is settled */
+    syncCanvasSize();
+    requestAnimationFrame(syncCanvasSize);
+
+    /* Belt-and-suspenders: catch late reflows (fonts, images settling) */
+    setTimeout(syncCanvasSize, 150);
+    setTimeout(syncCanvasSize, 600);
 
     ctx = canvas.getContext('2d');
     if (!ctx) {
@@ -575,12 +593,13 @@ window.PullPinWireframe = (function () {
       }
     });
 
-    /* ---- Resize ---- */
-    window.addEventListener('resize', function () {
-      var h = document.getElementById('hero');
-      canvas.width  = h ? h.offsetWidth  : window.innerWidth;
-      canvas.height = h ? h.offsetHeight : window.innerHeight;
-    });
+    /* ---- Resize: window event + ResizeObserver on hero ---- */
+    window.addEventListener('resize', syncCanvasSize);
+
+    var hero = document.getElementById('hero');
+    if (hero && window.ResizeObserver) {
+      new ResizeObserver(syncCanvasSize).observe(hero);
+    }
 
     loadModel();
     return true;
