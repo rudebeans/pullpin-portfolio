@@ -191,7 +191,7 @@ window.PullPinWireframe = (function () {
 
     var loader = new THREE.GLTFLoader();
     loader.load(
-      'media/pullpin-logo.glb',
+      'media/pullpin-logo-v2.glb',
 
       function (gltf) {
         var raw     = [];
