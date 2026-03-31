@@ -274,7 +274,6 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
   bottom: 120px;
   left: 80px;
   z-index: 3;
-  max-width: 700px;
 }
 
 .hero__eyebrow {
@@ -283,6 +282,7 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
   text-transform: uppercase;
   color: var(--muted);
   margin-bottom: 24px;
+  max-width: 600px;
   opacity: 0;
   transform: translateY(16px);
   transition: opacity 0.8s 0.1s var(--ease-out), transform 0.8s 0.1s var(--ease-out);
@@ -329,6 +329,7 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
   color: var(--muted);
   letter-spacing: 0.02em;
   margin-bottom: 36px;
+  max-width: 600px;
   opacity: 0;
   transform: translateY(16px);
   transition: opacity 0.8s 0.45s var(--ease-out), transform 0.8s 0.45s var(--ease-out);
