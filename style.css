@@ -551,6 +551,33 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
 }
 
 /* ============================================
+   CLIENT LOGO TICKER
+   ============================================ */
+.logo-ticker {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 28px 0;
+  overflow: hidden;
+  background: var(--off-black);
+}
+
+.logo-ticker__track {
+  display: flex;
+  align-items: center;
+  gap: 72px;
+  white-space: nowrap;
+  animation: ticker 40s linear infinite;
+}
+
+.logo-ticker__logo {
+  height: 22px;
+  width: auto;
+  flex-shrink: 0;
+  filter: brightness(0) invert(1);
+  opacity: 0.28;
+}
+
+/* ============================================
    WORK SECTION
    ============================================ */
 .work {
