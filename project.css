@@ -247,8 +247,7 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
 
 /* Outlined accent line — mirrors landing page hero__line--accent */
 .project-hero__title .outline {
-  color: transparent;
-  -webkit-text-stroke: 1.5px var(--white);
+  color: var(--white);
   display: block;
 }
 

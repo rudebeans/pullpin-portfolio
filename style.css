@@ -320,8 +320,7 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
 .hero__slide.active .hero__line:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 0.35s; }
 
 .hero__line--accent {
-  color: transparent;
-  -webkit-text-stroke: 1.5px var(--white);
+  color: var(--white);
 }
 
 .hero__desc {
@@ -975,8 +974,7 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
 
 .about__heading em {
   font-style: normal;
-  color: transparent;
-  -webkit-text-stroke: 1px var(--white);
+  color: var(--white);
 }
 
 .about__right {
