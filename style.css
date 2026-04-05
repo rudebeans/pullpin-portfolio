@@ -1185,6 +1185,7 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
 }
 
 @media (max-width: 600px) {
+  .hero__img--chuckle { object-position: 40% center; }
   .hero__title { font-size: 48px; }
   .hero__content { left: 24px; bottom: 80px; max-width: calc(100% - 48px); }
   .hero__meta { display: none; }
