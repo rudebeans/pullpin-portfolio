@@ -22,17 +22,18 @@
   document.addEventListener('mousemove', e => {
     mx = e.clientX;
     my = e.clientY;
-    cursorDot.style.transform = `translate3d(${mx - 3}px, ${my - 3}px, 0)`;
+    cursorDot.style.left = `${mx}px`;
+    cursorDot.style.top  = `${my}px`;
   }, { passive: true });
 
-  // Smooth ring follow — translate3d keeps it on GPU, no calc() string parsing
+  // Smooth ring follow — left/top + CSS translate(-50%,-50%) centers at any size
   function animateCursor() {
     rx += (mx - rx) * 0.12;
     ry += (my - ry) * 0.12;
-    const tx = (rx - 18) | 0;
-    const ty = (ry - 18) | 0;
-    cursorRing.style.transform  = `translate3d(${tx}px, ${ty}px, 0)`;
-    cursorLabel.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+    cursorRing.style.left  = `${(rx) | 0}px`;
+    cursorRing.style.top   = `${(ry) | 0}px`;
+    cursorLabel.style.left = `${(rx) | 0}px`;
+    cursorLabel.style.top  = `${(ry) | 0}px`;
     requestAnimationFrame(animateCursor);
   }
   animateCursor();
