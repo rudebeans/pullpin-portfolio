@@ -190,8 +190,16 @@ window.PullPinWireframe = (function () {
     }
 
     var loader = new THREE.GLTFLoader();
+
+    // grenade-v2.glb is Draco-compressed — wire up the decoder if available
+    if (THREE.DRACOLoader) {
+      var draco = new THREE.DRACOLoader();
+      draco.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+      loader.setDRACOLoader(draco);
+    }
+
     loader.load(
-      'media/pullpin-logo-v2.glb',
+      'media/grenade-v2.glb',
 
       function (gltf) {
         var raw     = [];
@@ -207,7 +215,7 @@ window.PullPinWireframe = (function () {
           child.updateWorldMatrix(true, false);
           var e = child.matrixWorld.elements;
 
-          var threshold = (part === 1) ? 1 : 15;
+          var threshold = 1;   // low threshold: captures all edges on smooth/curved surfaces
           var edgeGeo   = new THREE.EdgesGeometry(child.geometry, threshold);
           var pos       = edgeGeo.attributes.position;
 
