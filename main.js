@@ -52,7 +52,13 @@
 
   document.querySelectorAll('a, button').forEach(el => {
     el.addEventListener('mouseenter', () => cursor.classList.add('cursor--hover'));
-    el.addEventListener('mouseleave', () => cursor.classList.remove('cursor--hover'));
+    el.addEventListener('mouseleave', () => {
+      // Don't remove hover if we're still inside a [data-cursor] card —
+      // the card's own mouseleave will handle it when the cursor truly leaves
+      if (!el.closest('[data-cursor]')) {
+        cursor.classList.remove('cursor--hover');
+      }
+    });
   });
 
   /* ---- HERO BANNER ROTATOR ---- */
