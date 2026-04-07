@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Red Rocket · PullPin</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="../media/favicon/PullPin_Favicon_32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="../media/favicon/PullPin_Favicon_16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../media/favicon/PullPin_Favicon_180x180.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="PullPin" />
+  <meta property="og:title" content="PullPin — Creative Direction &amp; Design" />
+  <meta property="og:description" content="Brand identity, experiential design, campaigns, and creative direction across sports, gaming, lifestyle and beyond." />
+  <meta property="og:image" content="https://pullpin.com/media/og/pullpin-og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:url" content="https://pullpin.com/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://pullpin.com/media/og/pullpin-og.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../project.css" />
+  <style>
+    .project-hero__bg img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+      opacity: 0.75;
+      transform-origin: center center;
+      will-change: transform;
+    }
+
+    .project-hero__bg::after {
+      background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,1) 100%) !important;
+    }
+
+    /* Live site CTA in sidebar */
+    .project-sidebar__link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 24px;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 10px 18px;
+      border-radius: 2px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .project-sidebar__link:hover {
+      border-color: var(--white);
+      background: rgba(255,255,255,0.05);
+    }
+    .project-sidebar__link svg {
+      width: 11px;
+      height: 11px;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CUSTOM CURSOR -->
+  <div class="cursor" id="cursor">
+    <div class="cursor__dot"></div>
+    <div class="cursor__ring"></div>
+  </div>
+  <div class="cursor__label" id="cursorLabel"></div>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <a href="../index.html" class="nav__logo" data-cursor="Home">
+      <img src="../media/z_early_test_images/PullPin_Icon.svg" alt="PullPin" class="nav__icon" />
+      <span class="nav__name">PullPin.com</span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="../projects.html">Work</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+    <div class="nav__status">
+      <span>Creative Direction</span>
+    </div>
+  </nav>
+
+  <!-- PROJECT HERO -->
+  <section class="project-hero">
+    <div class="project-hero__bg" id="heroBg">
+      <img src="../media/work/campaigns/RedRocket/Red_Rocket_Project_Tile.png" alt="Red Rocket" id="heroBgImg" />
+    </div>
+    <div class="project-hero__content">
+      <p class="project-hero__eyebrow">Red Rocket · Web Design &amp; Digital</p>
+      <h1 class="project-hero__title">Blast off into<br><span class="outline" style="white-space:nowrap">the universe of $REDRKT.</span></h1>
+      <div class="project-hero__meta">
+        <div class="project-hero__meta-item">
+          <span class="project-hero__meta-label">Client</span>
+          <span class="project-hero__meta-value">Red Rocket</span>
+        </div>
+        <div class="project-hero__meta-item">
+          <span class="project-hero__meta-label">Scope</span>
+          <span class="project-hero__meta-value">Web Design · Digital · Brand</span>
+        </div>
+        <div class="project-hero__meta-item">
+          <span class="project-hero__meta-label">Year</span>
+          <span class="project-hero__meta-value">2024</span>
+        </div>
+        <div class="project-hero__meta-item">
+          <span class="project-hero__meta-label">Category</span>
+          <span class="project-hero__meta-value">Web3 · Digital · Art Direction</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECT BODY -->
+  <div class="project-body">
+
+    <!-- SIDEBAR -->
+    <aside class="project-sidebar">
+      <a href="../projects.html" class="project-sidebar__back" data-cursor="Back">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        All Work
+      </a>
+
+      <p class="project-sidebar__num">Red Rocket</p>
+      <h2 class="project-sidebar__title">Red Rocket, Web Design &amp; Digital Campaign</h2>
+
+      <p class="project-sidebar__desc">
+        Red Rocket ($REDRKT) is a meme-powered Solana token built around Captain Chuck Borris and his crew of Pawsmonauts — an ever-expanding universe of characters, gaming experiences, and collectible cosmic lore. The brand lives at the intersection of Web3 culture, retro gaming, and community-first storytelling.
+      </p>
+
+      <p class="project-sidebar__desc">
+        Our work covered the full digital presence: site architecture, visual design, and art direction — translating the brand's playful-yet-ambitious identity into a fast, immersive web experience. From the hero splash and tokenomics sections to the Red Rocket League game teaser and MoonDrops loyalty system, every screen was designed to make holders feel like they were already aboard the ship.
+      </p>
+
+      <div class="project-sidebar__divider"></div>
+
+      <div class="project-sidebar__tags">
+        <span class="project-sidebar__tag">Web Design</span>
+        <span class="project-sidebar__tag">Art Direction</span>
+        <span class="project-sidebar__tag">Digital</span>
+        <span class="project-sidebar__tag">Web3</span>
+        <span class="project-sidebar__tag">Brand</span>
+        <span class="project-sidebar__tag">UI/UX</span>
+      </div>
+
+      <a href="https://redrocketmeme.com" target="_blank" rel="noopener" class="project-sidebar__link" data-cursor="Visit">
+        Visit Site
+        <svg viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+
+      <p class="project-sidebar__year">© 2024 PullPin</p>
+    </aside>
+
+    <!-- IMAGE FEED -->
+    <main class="project-feed">
+
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/RedRocket/Red_Rocket_Project_Tile.png" alt="Red Rocket — Overview" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Site Overview</span>
+          <span class="project-feed__caption-num">01 / 04</span>
+        </div>
+      </div>
+
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/RedRocket/ProjectImages/RedRocket1.png" alt="Red Rocket — 02" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Welcome to the Universe of $REDRKT</span>
+          <span class="project-feed__caption-num">02 / 04</span>
+        </div>
+      </div>
+
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/RedRocket/ProjectImages/RedRocket2.png" alt="Red Rocket — 03" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Red Rocket League · Game Design</span>
+          <span class="project-feed__caption-num">03 / 04</span>
+        </div>
+      </div>
+
+      <div class="project-feed__item">
+        <img src="../media/work/campaigns/RedRocket/ProjectImages/RedRocket3.png" alt="Red Rocket — 04" loading="lazy" />
+        <div class="project-feed__caption">
+          <span class="project-feed__caption-text">Hold Strong · MoonDrops &amp; Rewards</span>
+          <span class="project-feed__caption-num">04 / 04</span>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- PROJECT FOOTER -->
+  <footer class="project-footer">
+    <span class="project-footer__label">PullPin · 2024</span>
+    <a href="../projects.html" class="project-footer__back" data-cursor="Back">
+      ← Back to All Work
+    </a>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const nav = document.getElementById('nav');
+      window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 60);
+      }, { passive: true });
+
+      const cursor      = document.getElementById('cursor');
+      const cursorDot   = cursor.querySelector('.cursor__dot');
+      const cursorRing  = cursor.querySelector('.cursor__ring');
+      const cursorLabel = document.getElementById('cursorLabel');
+
+      let mx = -100, my = -100, rx = -100, ry = -100;
+
+      document.addEventListener('mousemove', e => {
+        mx = e.clientX; my = e.clientY;
+        cursorDot.style.transform = `translate3d(${mx - 3}px, ${my - 3}px, 0)`;
+      }, { passive: true });
+
+      (function animateCursor() {
+        rx += (mx - rx) * 0.12;
+        ry += (my - ry) * 0.12;
+        const tx = (rx - 18) | 0;
+        const ty = (ry - 18) | 0;
+        cursorRing.style.transform  = `translate3d(${tx}px, ${ty}px, 0)`;
+        cursorLabel.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+        requestAnimationFrame(animateCursor);
+      })();
+
+      document.querySelectorAll('[data-cursor]').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          cursor.classList.add('cursor--hover');
+          cursorLabel.textContent = el.dataset.cursor;
+        });
+        el.addEventListener('mouseleave', () => {
+          cursor.classList.remove('cursor--hover');
+          cursorLabel.textContent = '';
+        });
+      });
+
+      document.querySelectorAll('a, button').forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('cursor--hover'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('cursor--hover'));
+      });
+
+      /* Feed scroll reveal */
+      const feedItems = document.querySelectorAll('.project-feed__item');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.06, rootMargin: '0px 0px -60px 0px' });
+
+      feedItems.forEach((el, i) => {
+        el.style.transitionDelay = `${i * 0.04}s`;
+        observer.observe(el);
+      });
+
+      /* Hero image parallax */
+      const heroBgImg = document.getElementById('heroBgImg');
+      window.addEventListener('scroll', () => {
+        if (heroBgImg) heroBgImg.style.transform = `scale(1.06) translateY(${window.scrollY * 0.12}px)`;
+      }, { passive: true });
+
+    })();
+  </script>
+
+</body>
+</html>
