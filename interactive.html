@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Oracle — PullPin</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="media/favicon/PullPin_Favicon_32x32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="preload" href="media/grenade-v2.glb" as="fetch" crossorigin="anonymous" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #060606; height: 100vh; overflow: hidden;
+      font-family: 'Space Grotesk', sans-serif; user-select: none; cursor: none;
+    }
+    a { cursor: none; }
+
+    /* ── Navigation ── */
+    #nav {
+      position: fixed; top: 0; left: 0; right: 0; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; z-index: 50; pointer-events: none;
+    }
+    #nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; color: rgba(255,255,255,0.7);
+      font-size: 13px; font-weight: 500; letter-spacing: 0.04em;
+      pointer-events: auto; transition: color 0.2s;
+    }
+    #nav-logo:hover { color: #fff; }
+    #nav-logo img { width: 28px; height: 28px; object-fit: contain; }
+    #nav-back {
+      font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3); text-decoration: none;
+      pointer-events: auto; transition: color 0.2s;
+    }
+    #nav-back:hover { color: rgba(255,255,255,0.7); }
+
+    /* ── Canvas ── */
+    canvas {
+      display: block; position: fixed; inset: 0;
+      width: 100%; height: 100%; touch-action: none;
+    }
+
+    /* ── Hint ── */
+    #ui {
+      position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3); pointer-events: none;
+      transition: opacity 0.8s; text-align: center; white-space: nowrap; z-index: 20;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    #ui.hidden { opacity: 0; }
+
+    /* ── Countdown ── */
+    #countdown {
+      position: fixed; inset: 0; display: flex;
+      align-items: center; justify-content: center;
+      pointer-events: none; z-index: 30; opacity: 0;
+      transition: opacity 0.15s;
+    }
+    #countdown.show { opacity: 1; }
+    #countdown-num {
+      font-size: clamp(100px, 28vh, 300px); font-weight: 700;
+      line-height: 1; letter-spacing: -0.05em; color: #fff8e0;
+      text-shadow: 0 0 100px rgba(255,215,70,1), 0 0 50px rgba(255,180,40,.8), 0 0 20px rgba(255,140,20,.5);
+      transform: scale(1.5); opacity: 0;
+      transition: transform 0.12s cubic-bezier(0.22,1,0.36,1), opacity 0.14s ease;
+    }
+    #countdown-num.pop  { transform: scale(1); opacity: 1; }
+    #countdown-num.fade { opacity: 0; transform: scale(0.82);
+      transition: transform 0.2s ease-in, opacity 0.2s ease-in; }
+
+    /* ── Fortune ── */
+    #fortune {
+      position: fixed; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      pointer-events: none; z-index: 25;
+      opacity: 0; transition: opacity 1.2s cubic-bezier(0.16,1,0.3,1);
+      padding: 40px; text-align: center;
+    }
+    #fortune.show { opacity: 1; pointer-events: auto; }
+    #fortune-eyebrow {
+      font-size: 10px; letter-spacing: 0.32em; text-transform: uppercase;
+      color: rgba(255,255,255,0.3); margin-bottom: 28px;
+    }
+    #fortune-rule {
+      width: 40px; height: 1px; background: rgba(255,255,255,0.15);
+      margin: 0 auto 36px;
+    }
+    #fortune-text {
+      font-size: clamp(20px, 3.2vw, 44px); font-weight: 300;
+      line-height: 1.35; letter-spacing: -0.01em;
+      color: rgba(255,255,255,0.92); max-width: 680px;
+      margin-bottom: 36px;
+    }
+    #fortune-tag {
+      font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+    }
+
+    /* ── Pull Again ── */
+    #reset-btn {
+      position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+      padding: 12px 32px; border: 1px solid rgba(255,255,255,0.25);
+      background: transparent; color: rgba(255,255,255,0.6);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      cursor: none; display: none; opacity: 0;
+      transition: opacity 0.5s, border-color 0.3s, color 0.3s; z-index: 30;
+    }
+    #reset-btn.visible { opacity: 1; }
+    #reset-btn:hover { border-color: rgba(255,255,255,0.7); color: #fff; }
+
+    /* ── Loading ── */
+    #loading {
+      position: fixed; inset: 0; display: flex; align-items: center;
+      justify-content: center; flex-direction: column; gap: 16px;
+      z-index: 40; transition: opacity 0.6s;
+    }
+    #loading.gone { opacity: 0; pointer-events: none; }
+    #loading-bar-wrap { width: 200px; height: 2px; background: rgba(255,255,255,0.1); }
+    #loading-bar { height: 100%; width: 0%; background: rgba(255,235,140,0.8); transition: width 0.3s; }
+    #loading-text {
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+    }
+
+    /* ── Custom cursor ── */
+    #cursor { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999; }
+    #cursor-dot {
+      position: absolute; width: 6px; height: 6px;
+      background: #fff; border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s, opacity 0.2s;
+    }
+    #cursor-ring {
+      position: absolute; width: 36px; height: 36px;
+      border: 1px solid rgba(255,255,255,0.55); border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.35s cubic-bezier(0.16,1,0.3,1),
+                  height 0.35s cubic-bezier(0.16,1,0.3,1), border-color 0.3s;
+    }
+    body.cursor-hover #cursor-ring { width: 72px; height: 72px; border-color: rgba(255,255,255,0.8); }
+    body.cursor-hover #cursor-dot  { transform: translate(-50%,-50%) scale(0); }
+  </style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div id="cursor">
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+</div>
+
+<!-- Nav -->
+<nav id="nav">
+  <a href="index.html" id="nav-logo">
+    <img src="media/z_early_test_images/PullPin_Icon.svg" alt="PullPin" />
+    <span>PullPin.com</span>
+  </a>
+  <a href="index.html" id="nav-back">← Home</a>
+</nav>
+
+<canvas id="c"></canvas>
+
+<div id="loading">
+  <div id="loading-text">Loading…</div>
+  <div id="loading-bar-wrap"><div id="loading-bar"></div></div>
+</div>
+
+<div id="countdown"><span id="countdown-num">3</span></div>
+
+<div id="fortune">
+  <p id="fortune-eyebrow">The Pin Has Spoken</p>
+  <div id="fortune-rule"></div>
+  <p id="fortune-text"></p>
+  <p id="fortune-tag"></p>
+</div>
+
+<div id="ui">Make a wish &nbsp;·&nbsp; Pull the Pin</div>
+<button id="reset-btn">↺ &nbsp;Pull Again</button>
+
+<!-- CDN Three.js + Draco (ES modules) -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader }  from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+
+'use strict';
+
+// ─── DOM ──────────────────────────────────────────────────────
+const canvas       = document.getElementById('c');
+const ctx          = canvas.getContext('2d');
+const ui           = document.getElementById('ui');
+const resetBtn     = document.getElementById('reset-btn');
+const countdownEl  = document.getElementById('countdown');
+const countdownNum = document.getElementById('countdown-num');
+const loadingEl    = document.getElementById('loading');
+const loadingBar   = document.getElementById('loading-bar');
+const fortuneEl    = document.getElementById('fortune');
+const fortuneText  = document.getElementById('fortune-text');
+const fortuneTag   = document.getElementById('fortune-tag');
+const cursorDot    = document.getElementById('cursor-dot');
+const cursorRing   = document.getElementById('cursor-ring');
+
+// ─── Custom cursor ────────────────────────────────────────────
+let cmx=-100, cmy=-100, crx=-100, cry=-100;
+document.addEventListener('mousemove', e => {
+  cmx=e.clientX; cmy=e.clientY;
+  cursorDot.style.left=`${cmx}px`; cursorDot.style.top=`${cmy}px`;
+}, { passive:true });
+(function animCursor() {
+  crx+=(cmx-crx)*0.12; cry+=(cmy-cry)*0.12;
+  cursorRing.style.left=`${crx|0}px`; cursorRing.style.top=`${cry|0}px`;
+  requestAnimationFrame(animCursor);
+})();
+
+// ─── Fortune pool ─────────────────────────────────────────────
+const FORTUNES = [
+  { text: "The idea you keep doubting is the one they'll remember.",        tag: "● Signs Point to Yes"    },
+  { text: "Pull harder. The best work always resists at first.",            tag: "● Outlook Positive"      },
+  { text: "The client doesn't know what they want yet. Show them.",         tag: "● It Is Certain"         },
+  { text: "This one goes in the portfolio.",                                tag: "● Without a Doubt"       },
+  { text: "The brief hasn't arrived yet. Keep the pin ready.",              tag: "● Reply Hazy, Try Again" },
+  { text: "Something is about to shift. Be ready.",                         tag: "● Cannot Predict Now"    },
+  { text: "Ask again after the next round of revisions.",                   tag: "● Outlook Uncertain"     },
+  { text: "The answer is already in the room.",                             tag: "● It Is Decidedly So"    },
+  { text: "Not every grenade is meant to go off today.",                    tag: "● Don't Count on It"     },
+  { text: "The concept is stronger than you think. Trust the instinct.",    tag: "● You May Rely on It"    },
+  { text: "Don't overthink it. You never did before.",                      tag: "● Signs Point to Yes"    },
+  { text: "The universe is still in revision. Ship anyway.",                tag: "● Better Not Tell Now"   },
+  { text: "The pin has spoken. The rest is execution.",                     tag: "● It Is Certain"         },
+  { text: "Green light. The timing is right and the work is ready.",        tag: "● Without a Doubt"       },
+  { text: "Someone in that room needs exactly what you're about to pitch.", tag: "● Most Likely"           },
+  { text: "The best campaigns are never fully approved. They're detonated.",tag: "● Outlook Positive"      },
+];
+let fortuneShown = false;
+
+function resize() { canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+// ─── State machine ────────────────────────────────────────────
+const S = { IDLE:0, HOVER_PIN:1, PULLING:2, COUNTDOWN:3, EXPLODING:4, DONE:5 };
+let state = S.IDLE;
+
+// ─── Orbit ────────────────────────────────────────────────────
+let rotY=0.5, rotX=-0.10;
+let isDragging=false, lastX=0, lastY=0;
+let velX=0, velY=0;
+const DRAG_SENS=0.006, INERTIA=0.94, AUTO_SPIN=0.0015;
+
+// ─── Pull ─────────────────────────────────────────────────────
+const MAX_PULL=120;
+let pullStartX=0, pullStartY=0, pullDX=0, pullDY=0, pullProgress=0, isPulling=false;
+
+// ─── 3D math ──────────────────────────────────────────────────
+let _cosY=1, _sinY=0, _cosX=1, _sinX=0;
+const CAM_Z=2.8;
+
+// ─── Parts registry ───────────────────────────────────────────
+const PARTS = {
+  bulb:    { name:'Mesh_Bulb',    edges:[], ox:0, oy:0, vx:0, vy:0, alpha:1, flying:false, edgeThresh:1 },
+  cradle:  { name:'Mesh_Cradle',  edges:[], ox:0, oy:0, vx:0, vy:0, alpha:1, flying:false, edgeThresh:1 },
+  pullpin: { name:'Mesh_Pullpin', edges:[], ox:0, oy:0, vx:0, vy:0, alpha:1, flying:false, edgeThresh:1 },
+  spoon:   { name:'Mesh_Spoon',   edges:[], ox:0, oy:0, vx:0, vy:0, alpha:1, flying:false, edgeThresh:8, spin:0, spinV:0 },
+};
+
+let modelHue=0, modelSat=0, lastAmbientT=0;
+let pinHitX=0, pinHitY=0, pinHitR=0;
+let pullDirX=1, pullDirY=0, bodyCentX=0, bodyCentY=0;
+let modelReady=false;
+let explodeT0=0;
+const FLASH_DUR=280, BULB_DUR=600;
+let resetShown=false;
+let particles=[], shockwaves=[];
+
+function sp(p) { if (particles.length<4000) particles.push(p); }
+
+function spawnExplosion(cx,cy) {
+  particles=[]; shockwaves=[];
+  for (let i=0;i<72;i++) {
+    const a=(i/72)*Math.PI*2, spd=24+Math.random()*24;
+    sp({x:cx,y:cy,px:cx,py:cy,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,life:1,decay:.020+Math.random()*.012,hue:32+Math.random()*36,size:3.5+Math.random()*3,depth:0,spawned:false});
+  }
+  for (let i=0;i<56;i++) {
+    const a=((i+.5)/56)*Math.PI*2, spd=14+Math.random()*16;
+    sp({x:cx,y:cy,px:cx,py:cy,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,life:.9+Math.random()*.1,decay:.022+Math.random()*.014,hue:20+Math.random()*55,size:2+Math.random()*2.5,depth:0,spawned:false});
+  }
+  for (let i=0;i<48;i++) {
+    const a=Math.random()*Math.PI*2, spd=5+Math.random()*10;
+    sp({x:cx+(Math.random()-.5)*80,y:cy+(Math.random()-.5)*80,px:cx,py:cy,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd-1,life:1,decay:.012+Math.random()*.010,hue:48+Math.random()*42,size:2+Math.random()*2.5,depth:1,spawned:true});
+  }
+  const now=performance.now(), diag=Math.hypot(canvas.width,canvas.height);
+  shockwaves.push({cx,cy,t0:now,    dur:600, maxR:diag*.60});
+  shockwaves.push({cx,cy,t0:now+120,dur:800, maxR:diag*.80});
+  shockwaves.push({cx,cy,t0:now+260,dur:1000,maxR:diag*.96});
+}
+
+function spawnChildren(p) {
+  if (p.depth>=3) return;
+  const ba=Math.atan2(p.vy,p.vx), sp2=p.depth===0?.36:.50;
+  const spd=Math.sqrt(p.vx*p.vx+p.vy*p.vy)*(.55+Math.random()*.25);
+  for (let i=0;i<2;i++) {
+    const a=ba+(i===0?sp2:-sp2)+(Math.random()-.5)*.22;
+    sp({x:p.x,y:p.y,px:p.x,py:p.y,vx:Math.cos(a)*spd,vy:Math.sin(a)*spd,life:.78+Math.random()*.22,decay:.022+Math.random()*.012,hue:(p.hue+(Math.random()-.5)*45+360)%360,size:p.size*.60,depth:p.depth+1,spawned:false});
+  }
+}
+
+function updateParticles() {
+  for (let i=particles.length-1;i>=0;i--) {
+    const p=particles[i];
+    p.px=p.x; p.py=p.y; p.x+=p.vx; p.y+=p.vy;
+    p.vx*=.955; p.vy*=.955; p.vy+=.12; p.life-=p.decay;
+    if (!p.spawned&&p.life<.48) { p.spawned=true; spawnChildren(p); }
+    if (p.life<=0) particles.splice(i,1);
+  }
+}
+
+function drawParticles() {
+  if (!particles.length) return;
+  ctx.save(); ctx.globalCompositeOperation='lighter'; ctx.shadowBlur=0;
+  for (const p of particles) {
+    const a=Math.max(0,p.life*p.life), r=p.size*Math.max(.2,p.life), hR=Math.round(p.hue);
+    const dx=p.x-p.px, dy=p.y-p.py;
+    if (dx*dx+dy*dy>.2) {
+      ctx.globalAlpha=a*.7; ctx.strokeStyle=`hsl(${hR},98%,72%)`;
+      ctx.lineWidth=r*.85; ctx.beginPath(); ctx.moveTo(p.px,p.py); ctx.lineTo(p.x,p.y); ctx.stroke();
+    }
+    ctx.globalAlpha=a; ctx.fillStyle=`hsl(${hR},60%,98%)`;
+    ctx.beginPath(); ctx.arc(p.x,p.y,r*.48,0,Math.PI*2); ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawShockwaves(now) {
+  if (!shockwaves.length) return;
+  ctx.save(); ctx.globalCompositeOperation='lighter';
+  for (let i=shockwaves.length-1;i>=0;i--) {
+    const s=shockwaves[i], el=now-s.t0; if (el<0) continue;
+    const t=Math.min(1,el/s.dur);
+    if (t>=1) { shockwaves.splice(i,1); continue; }
+    const r=t*s.maxR, alp=Math.pow(1-t,1.8)*.6, lw=(1-t*.85)*3.5;
+    ctx.strokeStyle=`rgba(255,215,90,${alp})`; ctx.shadowColor=`rgba(255,190,60,${alp*.9})`;
+    ctx.shadowBlur=20; ctx.lineWidth=lw; ctx.globalAlpha=1;
+    ctx.beginPath(); ctx.arc(s.cx,s.cy,r,0,Math.PI*2); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawPart(pt,focal,cx,cy) {
+  if (!pt.edges.length) return;
+  const BUCKETS=6, maxScale=focal/Math.max(CAM_Z-1.2,.001);
+  const paths=Array.from({length:BUCKETS},()=>[]);
+  const isPullPin=(pt===PARTS.pullpin);
+  const ox=pt.ox+(isPullPin?pullDX*pullProgress:0);
+  const oy=pt.oy+(isPullPin?pullDY*pullProgress:0);
+  let scMinX=Infinity,scMaxX=-Infinity,scMinY=Infinity,scMaxY=-Infinity;
+
+  for (const ed of pt.edges) {
+    const ax0=ed.a[0],ay0=ed.a[1],az0=ed.a[2];
+    const arxA=ax0*_cosY+az0*_sinY, arzA=-ax0*_sinY+az0*_cosY;
+    const afyA=ay0*_cosX-arzA*_sinX, afzA=ay0*_sinX+arzA*_cosX;
+    const saA=focal/Math.max(CAM_Z-afzA,0.001);
+    const paxA=arxA*saA+cx+ox, payA=-afyA*saA+cy+oy;
+    const bx0=ed.b[0],by0=ed.b[1],bz0=ed.b[2];
+    const arxB=bx0*_cosY+bz0*_sinY, arzB=-bx0*_sinY+bz0*_cosY;
+    const afyB=by0*_cosX-arzB*_sinX, afzB=by0*_sinX+arzB*_cosX;
+    const saB=focal/Math.max(CAM_Z-afzB,0.001);
+    const paxB=arxB*saB+cx+ox, payB=-afyB*saB+cy+oy;
+    const depth=(saA+saB)*.5;
+    paths[Math.min(BUCKETS-1,Math.floor((depth/maxScale)*BUCKETS))].push(paxA,payA,paxB,payB);
+    if (paxA<scMinX)scMinX=paxA; if (paxA>scMaxX)scMaxX=paxA;
+    if (payA<scMinY)scMinY=payA; if (payA>scMaxY)scMaxY=payA;
+    if (paxB<scMinX)scMinX=paxB; if (paxB>scMaxX)scMaxX=paxB;
+    if (payB<scMinY)scMinY=payB; if (payB>scMaxY)scMaxY=payB;
+  }
+
+  const pullBoost=isPullPin?.2+pullProgress*.8:0;
+  const hN=Math.round(modelHue), sN=Math.round(modelSat);
+  const hasSpin=pt.spinV!==undefined&&pt.spin!==0;
+  if (hasSpin) {
+    ctx.save();
+    const scCx=(scMinX+scMaxX)*.5, scCy=(scMinY+scMaxY)*.5;
+    ctx.translate(scCx,scCy); ctx.rotate(pt.spin); ctx.translate(-scCx,-scCy);
+  }
+  for (let b=0;b<BUCKETS;b++) {
+    if (!paths[b].length) continue;
+    const t=b/(BUCKETS-1), baseAlpha=Math.min(1,(.06+t*.84+pullBoost))*pt.alpha;
+    const lum=Math.round(78+t*16+(isPullPin?pullProgress*8:0));
+    ctx.shadowBlur=b>=BUCKETS-2?(isPullPin&&pullProgress>.3?20:(b===BUCKETS-1?12:4)):0;
+    ctx.shadowColor=`hsla(${hN},${Math.min(100,sN+25)}%,72%,${(baseAlpha*.65).toFixed(3)})`;
+    ctx.strokeStyle=`hsla(${hN},${sN}%,${lum}%,${baseAlpha.toFixed(3)})`;
+    ctx.lineWidth=.8+t*.6+(isPullPin?pullProgress*.9:0);
+    ctx.beginPath();
+    const pts=paths[b];
+    for (let k=0;k<pts.length;k+=4){ctx.moveTo(pts[k],pts[k+1]);ctx.lineTo(pts[k+2],pts[k+3]);}
+    ctx.stroke();
+  }
+  ctx.shadowBlur=0;
+  if (hasSpin) ctx.restore();
+}
+
+function updatePinHit(focal,cx,cy) {
+  const pt=PARTS.pullpin; if (!pt.edges.length) return;
+  let mnX=Infinity,mxX=-Infinity,mnY=Infinity,mxY=-Infinity;
+  const ox=pt.ox+(pullDX*pullProgress), oy=pt.oy+(pullDY*pullProgress);
+  for (const ed of pt.edges) {
+    const ax0=ed.a[0],ay0=ed.a[1],az0=ed.a[2];
+    const arxA=ax0*_cosY+az0*_sinY,arzA=-ax0*_sinY+az0*_cosY;
+    const afyA=ay0*_cosX-arzA*_sinX,afzA=ay0*_sinX+arzA*_cosX;
+    const saA=focal/Math.max(CAM_Z-afzA,0.001);
+    const paxA=arxA*saA+cx+ox,payA=-afyA*saA+cy+oy;
+    const bx0=ed.b[0],by0=ed.b[1],bz0=ed.b[2];
+    const arxB=bx0*_cosY+bz0*_sinY,arzB=-bx0*_sinY+bz0*_cosY;
+    const afyB=by0*_cosX-arzB*_sinX,afzB=by0*_sinX+arzB*_cosX;
+    const saB=focal/Math.max(CAM_Z-afzB,0.001);
+    const paxB=arxB*saB+cx+ox,payB=-afyB*saB+cy+oy;
+    mnX=Math.min(mnX,paxA,paxB);mxX=Math.max(mxX,paxA,paxB);
+    mnY=Math.min(mnY,payA,payB);mxY=Math.max(mxY,payA,payB);
+  }
+  pinHitX=(mnX+mxX)*.5; pinHitY=(mnY+mxY)*.5;
+  pinHitR=Math.max(mxX-mnX,mxY-mnY)*.5+32;
+  if (state<=S.PULLING) {
+    const bt=PARTS.bulb; if (!bt.edges.length) return;
+    let bmnX=Infinity,bmxX=-Infinity,bmnY=Infinity,bmxY=-Infinity;
+    for (const ed of bt.edges) {
+      const ax0=ed.a[0],ay0=ed.a[1],az0=ed.a[2];
+      const arxA=ax0*_cosY+az0*_sinY,arzA=-ax0*_sinY+az0*_cosY;
+      const afyA=ay0*_cosX-arzA*_sinX,afzA=ay0*_sinX+arzA*_cosX;
+      const saA=focal/Math.max(CAM_Z-afzA,0.001);
+      const paxA=arxA*saA+cx,payA=-afyA*saA+cy;
+      const bx0=ed.b[0],by0=ed.b[1],bz0=ed.b[2];
+      const arxB=bx0*_cosY+bz0*_sinY,arzB=-bx0*_sinY+bz0*_cosY;
+      const afyB=by0*_cosX-arzB*_sinX,afzB=by0*_sinX+arzB*_cosX;
+      const saB=focal/Math.max(CAM_Z-afzB,0.001);
+      const paxB=arxB*saB+cx,payB=-afyB*saB+cy;
+      bmnX=Math.min(bmnX,paxA,paxB);bmxX=Math.max(bmxX,paxA,paxB);
+      bmnY=Math.min(bmnY,payA,payB);bmxY=Math.max(bmxY,payA,payB);
+    }
+    bodyCentX=(bmnX+bmxX)*.5; bodyCentY=(bmnY+bmxY)*.5;
+    if (!isPulling) { pullDirX=(pinHitX>=bodyCentX)?1:-1; pullDirY=0; }
+  }
+}
+
+function onPin(mx,my) { const dx=mx-pinHitX,dy=my-pinHitY; return Math.sqrt(dx*dx+dy*dy)<pinHitR; }
+
+function drawTensionLine(cx,cy) {
+  if (pullProgress<.06) return;
+  const rx=pinHitX,ry=pinHitY,a=pullProgress*.55;
+  const g=ctx.createLinearGradient(cx,cy,rx,ry);
+  g.addColorStop(0,`rgba(200,190,150,${a.toFixed(2)})`);
+  g.addColorStop(1,`rgba(255,235,140,${Math.min(1,a*1.5).toFixed(2)})`);
+  ctx.save(); ctx.setLineDash([3,7]);
+  ctx.strokeStyle=g; ctx.lineWidth=.9;
+  ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(rx,ry); ctx.stroke();
+  ctx.setLineDash([]); ctx.restore();
+}
+
+function drawPinGlow(now) {
+  if (state!==S.HOVER_PIN&&state!==S.PULLING) return;
+  const isPull=state===S.PULLING;
+  const pulse=0.5+0.5*Math.sin(now*(isPull?0.008:0.0045));
+  const baseAlpha=isPull?0.15+pullProgress*0.55:0.28+pulse*0.42;
+  const r=pinHitR;
+  ctx.save(); ctx.globalCompositeOperation='lighter';
+  const hG=Math.round(modelHue), sG=Math.min(100,Math.round(modelSat+30));
+  const grad=ctx.createRadialGradient(pinHitX,pinHitY,0,pinHitX,pinHitY,r*2.2);
+  grad.addColorStop(0,`hsla(${hG},${sG}%,90%,${(baseAlpha*.55).toFixed(3)})`);
+  grad.addColorStop(0.38,`hsla(${hG},${sG}%,75%,${(baseAlpha*.22).toFixed(3)})`);
+  grad.addColorStop(1,`hsla(${hG},${sG}%,60%,0)`);
+  ctx.fillStyle=grad; ctx.beginPath(); ctx.arc(pinHitX,pinHitY,r*2.2,0,Math.PI*2); ctx.fill();
+  const ringR=r*(0.86+pulse*0.14);
+  ctx.strokeStyle=`hsla(${hG},${sG}%,95%,${baseAlpha.toFixed(3)})`;
+  ctx.shadowColor=`hsla(${hG},${Math.min(100,sG+20)}%,80%,0.95)`;
+  ctx.shadowBlur=16+pulse*18; ctx.lineWidth=1.0+pulse*1.2;
+  ctx.beginPath(); ctx.arc(pinHitX,pinHitY,ringR,0,Math.PI*2); ctx.stroke();
+  ctx.strokeStyle=`hsla(${hG},${sG}%,98%,${(baseAlpha*.45).toFixed(3)})`;
+  ctx.shadowBlur=8; ctx.lineWidth=0.6;
+  ctx.beginPath(); ctx.arc(pinHitX,pinHitY,ringR*0.72,0,Math.PI*2); ctx.stroke();
+  ctx.restore();
+}
+
+function drawPullArc() {
+  if (pullProgress<.05) return;
+  ctx.save();
+  ctx.strokeStyle=`rgba(255,235,100,${pullProgress*.9})`;
+  ctx.lineWidth=1.8; ctx.shadowColor='rgba(255,220,80,.7)'; ctx.shadowBlur=10;
+  ctx.beginPath(); ctx.arc(pinHitX,pinHitY,pinHitR+10,-Math.PI/2,-Math.PI/2+Math.PI*2*pullProgress);
+  ctx.stroke(); ctx.restore();
+}
+
+function spawnAmbient(now) {
+  if (state>=S.COUNTDOWN) return;
+  const interval=isDragging?55:160;
+  if (now-lastAmbientT<interval) return;
+  lastAmbientT=now;
+  const W=canvas.width,H=canvas.height,cx=W*.5,cy=H*.48;
+  const rx=Math.min(W,H)*.18,ry=Math.min(W,H)*.30;
+  const dragVel=Math.sqrt(velX*velX+velY*velY);
+  const count=isDragging?7:3, spdMult=isDragging?1.4+dragVel*25:1;
+  for (let i=0;i<count;i++) {
+    const angle=Math.random()*Math.PI*2, dist=Math.sqrt(Math.random());
+    const px=cx+Math.cos(angle)*rx*dist, py=cy+Math.sin(angle)*ry*dist;
+    const spd=(0.25+Math.random()*0.65)*spdMult, va=Math.random()*Math.PI*2;
+    const hue=(modelHue+(Math.random()-.5)*45+360)%360;
+    sp({x:px,y:py,px,py,vx:Math.cos(va)*spd,vy:Math.sin(va)*spd-0.4*spdMult,
+        life:1,decay:0.004+Math.random()*0.003,hue,
+        size:(0.7+Math.random()*1.4)*(isDragging?1.4:1),depth:2,spawned:true});
+  }
+}
+
+function draw(now) {
+  const W=canvas.width,H=canvas.height,cx=W*.5,cy=H*.48,focal=H*.5;
+  _cosY=Math.cos(rotY); _sinY=Math.sin(rotY);
+  _cosX=Math.cos(rotX); _sinX=Math.sin(rotX);
+
+  const dragVel=Math.sqrt(velX*velX+velY*velY);
+  const dragBoost=isDragging?Math.max(2,dragVel*400):1;
+  modelHue=(modelHue+0.06*dragBoost)%360;
+  const targetSat=isDragging?Math.min(100,70+dragVel*1000):Math.max(0,37+38*Math.sin(now*0.00028-Math.PI/2));
+  modelSat+=(targetSat-modelSat)*(isDragging?0.14:0.04);
+
+  ctx.fillStyle='#060606'; ctx.fillRect(0,0,W,H);
+  if (!modelReady) return;
+
+  spawnAmbient(now);
+  updatePinHit(focal,cx,cy);
+  drawPart(PARTS.bulb,focal,cx,cy);
+  drawPart(PARTS.cradle,focal,cx,cy);
+  drawPart(PARTS.spoon,focal,cx,cy);
+  drawPart(PARTS.pullpin,focal,cx,cy);
+  drawPinGlow(now);
+  if (state===S.PULLING) { drawTensionLine(cx,cy); drawPullArc(); }
+  updateParticles(); drawParticles(); drawShockwaves(now);
+
+  if (state===S.EXPLODING||state===S.DONE) {
+    const el=now-explodeT0, fa=Math.max(0,1-el/FLASH_DUR);
+    for (const pt of Object.values(PARTS)) {
+      if (pt.flying&&pt!==PARTS.bulb) pt.alpha=Math.max(0,1-el/FLASH_DUR);
+    }
+    if (fa>0) { ctx.save(); ctx.globalAlpha=fa*fa; ctx.fillStyle='#fff'; ctx.fillRect(0,0,W,H); ctx.restore(); }
+    PARTS.bulb.alpha=Math.max(0,1-el/BULB_DUR);
+    if (!fortuneShown&&el>700) {
+      fortuneShown=true;
+      const f=FORTUNES[Math.floor(Math.random()*FORTUNES.length)];
+      fortuneText.textContent=f.text; fortuneTag.textContent=f.tag;
+      fortuneEl.classList.add('show');
+    }
+    if (!resetShown&&el>1400) {
+      resetShown=true; resetBtn.style.display='block';
+      requestAnimationFrame(()=>resetBtn.classList.add('visible'));
+    }
+  }
+}
+
+function loop(now) {
+  requestAnimationFrame(loop);
+  if (state===S.IDLE||state===S.HOVER_PIN) {
+    if (!isDragging) {
+      velX*=INERTIA; velY*=INERTIA; rotY+=velX; rotX+=velY;
+      if (Math.abs(velX)<.0003&&Math.abs(velY)<.0003) rotY+=AUTO_SPIN;
+      rotX=Math.max(-1.2,Math.min(1.2,rotX));
+    }
+  }
+  for (const pt of Object.values(PARTS)) {
+    if (!pt.flying) continue;
+    pt.vx*=.96; pt.vy=pt.vy*.96+.20; pt.ox+=pt.vx; pt.oy+=pt.vy;
+    if (pt.spinV!==undefined&&pt.spinV!==0) { pt.spin+=pt.spinV; pt.spinV*=0.997; }
+  }
+  if (state===S.EXPLODING&&!particles.length&&!shockwaves.length&&PARTS.bulb.alpha<=.005) state=S.DONE;
+  draw(now);
+}
+
+function partScreenCent(pt) {
+  const W=canvas.width,H=canvas.height,cxv=W*.5,cyv=H*.48,focal=H*.5;
+  let mnX=Infinity,mxX=-Infinity,mnY=Infinity,mxY=-Infinity;
+  for (const ed of pt.edges) {
+    const ax0=ed.a[0],ay0=ed.a[1],az0=ed.a[2];
+    const arxA=ax0*_cosY+az0*_sinY,arzA=-ax0*_sinY+az0*_cosY;
+    const afyA=ay0*_cosX-arzA*_sinX,afzA=ay0*_sinX+arzA*_cosX;
+    const saA=focal/Math.max(CAM_Z-afzA,0.001);
+    const paxA=arxA*saA+cxv,payA=-afyA*saA+cyv;
+    const bx0=ed.b[0],by0=ed.b[1],bz0=ed.b[2];
+    const arxB=bx0*_cosY+bz0*_sinY,arzB=-bx0*_sinY+bz0*_cosY;
+    const afyB=by0*_cosX-arzB*_sinX,afzB=by0*_sinX+arzB*_cosX;
+    const saB=focal/Math.max(CAM_Z-afzB,0.001);
+    const paxB=arxB*saB+cxv,payB=-afyB*saB+cyv;
+    mnX=Math.min(mnX,paxA,paxB);mxX=Math.max(mxX,paxA,paxB);
+    mnY=Math.min(mnY,payA,payB);mxY=Math.max(mxY,payA,payB);
+  }
+  return [(mnX+mxX)*.5,(mnY+mxY)*.5];
+}
+
+let cdTimers=[];
+function startCountdown() {
+  isPulling=false; state=S.COUNTDOWN;
+  ui.classList.add('hidden'); canvas.style.cursor='default';
+  const [spScrX,spScrY]=partScreenCent(PARTS.spoon);
+  let sdx=spScrX-bodyCentX, sdy=spScrY-bodyCentY;
+  const slen=Math.sqrt(sdx*sdx+sdy*sdy)||1; sdx/=slen; sdy/=slen;
+  const spoon=PARTS.spoon, spoonSpd=88+Math.random()*28;
+  spoon.vx=sdx*spoonSpd+(Math.random()-.5)*12;
+  spoon.vy=sdy*spoonSpd-14+(Math.random()-.5)*10;
+  spoon.spinV=(Math.random()>.5?1:-1)*(0.28+Math.random()*0.18);
+  spoon.spin=0; spoon.flying=true;
+  for (let i=0;i<10;i++) {
+    const a=Math.random()*Math.PI*2,spd=4+Math.random()*9;
+    sp({x:spScrX,y:spScrY,px:spScrX,py:spScrY,
+        vx:sdx*spd*1.2+Math.cos(a)*spd*.5,vy:sdy*spd*1.2+Math.sin(a)*spd*.5-2,
+        life:0.9+Math.random()*.1,decay:0.028+Math.random()*0.018,
+        hue:(modelHue+20+Math.random()*40)%360,size:1.2+Math.random()*1.4,depth:1,spawned:true});
+  }
+  tickCd(3);
+}
+
+function showNum(n) {
+  countdownNum.textContent=n; countdownNum.classList.remove('fade');
+  void countdownNum.offsetWidth; countdownNum.classList.add('pop');
+  countdownEl.classList.add('show');
+}
+
+function tickCd(n) {
+  if (state!==S.COUNTDOWN) return;
+  showNum(n);
+  if (n>1) {
+    cdTimers.push(setTimeout(()=>{if(state===S.COUNTDOWN){countdownNum.classList.remove('pop');countdownNum.classList.add('fade');}},540));
+    cdTimers.push(setTimeout(()=>tickCd(n-1),750));
+  } else {
+    cdTimers.push(setTimeout(()=>{if(state===S.COUNTDOWN){countdownNum.classList.remove('pop');countdownNum.classList.add('fade');}},540));
+    cdTimers.push(setTimeout(()=>{countdownEl.classList.remove('show');if(state===S.COUNTDOWN)fire();},780));
+  }
+}
+
+function cancelCd() {
+  cdTimers.forEach(clearTimeout); cdTimers=[];
+  countdownEl.classList.remove('show'); countdownNum.classList.remove('pop','fade');
+}
+
+function fire() {
+  state=S.EXPLODING; explodeT0=performance.now(); PARTS.bulb.alpha=1;
+  const pullAngle=Math.atan2(pullDY,pullDX), ppSpd=44+Math.random()*16;
+  const pp=PARTS.pullpin;
+  pp.vx=Math.cos(pullAngle)*ppSpd; pp.vy=Math.sin(pullAngle)*ppSpd-8; pp.flying=true;
+  const [crScrX,crScrY]=partScreenCent(PARTS.cradle);
+  let cdx=crScrX-bodyCentX,cdy=crScrY-bodyCentY;
+  const clen=Math.sqrt(cdx*cdx+cdy*cdy)||1, crSpd=38+Math.random()*18;
+  const cr=PARTS.cradle;
+  cr.vx=(cdx/clen)*crSpd+(Math.random()-.5)*12; cr.vy=(cdy/clen)*crSpd+(Math.random()-.5)*12; cr.flying=true;
+  spawnExplosion(canvas.width*.5,canvas.height*.48);
+}
+
+function loadModel() {
+  const draco=new DRACOLoader();
+  draco.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+  const loader=new GLTFLoader();
+  loader.setDRACOLoader(draco);
+  loader.load('media/grenade-v2.glb', gltf => {
+    const raw={};
+    const gMM={minX:Infinity,maxX:-Infinity,minY:Infinity,maxY:-Infinity,minZ:Infinity,maxZ:-Infinity};
+    gltf.scene.traverse(child => {
+      if (!child.isMesh) return;
+      const key=Object.keys(PARTS).find(k=>PARTS[k].name===child.name);
+      if (!key) return;
+      child.updateWorldMatrix(true,false);
+      const e=child.matrixWorld.elements, thresh=PARTS[key].edgeThresh;
+      const geo=new THREE.EdgesGeometry(child.geometry,thresh), pos=geo.attributes.position;
+      const arr=[];
+      for (let i=0;i<pos.count;i+=2) {
+        const ax=pos.getX(i),ay=pos.getY(i),az=pos.getZ(i);
+        const bx=pos.getX(i+1),by=pos.getY(i+1),bz=pos.getZ(i+1);
+        const wa=[e[0]*ax+e[4]*ay+e[8]*az+e[12],e[1]*ax+e[5]*ay+e[9]*az+e[13],e[2]*ax+e[6]*ay+e[10]*az+e[14]];
+        const wb=[e[0]*bx+e[4]*by+e[8]*bz+e[12],e[1]*bx+e[5]*by+e[9]*bz+e[13],e[2]*bx+e[6]*by+e[10]*bz+e[14]];
+        arr.push({a:wa,b:wb});
+        gMM.minX=Math.min(gMM.minX,wa[0],wb[0]); gMM.maxX=Math.max(gMM.maxX,wa[0],wb[0]);
+        gMM.minY=Math.min(gMM.minY,wa[1],wb[1]); gMM.maxY=Math.max(gMM.maxY,wa[1],wb[1]);
+        gMM.minZ=Math.min(gMM.minZ,wa[2],wb[2]); gMM.maxZ=Math.max(gMM.maxZ,wa[2],wb[2]);
+      }
+      raw[key]=arr;
+    });
+    const cX=(gMM.minX+gMM.maxX)*.5,cY=(gMM.minY+gMM.maxY)*.5,cZ=(gMM.minZ+gMM.maxZ)*.5;
+    const span=Math.max(gMM.maxX-gMM.minX,gMM.maxY-gMM.minY,.001), sc=3.6/span;
+    for (const [key,arr] of Object.entries(raw)) {
+      PARTS[key].edges=arr.map(ed=>({
+        a:[(ed.a[0]-cX)*sc,(ed.a[1]-cY)*sc,(ed.a[2]-cZ)*sc],
+        b:[(ed.b[0]-cX)*sc,(ed.b[1]-cY)*sc,(ed.b[2]-cZ)*sc]
+      }));
+    }
+    modelReady=true; loadingEl.classList.add('gone');
+  }, xhr=>{ loadingBar.style.width=(xhr.loaded/xhr.total*100)+'%'; },
+     err=>{ document.getElementById('loading-text').textContent='Load failed: '+err.message; });
+}
+
+// ─── Pointer events ───────────────────────────────────────────
+window.addEventListener('mousemove', e => {
+  if (isPulling) {
+    const dx=e.clientX-pullStartX, dy=e.clientY-pullStartY;
+    const proj=Math.max(0,dx*pullDirX+dy*pullDirY);
+    pullProgress=Math.min(1,proj/MAX_PULL);
+    pullDX=pullDirX*proj; pullDY=pullDirY*proj;
+    if (pullProgress>=1&&state===S.PULLING) startCountdown();
+    return;
+  }
+  if (isDragging) {
+    const vx=(e.clientX-lastX)*DRAG_SENS, vy=(e.clientY-lastY)*DRAG_SENS;
+    velX=velX*.55+vx*.45; velY=velY*.55+vy*.45;
+    rotY+=vx; rotX+=vy; rotX=Math.max(-1.2,Math.min(1.2,rotX));
+    lastX=e.clientX; lastY=e.clientY; return;
+  }
+  if (modelReady&&(state===S.IDLE||state===S.HOVER_PIN)) {
+    if (onPin(e.clientX,e.clientY)) {
+      state=S.HOVER_PIN; canvas.style.cursor='pointer';
+      document.body.classList.add('cursor-hover');
+      ui.textContent='Hold your wish · Don\'t let go'; ui.classList.remove('hidden');
+    } else {
+      state=S.IDLE; canvas.style.cursor='grab';
+      document.body.classList.remove('cursor-hover');
+      ui.textContent='Make a wish · Pull the Pin';
+    }
+  }
+}, { passive:true });
+
+canvas.addEventListener('mousedown', e => {
+  if (state===S.EXPLODING||state===S.DONE||state===S.COUNTDOWN) return;
+  if (onPin(e.clientX,e.clientY)) {
+    isPulling=true; state=S.PULLING;
+    pullStartX=e.clientX; pullStartY=e.clientY; pullProgress=0;
+    canvas.style.cursor='grabbing';
+    ui.textContent='Keep pulling…  don\'t stop now'; e.preventDefault();
+  } else {
+    isDragging=true; lastX=e.clientX; lastY=e.clientY; velX=velY=0;
+    canvas.style.cursor='grabbing'; ui.classList.add('hidden');
+    document.body.classList.remove('cursor-hover');
+  }
+});
+
+window.addEventListener('mouseup', () => {
+  if (isPulling&&state===S.PULLING) {
+    isPulling=false; state=S.IDLE; pullProgress=0; pullDX=pullDY=0;
+    canvas.style.cursor='grab'; document.body.classList.remove('cursor-hover');
+    ui.textContent='Make a wish · Pull the Pin'; ui.classList.remove('hidden');
+  }
+  isPulling=false; isDragging=false;
+  if (state!==S.EXPLODING&&state!==S.DONE&&state!==S.COUNTDOWN) canvas.style.cursor='grab';
+});
+
+resetBtn.addEventListener('click', () => {
+  cancelCd();
+  state=S.IDLE; isPulling=false; isDragging=false;
+  pullProgress=0; pullDX=pullDY=0;
+  particles=[]; shockwaves=[]; resetShown=false; fortuneShown=false;
+  for (const pt of Object.values(PARTS)) {
+    pt.ox=0;pt.oy=0;pt.vx=0;pt.vy=0;pt.alpha=1;pt.flying=false;
+    if (pt.spinV!==undefined){pt.spin=0;pt.spinV=0;}
+  }
+  resetBtn.classList.remove('visible');
+  setTimeout(()=>{resetBtn.style.display='none';},500);
+  fortuneEl.classList.remove('show');
+  document.body.classList.remove('cursor-hover');
+  ui.textContent='Make a wish · Pull the Pin';
+  ui.classList.remove('hidden'); canvas.style.cursor='grab';
+  rotY=0.5; rotX=-0.10; velX=velY=0;
+});
+
+loadModel();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

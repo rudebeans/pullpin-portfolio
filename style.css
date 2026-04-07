@@ -482,7 +482,7 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
 }
 
 .hero__scroll-hint {
-  position: absolute;
+  position: fixed;
   bottom: 48px;
   left: 50%;
   transform: translateX(-50%);
