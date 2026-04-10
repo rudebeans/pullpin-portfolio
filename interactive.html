@@ -685,6 +685,21 @@ function loop(now) {
       rotX=Math.max(-1.2,Math.min(1.2,rotX));
     }
   }
+  // ── Countdown tick (driven by loop — no separate timers) ─────
+  if (state===S.COUNTDOWN) {
+    if (cdT0<0) cdT0=now;
+    const el=now-cdT0;
+    // Switch number every 750 ms: 3→2→1
+    const n=el<750?3:el<1500?2:1;
+    if (countdownNum.textContent!==String(n)) showNum(n);
+    // Fade current number at 540 ms into its slot
+    const phase=el%750;
+    if (phase>=540&&!countdownNum.classList.contains('fade')) {
+      countdownNum.classList.remove('pop'); countdownNum.classList.add('fade');
+    }
+    // Fire after 3×750 ms
+    if (el>=2250) { countdownEl.classList.remove('show'); fire(); }
+  }
   for (const pt of Object.values(PARTS)) {
     if (!pt.flying) continue;
     pt.vx*=.96; pt.vy=pt.vy*.96+.20; pt.ox+=pt.vx; pt.oy+=pt.vy;
@@ -714,10 +729,11 @@ function partScreenCent(pt) {
   return [(mnX+mxX)*.5,(mnY+mxY)*.5];
 }
 
-// rAF-based countdown — immune to iOS setTimeout throttling under heavy rAF load
-let cdCancelled=false;
+// ─── Countdown (loop-driven — no timers, no separate rAF) ────
+let cdT0=-1; // -1 = inactive; set to `now` on first loop frame
+
 function startCountdown() {
-  isPulling=false; state=S.COUNTDOWN; cdCancelled=false;
+  isPulling=false; state=S.COUNTDOWN; cdT0=-1;
   ui.classList.add('hidden'); canvas.style.cursor='default';
   const [spScrX,spScrY]=partScreenCent(PARTS.spoon);
   let sdx=spScrX-bodyCentX, sdy=spScrY-bodyCentY;
@@ -734,39 +750,19 @@ function startCountdown() {
         life:0.9+Math.random()*.1,decay:0.028+Math.random()*0.018,
         hue:(modelHue+20+Math.random()*40)%360,size:1.2+Math.random()*1.4,depth:1,spawned:true});
   }
-  tickCd(3);
+  showNum(3);
 }
 
 function showNum(n) {
-  countdownNum.textContent=n; countdownNum.classList.remove('fade');
-  void countdownNum.offsetWidth; countdownNum.classList.add('pop');
+  countdownNum.textContent=String(n);
+  countdownNum.classList.remove('fade');
+  void countdownNum.offsetWidth;
+  countdownNum.classList.add('pop');
   countdownEl.classList.add('show');
 }
 
-function tickCd(n) {
-  if (state!==S.COUNTDOWN||cdCancelled) return;
-  showNum(n);
-  let t0=null, fadeDone=false;
-  function frame(now) {
-    if (state!==S.COUNTDOWN||cdCancelled) return;
-    if (!t0) t0=now;
-    const el=now-t0;
-    if (!fadeDone&&el>=540) {
-      fadeDone=true;
-      countdownNum.classList.remove('pop'); countdownNum.classList.add('fade');
-    }
-    if (el>=750) {
-      if (n>1) { tickCd(n-1); }
-      else { countdownEl.classList.remove('show'); if(state===S.COUNTDOWN&&!cdCancelled) fire(); }
-      return;
-    }
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-}
-
 function cancelCd() {
-  cdCancelled=true;
+  cdT0=-1;
   countdownEl.classList.remove('show'); countdownNum.classList.remove('pop','fade');
 }
 
