@@ -288,15 +288,19 @@ const CAM_Z=2.8;
 
 // ─── Parts registry ───────────────────────────────────────────
 const PARTS = {
-  bulb:    { name:'Mesh_Bulb',    edges:[], ox:0, oy:0, vx:0, vy:0, alpha:1, flying:false, edgeThresh:1 },
-  cradle:  { name:'Mesh_Cradle',  edges:[], ox:0, oy:0, vx:0, vy:0, alpha:1, flying:false, edgeThresh:1 },
-  pullpin: { name:'Mesh_Pullpin', edges:[], ox:0, oy:0, vx:0, vy:0, alpha:1, flying:false, edgeThresh:1 },
-  spoon:   { name:'Mesh_Spoon',   edges:[], ox:0, oy:0, vx:0, vy:0, alpha:1, flying:false, edgeThresh:8, spin:0, spinV:0 },
+  bulb:    { name:'Mesh_Bulb',    edges:[], faces:[], ox:0, oy:0, vx:0, vy:0, alpha:1, flying:false, edgeThresh:1 },
+  cradle:  { name:'Mesh_Cradle',  edges:[], faces:[], ox:0, oy:0, vx:0, vy:0, alpha:1, flying:false, edgeThresh:1 },
+  pullpin: { name:'Mesh_Pullpin', edges:[], faces:[], ox:0, oy:0, vx:0, vy:0, alpha:1, flying:false, edgeThresh:1 },
+  spoon:   { name:'Mesh_Spoon',   edges:[], faces:[], ox:0, oy:0, vx:0, vy:0, alpha:1, flying:false, edgeThresh:8, spin:0, spinV:0 },
 };
 
 let modelHue=0, modelSat=0, lastAmbientT=0;
 let pinHitX=0, pinHitY=0, pinHitR=0;
 let pullDirX=1, pullDirY=0, bodyCentX=0, bodyCentY=0;
+
+// ─── Cursor proximity → face opacity ──────────────────────────
+let cursorX = -9999, cursorY = -9999;
+let faceAlpha = 0;
 let modelReady=false;
 let explodeT0=0;
 const FLASH_DUR=280, BULB_DUR=600;
@@ -432,6 +436,7 @@ function drawPart(pt,focal,cx,cy) {
 function updatePinHit(focal,cx,cy) {
   const pt=PARTS.pullpin; if (!pt.edges.length) return;
   let mnX=Infinity,mxX=-Infinity,mnY=Infinity,mxY=-Infinity;
+  let pinWorldXSum=0, pinWorldXCount=0;
   const ox=pt.ox+(pullDX*pullProgress), oy=pt.oy+(pullDY*pullProgress);
   for (const ed of pt.edges) {
     const ax0=ed.a[0],ay0=ed.a[1],az0=ed.a[2];
@@ -446,28 +451,15 @@ function updatePinHit(focal,cx,cy) {
     const paxB=arxB*saB+cx+ox,payB=-afyB*saB+cy+oy;
     mnX=Math.min(mnX,paxA,paxB);mxX=Math.max(mxX,paxA,paxB);
     mnY=Math.min(mnY,payA,payB);mxY=Math.max(mxY,payA,payB);
+    pinWorldXSum += arxA + arxB;
+    pinWorldXCount += 2;
   }
   pinHitX=(mnX+mxX)*.5; pinHitY=(mnY+mxY)*.5;
   pinHitR=Math.max(mxX-mnX,mxY-mnY)*.5+32;
-  if (state<=S.PULLING) {
-    const bt=PARTS.bulb; if (!bt.edges.length) return;
-    let bmnX=Infinity,bmxX=-Infinity,bmnY=Infinity,bmxY=-Infinity;
-    for (const ed of bt.edges) {
-      const ax0=ed.a[0],ay0=ed.a[1],az0=ed.a[2];
-      const arxA=ax0*_cosY+az0*_sinY,arzA=-ax0*_sinY+az0*_cosY;
-      const afyA=ay0*_cosX-arzA*_sinX,afzA=ay0*_sinX+arzA*_cosX;
-      const saA=focal/Math.max(CAM_Z-afzA,0.001);
-      const paxA=arxA*saA+cx,payA=-afyA*saA+cy;
-      const bx0=ed.b[0],by0=ed.b[1],bz0=ed.b[2];
-      const arxB=bx0*_cosY+bz0*_sinY,arzB=-bx0*_sinY+bz0*_cosY;
-      const afyB=by0*_cosX-arzB*_sinX,afzB=by0*_sinX+arzB*_cosX;
-      const saB=focal/Math.max(CAM_Z-afzB,0.001);
-      const paxB=arxB*saB+cx,payB=-afyB*saB+cy;
-      bmnX=Math.min(bmnX,paxA,paxB);bmxX=Math.max(bmxX,paxA,paxB);
-      bmnY=Math.min(bmnY,payA,payB);bmxY=Math.max(bmxY,payA,payB);
-    }
-    bodyCentX=(bmnX+bmxX)*.5; bodyCentY=(bmnY+bmxY)*.5;
-    if (!isPulling) { pullDirX=(pinHitX>=bodyCentX)?1:-1; pullDirY=0; }
+  // World-space X determines direction — unaffected by ring overhang / projection skew
+  if (state<=S.PULLING && !isPulling) {
+    pullDirX = (pinWorldXSum / pinWorldXCount >= 0) ? 1 : -1;
+    pullDirY = 0;
   }
 }
 
@@ -506,6 +498,35 @@ function drawPinGlow(now) {
   ctx.strokeStyle=`hsla(${hG},${sG}%,98%,${(baseAlpha*.45).toFixed(3)})`;
   ctx.shadowBlur=8; ctx.lineWidth=0.6;
   ctx.beginPath(); ctx.arc(pinHitX,pinHitY,ringR*0.72,0,Math.PI*2); ctx.stroke();
+
+  // ── Directional pull arrow (hover only) ──────────────────────
+  // Arrow lives entirely on ONE side: tail starts at the ring edge,
+  // head points outward — no stub on the opposite side.
+  if (!isPull) {
+    const dir    = pullDirX;
+    const tailX0 = pinHitX + dir * (ringR * 1.3);
+    const tailLen = 28, aw = 12, al = 18;
+    const tipX   = tailX0 + dir * (tailLen + al);
+    const baseX  = tailX0 + dir * tailLen;
+    const ay     = pinHitY;
+    const arrowAlpha = (0.6 + pulse * 0.35).toFixed(3);
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.strokeStyle = `hsla(${hG},${sG}%,95%,${arrowAlpha})`;
+    ctx.fillStyle   = `hsla(${hG},${sG}%,95%,${arrowAlpha})`;
+    ctx.shadowColor = `hsla(${hG},${Math.min(100,sG+20)}%,80%,0.9)`;
+    ctx.shadowBlur  = 14 + pulse * 10;
+    ctx.lineWidth   = 1.5;
+    ctx.beginPath(); ctx.moveTo(tailX0, ay); ctx.lineTo(baseX, ay); ctx.stroke();
+    ctx.shadowBlur = 18 + pulse * 12;
+    ctx.beginPath();
+    ctx.moveTo(tipX, ay);
+    ctx.lineTo(baseX, ay - aw);
+    ctx.lineTo(baseX, ay + aw);
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+
   ctx.restore();
 }
 
@@ -516,6 +537,41 @@ function drawPullArc() {
   ctx.lineWidth=1.8; ctx.shadowColor='rgba(255,220,80,.7)'; ctx.shadowBlur=10;
   ctx.beginPath(); ctx.arc(pinHitX,pinHitY,pinHitR+10,-Math.PI/2,-Math.PI/2+Math.PI*2*pullProgress);
   ctx.stroke(); ctx.restore();
+}
+
+// ─── Transparent face fill (painter's algorithm) ─────────────
+function drawAllFaces(focal, cx, cy) {
+  const tris = [];
+  for (const pt of Object.values(PARTS)) {
+    if (!pt.faces || !pt.faces.length || pt.alpha <= 0) continue;
+    const ox = pt.ox + (pt === PARTS.pullpin ? pullDX * pullProgress : 0);
+    const oy = pt.oy + (pt === PARTS.pullpin ? pullDY * pullProgress : 0);
+    for (const f of pt.faces) {
+      const project = (v) => {
+        const x  =  v[0]*_cosY + v[2]*_sinY;
+        const arZ= -v[0]*_sinY + v[2]*_cosY;
+        const afy=  v[1]*_cosX - arZ*_sinX;
+        const afz=  v[1]*_sinX + arZ*_cosX;
+        const sa  = focal / Math.max(CAM_Z - afz, 0.001);
+        return [cx + ox + x * sa, cy + oy - afy * sa, afz];
+      };
+      const pa = project(f.a), pb = project(f.b), pc = project(f.c);
+      tris.push({ pa, pb, pc, avgZ: (pa[2]+pb[2]+pc[2])/3, alpha: pt.alpha });
+    }
+  }
+  tris.sort((a, b) => a.avgZ - b.avgZ);
+  if (faceAlpha < 0.002) return;
+  ctx.save();
+  ctx.fillStyle = `hsl(${modelHue},${modelSat.toFixed(1)}%,68%)`;
+  for (const t of tris) {
+    ctx.globalAlpha = t.alpha * faceAlpha;
+    ctx.beginPath();
+    ctx.moveTo(t.pa[0], t.pa[1]);
+    ctx.lineTo(t.pb[0], t.pb[1]);
+    ctx.lineTo(t.pc[0], t.pc[1]);
+    ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
 }
 
 function spawnAmbient(now) {
@@ -554,6 +610,14 @@ function draw(now) {
 
   spawnAmbient(now);
   updatePinHit(focal,cx,cy);
+
+  // Cursor proximity → face alpha (0 = wireframe only, 0.5 = full fill)
+  const grenadeR   = Math.min(W, H) * 0.38;
+  const cdx        = cursorX - cx, cdy = cursorY - cy;
+  const proximityT = Math.max(0, 1 - Math.sqrt(cdx*cdx + cdy*cdy) / grenadeR);
+  faceAlpha += (proximityT * 0.5 - faceAlpha) * 0.08;
+
+  drawAllFaces(focal, cx, cy);
   drawPart(PARTS.bulb,focal,cx,cy);
   drawPart(PARTS.cradle,focal,cx,cy);
   drawPart(PARTS.spoon,focal,cx,cy);
@@ -705,13 +769,36 @@ function loadModel() {
         gMM.minZ=Math.min(gMM.minZ,wa[2],wb[2]); gMM.maxZ=Math.max(gMM.maxZ,wa[2],wb[2]);
       }
       raw[key]=arr;
+      // Extract triangle faces from raw geometry for transparent fill
+      const rp=child.geometry.attributes.position, idx=child.geometry.index;
+      const faceArr=[];
+      if (idx) {
+        for (let i=0;i<idx.count;i+=3) {
+          const i0=idx.getX(i),i1=idx.getX(i+1),i2=idx.getX(i+2);
+          const px=rp.getX(i0),py=rp.getY(i0),pz=rp.getZ(i0);
+          const qx=rp.getX(i1),qy=rp.getY(i1),qz=rp.getZ(i1);
+          const rx2=rp.getX(i2),ry2=rp.getY(i2),rz2=rp.getZ(i2);
+          faceArr.push({
+            a:[e[0]*px+e[4]*py+e[8]*pz+e[12],e[1]*px+e[5]*py+e[9]*pz+e[13],e[2]*px+e[6]*py+e[10]*pz+e[14]],
+            b:[e[0]*qx+e[4]*qy+e[8]*qz+e[12],e[1]*qx+e[5]*qy+e[9]*qz+e[13],e[2]*qx+e[6]*qy+e[10]*qz+e[14]],
+            c:[e[0]*rx2+e[4]*ry2+e[8]*rz2+e[12],e[1]*rx2+e[5]*ry2+e[9]*rz2+e[13],e[2]*rx2+e[6]*ry2+e[10]*rz2+e[14]]
+          });
+        }
+      }
+      raw['_faces_'+key]=faceArr;
     });
     const cX=(gMM.minX+gMM.maxX)*.5,cY=(gMM.minY+gMM.maxY)*.5,cZ=(gMM.minZ+gMM.maxZ)*.5;
     const span=Math.max(gMM.maxX-gMM.minX,gMM.maxY-gMM.minY,.001), sc=3.6/span;
     for (const [key,arr] of Object.entries(raw)) {
+      if (key.startsWith('_faces_')) continue;
       PARTS[key].edges=arr.map(ed=>({
         a:[(ed.a[0]-cX)*sc,(ed.a[1]-cY)*sc,(ed.a[2]-cZ)*sc],
         b:[(ed.b[0]-cX)*sc,(ed.b[1]-cY)*sc,(ed.b[2]-cZ)*sc]
+      }));
+      PARTS[key].faces=(raw['_faces_'+key]||[]).map(f=>({
+        a:[(f.a[0]-cX)*sc,(f.a[1]-cY)*sc,(f.a[2]-cZ)*sc],
+        b:[(f.b[0]-cX)*sc,(f.b[1]-cY)*sc,(f.b[2]-cZ)*sc],
+        c:[(f.c[0]-cX)*sc,(f.c[1]-cY)*sc,(f.c[2]-cZ)*sc]
       }));
     }
     modelReady=true; loadingEl.classList.add('gone');
@@ -721,6 +808,7 @@ function loadModel() {
 
 // ─── Pointer events ───────────────────────────────────────────
 window.addEventListener('mousemove', e => {
+  cursorX = e.clientX; cursorY = e.clientY;
   if (isPulling) {
     const dx=e.clientX-pullStartX, dy=e.clientY-pullStartY;
     const proj=Math.max(0,dx*pullDirX+dy*pullDirY);
