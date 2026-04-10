@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
   <link rel="preload" href="media/grenade-v2.glb" as="fetch" crossorigin="anonymous" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -17,60 +18,15 @@
     }
     a { cursor: none; }
 
-    /* ── Navigation ── */
-    #nav {
-      position: fixed; top: 0; left: 0; right: 0; height: 64px;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 40px; z-index: 100; pointer-events: none;
-    }
-    /* Left: logo stacked above ← Home */
-    #nav-left {
-      display: flex; flex-direction: column; gap: 3px;
-      pointer-events: auto;
-    }
-    #nav-logo {
-      display: flex; align-items: center; gap: 6px;
-      text-decoration: none; color: #fff;
-    }
-    #nav-logo img { width: 42px; height: 42px; flex-shrink: 0; opacity: 0.9; margin-right: -14px; }
-    #nav-logo span {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 14px; font-weight: 600; letter-spacing: -0.01em; color: #fff;
-    }
-    #nav-back {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 11px; letter-spacing: 0.04em; text-transform: none;
-      color: rgba(255,255,255,0.4); text-decoration: none;
-      padding-left: 30px; /* align with logo text past icon */
-      transition: color 0.2s; pointer-events: auto;
-    }
-    #nav-back:hover { color: rgba(255,255,255,0.8); }
-    /* Centre: Work / About / Contact */
-    #nav-links {
+    /* ── Navigation overrides (base styles from style.css) ── */
+    /* Reuse .nav, .nav__logo, .nav__links, .nav__status from style.css */
+    /* Centre the links absolutely so they don't shift with left/right content */
+    .nav__links {
       position: absolute; left: 50%; transform: translateX(-50%);
-      display: flex; gap: 36px; list-style: none;
-      pointer-events: auto;
     }
-    #nav-links a {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase;
-      color: rgba(255,255,255,0.65); text-decoration: none;
-      position: relative; transition: color 0.2s;
-    }
-    #nav-links a::after {
-      content: ''; position: absolute; bottom: -3px; left: 0;
-      width: 0; height: 1px; background: #fff;
-      transition: width 0.3s ease;
-    }
-    #nav-links a:hover { color: #fff; }
-    #nav-links a:hover::after { width: 100%; }
-    /* Right: Creative Direction */
-    #nav-status {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 12px; letter-spacing: 0.02em;
-      color: rgba(255,255,255,0.65);
-      pointer-events: none;
-    }
+    /* Ensure nav pointer events work over the canvas */
+    .nav { pointer-events: none; }
+    .nav__logo, .nav__links, .nav__status { pointer-events: auto; }
 
     /* ── Canvas ── */
     canvas {
@@ -192,6 +148,18 @@
     }
     body.cursor-hover #cursor-ring { width: 72px; height: 72px; border-color: rgba(255,255,255,0.8); }
     body.cursor-hover #cursor-dot  { transform: translate(-50%,-50%) scale(0); }
+
+    /* ── Cursor label ── */
+    #cursor-label {
+      position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 9px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+      transform: translate(-50%, 28px);
+      opacity: 0; transition: opacity 0.2s;
+      white-space: nowrap;
+    }
+    body.cursor-hover #cursor-label { opacity: 1; }
   </style>
 </head>
 <body>
@@ -201,22 +169,20 @@
   <div id="cursor-dot"></div>
   <div id="cursor-ring"></div>
 </div>
+<div id="cursor-label"></div>
 
 <!-- Nav -->
-<nav id="nav">
-  <div id="nav-left">
-    <a href="interactive.html" id="nav-logo">
-      <img src="media/z_early_test_images/PullPin_Icon.svg" alt="PullPin" />
-      <span>PullPin.com</span>
-    </a>
-    <a href="index.html#work" id="nav-back">← Home</a>
-  </div>
-  <ul id="nav-links">
+<nav class="nav" id="nav">
+  <a href="index.html" class="nav__logo" data-cursor="Home">
+    <img src="media/z_early_test_images/PullPin_Icon.svg" alt="PullPin" />
+    <span>PullPin.com</span>
+  </a>
+  <ul class="nav__links">
     <li><a href="index.html#work">Work</a></li>
     <li><a href="index.html#about">About</a></li>
     <li><a href="index.html#contact">Contact</a></li>
   </ul>
-  <div id="nav-status">Creative Direction</div>
+  <div class="nav__status">Creative Direction</div>
 </nav>
 
 <canvas id="c"></canvas>
@@ -274,6 +240,7 @@ const cursorDot    = document.getElementById('cursor-dot');
 const cursorRing   = document.getElementById('cursor-ring');
 
 // ─── Custom cursor ────────────────────────────────────────────
+const cursorLabel = document.getElementById('cursor-label');
 let cmx=-100, cmy=-100, crx=-100, cry=-100;
 document.addEventListener('mousemove', e => {
   cmx=e.clientX; cmy=e.clientY;
@@ -282,8 +249,21 @@ document.addEventListener('mousemove', e => {
 (function animCursor() {
   crx+=(cmx-crx)*0.12; cry+=(cmy-cry)*0.12;
   cursorRing.style.left=`${crx|0}px`; cursorRing.style.top=`${cry|0}px`;
+  cursorLabel.style.left=`${crx|0}px`; cursorLabel.style.top=`${cry|0}px`;
   requestAnimationFrame(animCursor);
 })();
+
+// Cursor label on [data-cursor] elements
+document.querySelectorAll('[data-cursor]').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    document.body.classList.add('cursor-hover');
+    cursorLabel.textContent = el.dataset.cursor;
+  });
+  el.addEventListener('mouseleave', () => {
+    document.body.classList.remove('cursor-hover');
+    cursorLabel.textContent = '';
+  });
+});
 
 // ─── Fortune pool ─────────────────────────────────────────────
 const FORTUNES = [
