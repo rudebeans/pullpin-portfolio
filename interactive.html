@@ -19,14 +19,22 @@
     a { cursor: none; }
 
     /* ── Navigation overrides (base styles from style.css) ── */
-    /* Reuse .nav, .nav__logo, .nav__links, .nav__status from style.css */
     /* Centre the links absolutely so they don't shift with left/right content */
-    .nav__links {
-      position: absolute; left: 50%; transform: translateX(-50%);
-    }
+    .nav__links { position: absolute; left: 50%; transform: translateX(-50%); }
     /* Ensure nav pointer events work over the canvas */
     .nav { pointer-events: none; }
     .nav__logo, .nav__links, .nav__status { pointer-events: auto; }
+    /* Mobile: revert absolute centering so links don't overlap logo */
+    @media (max-width: 768px) {
+      .nav__links { position: static !important; transform: none !important; }
+      .nav__status { display: none !important; }
+    }
+
+    /* ── Mobile: hide custom cursor, restore native pointer ── */
+    @media (hover: none), (pointer: coarse) {
+      #cursor, #cursor-label { display: none !important; }
+      body, a, button { cursor: auto !important; }
+    }
 
     /* ── Canvas ── */
     canvas {
@@ -824,6 +832,8 @@ function loadModel() {
       }));
     }
     modelReady=true; loadingEl.classList.add('gone');
+    if(window.matchMedia('(pointer:coarse)').matches)
+      ui.textContent='Swipe to explore · Hold pin to pull';
   }, xhr=>{ loadingBar.style.width=(xhr.loaded/xhr.total*100)+'%'; },
      err=>{ document.getElementById('loading-text').textContent='Load failed: '+err.message; });
 }
@@ -898,6 +908,81 @@ resetBtn.addEventListener('click', () => {
   ui.textContent='Make a wish · Pull the Pin';
   ui.classList.remove('hidden'); canvas.style.cursor='grab';
   rotY=0.5; rotX=-0.10; velX=velY=0;
+});
+
+// ─── Touch gestures (mobile) ─────────────────────────────────
+let touchId=null, touchStartX=0, touchStartY=0, touchLastX=0, touchLastY=0;
+let longPressTimer=null, isLongPress=false;
+const LONG_PRESS_MS=450;
+
+canvas.addEventListener('touchstart', e=>{
+  if(state===S.EXPLODING||state===S.DONE||state===S.COUNTDOWN) return;
+  e.preventDefault();
+  const t=e.changedTouches[0];
+  touchId=t.identifier;
+  touchStartX=touchLastX=t.clientX; touchStartY=touchLastY=t.clientY;
+  cursorX=t.clientX; cursorY=t.clientY;
+  velX=velY=0;
+
+  if(modelReady&&onPin(t.clientX,t.clientY)){
+    state=S.HOVER_PIN;
+    ui.textContent='Hold to pull the pin…'; ui.classList.remove('hidden');
+    longPressTimer=setTimeout(()=>{
+      if(state===S.HOVER_PIN){
+        isLongPress=true; isPulling=true; state=S.PULLING;
+        pullStartX=touchLastX; pullStartY=touchLastY; pullProgress=0;
+        ui.textContent='Keep pulling…  don\'t stop now';
+        if(navigator.vibrate) navigator.vibrate(40);
+      }
+    }, LONG_PRESS_MS);
+  } else {
+    isDragging=true; lastX=t.clientX; lastY=t.clientY;
+    ui.classList.add('hidden');
+  }
+},{passive:false});
+
+canvas.addEventListener('touchmove', e=>{
+  e.preventDefault();
+  let t=null;
+  for(const touch of e.changedTouches) if(touch.identifier===touchId){t=touch;break;}
+  if(!t) return;
+  cursorX=t.clientX; cursorY=t.clientY;
+
+  if(isPulling&&isLongPress){
+    const dx=t.clientX-pullStartX, dy=t.clientY-pullStartY;
+    const proj=Math.max(0,dx*pullDirX+dy*pullDirY);
+    pullProgress=Math.min(1,proj/MAX_PULL); pullDX=pullDirX*proj; pullDY=pullDirY*proj;
+    if(pullProgress>=1&&state===S.PULLING) startCountdown();
+    return;
+  }
+  // Cancel long press if finger moves beyond threshold → orbit instead
+  const mdx=t.clientX-touchStartX, mdy=t.clientY-touchStartY;
+  if(longPressTimer&&Math.sqrt(mdx*mdx+mdy*mdy)>10){
+    clearTimeout(longPressTimer); longPressTimer=null;
+    state=S.IDLE; isDragging=true; lastX=touchLastX; lastY=touchLastY;
+  }
+  if(isDragging){
+    const vx=(t.clientX-lastX)*DRAG_SENS, vy=(t.clientY-lastY)*DRAG_SENS;
+    velX=velX*.55+vx*.45; velY=velY*.55+vy*.45;
+    rotY+=vx; rotX+=vy; rotX=Math.max(-1.2,Math.min(1.2,rotX));
+    lastX=t.clientX; lastY=t.clientY;
+  }
+  touchLastX=t.clientX; touchLastY=t.clientY;
+},{passive:false});
+
+window.addEventListener('touchend', e=>{
+  clearTimeout(longPressTimer); longPressTimer=null;
+  if(isLongPress&&isPulling&&state===S.PULLING){
+    // Released before countdown fires — snap back
+    isPulling=false; state=S.IDLE; pullProgress=0; pullDX=pullDY=0;
+    ui.textContent=window.matchMedia('(pointer:coarse)').matches
+      ?'Swipe to explore · Hold pin to pull':'Make a wish · Pull the Pin';
+    ui.classList.remove('hidden');
+  }
+  isLongPress=false; isDragging=false; touchId=null;
+  if(state!==S.EXPLODING&&state!==S.DONE&&state!==S.COUNTDOWN&&state!==S.PULLING){
+    if(state===S.HOVER_PIN) state=S.IDLE;
+  }
 });
 
 loadModel();
