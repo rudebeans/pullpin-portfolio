@@ -877,7 +877,7 @@ function loadModel() {
     }
     modelReady=true; loadingEl.classList.add('gone');
     if(isTouch)
-      ui.textContent='Swipe to explore · Hold pin to detonate';
+      ui.textContent='Hold pin to detonate';
   }, xhr=>{ loadingBar.style.width=(xhr.loaded/xhr.total*100)+'%'; },
      err=>{ document.getElementById('loading-text').textContent='Load failed: '+err.message; });
 }
@@ -994,7 +994,7 @@ canvas.addEventListener('touchmove', e=>{
     if(Math.sqrt(mdx*mdx+mdy*mdy)>12){
       holdStart=0; cancelCd();
       state=S.IDLE; isDragging=true; lastX=touchLastX; lastY=touchLastY;
-      ui.textContent='Swipe to explore · Hold pin to detonate'; ui.classList.remove('hidden');
+      ui.textContent='Hold pin to detonate'; ui.classList.remove('hidden');
     }
   }
   if(isDragging){
@@ -1011,7 +1011,7 @@ window.addEventListener('touchend', e=>{
     // Lifted before 3 s — abort, reset countdown so next press starts fresh
     holdStart=0; cancelCd();
     state=S.IDLE;
-    ui.textContent='Swipe to explore · Hold pin to detonate';
+    ui.textContent='Hold pin to detonate';
     ui.classList.remove('hidden');
   }
   isDragging=false; touchId=null;
