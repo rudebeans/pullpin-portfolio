@@ -195,7 +195,6 @@
 </nav>
 
 <canvas id="c"></canvas>
-<div id="dbg" style="position:fixed;top:80px;left:12px;z-index:9999;color:lime;font:11px monospace;pointer-events:none;"></div>
 
 <div id="loading">
   <div id="loading-text">Loading…</div>
@@ -690,12 +689,9 @@ function loop(now) {
     }
   }
   // ── Countdown tick (driven by loop — no separate timers) ─────
-  const dbg=document.getElementById('dbg');
-  if (dbg) dbg.textContent=`state:${state} cdT0:${cdT0<0?-1:Math.round(cdT0)} now:${Math.round(now)} isPulling:${isPulling} isLP:${isLongPress}`;
   if (state===S.COUNTDOWN) {
     if (cdT0<0) cdT0=now;
     const el=now-cdT0;
-    if (dbg) dbg.textContent+=` el:${Math.round(el)}`;
     // Switch number every 750 ms: 3→2→1
     const n=el<750?3:el<1500?2:1;
     if (countdownNum.textContent!==String(n)) showNum(n);
@@ -942,6 +938,7 @@ canvas.addEventListener('touchstart', e=>{
     state=S.HOVER_PIN;
     ui.textContent='Hold to pull the pin…'; ui.classList.remove('hidden');
     longPressTimer=setTimeout(()=>{
+      longPressTimer=null;  // clear so touchmove guard doesn't fire after timer completes
       if(state===S.HOVER_PIN){
         isLongPress=true; isPulling=true; state=S.PULLING;
         pullStartX=touchLastX; pullStartY=touchLastY; pullProgress=0;
