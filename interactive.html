@@ -180,33 +180,6 @@
       opacity: 0; transition: opacity 0.2s; pointer-events: none;
     }
 
-    /* ── Mobile: pull direction hint (replaces off-screen canvas arrow) ── */
-    #pull-hint {
-      position: fixed;
-      top: 68%; left: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none; z-index: 21;
-      opacity: 0; transition: opacity 0.35s ease;
-      display: flex; align-items: center; gap: 32px;
-      white-space: nowrap;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 30px; letter-spacing: 0.18em; text-transform: uppercase;
-      color: rgba(255,255,255,0.8);
-    }
-    #pull-hint.show { opacity: 1; }
-    #pull-hint .ph-arrow {
-      display: inline-block; font-size: 64px; line-height: 1;
-    }
-    #pull-hint.dir-left  .ph-arrow { animation: ph-nudge-left  0.9s ease-in-out infinite; }
-    #pull-hint.dir-right .ph-arrow { animation: ph-nudge-right 0.9s ease-in-out infinite; }
-    @keyframes ph-nudge-left  {
-      0%,100% { transform: translateX(0);     opacity: 0.4; }
-      50%     { transform: translateX(-24px); opacity: 1;   }
-    }
-    @keyframes ph-nudge-right {
-      0%,100% { transform: translateX(0);    opacity: 0.4; }
-      50%     { transform: translateX(24px); opacity: 1;   }
-    }
   </style>
 </head>
 <body>
@@ -249,7 +222,6 @@
 </div>
 
 <div id="ui">Make a wish &nbsp;·&nbsp; Pull the Pin</div>
-<div id="pull-hint"></div>
 <div id="btn-row">
   <a id="explore-btn" href="index.html#work">Explore Work</a>
   <button id="reset-btn">↺ &nbsp;Pull Again</button>
@@ -286,7 +258,6 @@ const fortuneText  = document.getElementById('fortune-text');
 const fortuneTag   = document.getElementById('fortune-tag');
 const cursorDot    = document.getElementById('cursor-dot');
 const cursorRing   = document.getElementById('cursor-ring');
-const pullHint     = document.getElementById('pull-hint');
 const isTouch      = window.matchMedia('(pointer:coarse)').matches;
 
 // ─── Custom cursor ────────────────────────────────────────────
@@ -539,18 +510,6 @@ function updatePinHit(focal,cx,cy) {
 
 function onPin(mx,my) { const dx=mx-pinHitX,dy=my-pinHitY; return Math.sqrt(dx*dx+dy*dy)<pinHitR; }
 
-// ─── Mobile pull-direction hint ───────────────────────────────
-function showPullHint() {
-  if (!isTouch) return;
-  if (pullDirX < 0) {
-    pullHint.innerHTML='<span class="ph-arrow">←</span><span class="ph-label">Pull</span>';
-    pullHint.className='dir-left show';
-  } else {
-    pullHint.innerHTML='<span class="ph-label">Pull</span><span class="ph-arrow">→</span>';
-    pullHint.className='dir-right show';
-  }
-}
-function hidePullHint() { pullHint.classList.remove('show'); }
 
 function drawTensionLine(cx,cy) {
   if (pullProgress<.06) return;
@@ -757,6 +716,22 @@ function loop(now) {
     // Fire after 3×750 ms
     if (el>=2250) { countdownEl.classList.remove('show'); fire(); }
   }
+  // ── Mobile hold-to-detonate: HOVER_PIN + held = live countdown ──
+  if (state===S.HOVER_PIN && isTouch && holdStart>0) {
+    const held=now-holdStart;
+    const n=held<1000?3:held<2000?2:1;
+    if (countdownNum.textContent!==String(n)) showNum(n);
+    const phase=held%1000;
+    if (phase>=720&&!countdownNum.classList.contains('fade')) {
+      countdownNum.classList.remove('pop'); countdownNum.classList.add('fade');
+    }
+    if (held>=3000) {
+      countdownEl.classList.remove('show');
+      holdStart=0;
+      pullDX=pullDirX*80; pullDY=-20; // give pin a direction to fly out
+      fire();
+    }
+  }
   for (const pt of Object.values(PARTS)) {
     if (!pt.flying) continue;
     pt.vx*=.96; pt.vy=pt.vy*.96+.20; pt.ox+=pt.vx; pt.oy+=pt.vy;
@@ -791,7 +766,6 @@ let cdT0=-1; // -1 = inactive; set to `now` on first loop frame
 
 function startCountdown() {
   isPulling=false; state=S.COUNTDOWN; cdT0=-1;
-  hidePullHint();
   ui.classList.add('hidden'); canvas.style.cursor='default';
   const [spScrX,spScrY]=partScreenCent(PARTS.spoon);
   let sdx=spScrX-bodyCentX, sdy=spScrY-bodyCentY;
@@ -897,8 +871,8 @@ function loadModel() {
       }));
     }
     modelReady=true; loadingEl.classList.add('gone');
-    if(window.matchMedia('(pointer:coarse)').matches)
-      ui.textContent='Swipe to explore · Hold pin to pull';
+    if(isTouch)
+      ui.textContent='Swipe to explore · Hold pin to detonate';
   }, xhr=>{ loadingBar.style.width=(xhr.loaded/xhr.total*100)+'%'; },
      err=>{ document.getElementById('loading-text').textContent='Load failed: '+err.message; });
 }
@@ -958,7 +932,7 @@ window.addEventListener('mouseup', () => {
 });
 
 resetBtn.addEventListener('click', () => {
-  cancelCd();
+  holdStart=0; cancelCd();
   state=S.IDLE; isPulling=false; isDragging=false;
   pullProgress=0; pullDX=pullDY=0;
   particles=[]; shockwaves=[]; resetShown=false; fortuneShown=false;
@@ -977,31 +951,25 @@ resetBtn.addEventListener('click', () => {
 
 // ─── Touch gestures (mobile) ─────────────────────────────────
 let touchId=null, touchStartX=0, touchStartY=0, touchLastX=0, touchLastY=0;
-let longPressTimer=null, isLongPress=false;
-const LONG_PRESS_MS=450;
+let holdStart=0; // timestamp (ms) when pin hold began; 0 = not holding
 
 canvas.addEventListener('touchstart', e=>{
   if(state===S.EXPLODING||state===S.DONE||state===S.COUNTDOWN) return;
   e.preventDefault();
   const t=e.changedTouches[0];
+  if(touchId!==null) return;
   touchId=t.identifier;
   touchStartX=touchLastX=t.clientX; touchStartY=touchLastY=t.clientY;
   cursorX=t.clientX; cursorY=t.clientY;
   velX=velY=0;
 
   if(modelReady&&onPin(t.clientX,t.clientY)){
+    // ── Hold-to-detonate: countdown runs while finger is held ──
     state=S.HOVER_PIN;
-    ui.textContent='Hold to pull the pin…'; ui.classList.remove('hidden');
-    showPullHint();
-    longPressTimer=setTimeout(()=>{
-      longPressTimer=null;  // clear so touchmove guard doesn't fire after timer completes
-      if(state===S.HOVER_PIN){
-        isLongPress=true; isPulling=true; state=S.PULLING;
-        pullStartX=touchLastX; pullStartY=touchLastY; pullProgress=0;
-        ui.textContent='Keep pulling…  don\'t stop now';
-        if(navigator.vibrate) navigator.vibrate(40);
-      }
-    }, LONG_PRESS_MS);
+    holdStart=performance.now();
+    ui.classList.add('hidden');
+    showNum(3);
+    if(navigator.vibrate) navigator.vibrate(20);
   } else {
     isDragging=true; lastX=t.clientX; lastY=t.clientY;
     ui.classList.add('hidden');
@@ -1015,19 +983,14 @@ canvas.addEventListener('touchmove', e=>{
   if(!t) return;
   cursorX=t.clientX; cursorY=t.clientY;
 
-  if(isPulling&&isLongPress){
-    const dx=t.clientX-pullStartX, dy=t.clientY-pullStartY;
-    const proj=Math.max(0,dx*pullDirX+dy*pullDirY);
-    pullProgress=Math.min(1,proj/MAX_PULL); pullDX=pullDirX*proj; pullDY=pullDirY*proj;
-    if(pullProgress>=1&&state===S.PULLING) startCountdown();
-    return;
-  }
-  // Cancel long press if finger moves beyond threshold → orbit instead
-  const mdx=t.clientX-touchStartX, mdy=t.clientY-touchStartY;
-  if(longPressTimer&&Math.sqrt(mdx*mdx+mdy*mdy)>10){
-    clearTimeout(longPressTimer); longPressTimer=null;
-    state=S.IDLE; isDragging=true; lastX=touchLastX; lastY=touchLastY;
-    hidePullHint();
+  // If holding the pin and finger drifts → cancel, switch to orbit
+  if(holdStart>0){
+    const mdx=t.clientX-touchStartX, mdy=t.clientY-touchStartY;
+    if(Math.sqrt(mdx*mdx+mdy*mdy)>12){
+      holdStart=0; cancelCd();
+      state=S.IDLE; isDragging=true; lastX=touchLastX; lastY=touchLastY;
+      ui.textContent='Swipe to explore · Hold pin to detonate'; ui.classList.remove('hidden');
+    }
   }
   if(isDragging){
     const vx=(t.clientX-lastX)*DRAG_SENS, vy=(t.clientY-lastY)*DRAG_SENS;
@@ -1039,17 +1002,15 @@ canvas.addEventListener('touchmove', e=>{
 },{passive:false});
 
 window.addEventListener('touchend', e=>{
-  clearTimeout(longPressTimer); longPressTimer=null;
-  hidePullHint();
-  if(isLongPress&&isPulling&&state===S.PULLING){
-    // Released before countdown fires — snap back
-    isPulling=false; state=S.IDLE; pullProgress=0; pullDX=pullDY=0;
-    ui.textContent=window.matchMedia('(pointer:coarse)').matches
-      ?'Swipe to explore · Hold pin to pull':'Make a wish · Pull the Pin';
+  if(holdStart>0){
+    // Lifted before 3 s — abort, reset countdown so next press starts fresh
+    holdStart=0; cancelCd();
+    state=S.IDLE;
+    ui.textContent='Swipe to explore · Hold pin to detonate';
     ui.classList.remove('hidden');
   }
-  isLongPress=false; isDragging=false; touchId=null;
-  if(state!==S.EXPLODING&&state!==S.DONE&&state!==S.COUNTDOWN&&state!==S.PULLING){
+  isDragging=false; touchId=null;
+  if(state!==S.EXPLODING&&state!==S.DONE&&state!==S.COUNTDOWN){
     if(state===S.HOVER_PIN) state=S.IDLE;
   }
 });
