@@ -101,23 +101,33 @@
       font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
       color: rgba(255,255,255,0.25);
     }
+    /* Mobile: flush-left fortune copy */
+    @media (max-width: 768px) {
+      #fortune { align-items: flex-start; text-align: left; padding: 32px 28px; }
+      #fortune-rule { margin: 0 0 36px; }
+    }
 
     /* ── Button row (Explore Work + Pull Again) ── */
     #btn-row {
       position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
       display: none; opacity: 0; gap: 16px;
-      align-items: center; z-index: 30;
+      align-items: stretch; z-index: 30;
       transition: opacity 0.5s;
     }
     #btn-row.visible { opacity: 1; display: flex; }
     #explore-btn, #reset-btn {
-      padding: 12px 32px; border: 1px solid rgba(255,255,255,0.25);
+      /* Reset button UA styles */
+      -webkit-appearance: none; appearance: none;
+      box-sizing: border-box;
+      padding: 14px 28px; border: 1px solid rgba(255,255,255,0.25);
       background: transparent; color: rgba(255,255,255,0.6);
       font-family: 'Space Grotesk', sans-serif;
       font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
       cursor: none; overflow: hidden; position: relative;
       transition: border-color 0.3s, color 0.3s;
-      text-decoration: none; display: inline-block;
+      text-decoration: none;
+      display: flex; align-items: center; justify-content: center;
+      white-space: nowrap;
     }
     #explore-btn::before, #reset-btn::before {
       content: ''; position: absolute; inset: 0;
