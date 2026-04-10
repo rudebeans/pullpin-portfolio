@@ -729,6 +729,7 @@ function loop(now) {
       countdownEl.classList.remove('show');
       holdStart=0;
       pullDX=pullDirX*80; pullDY=-20; // give pin a direction to fly out
+      launchSpoon();
       fire();
     }
   }
@@ -764,9 +765,7 @@ function partScreenCent(pt) {
 // ─── Countdown (loop-driven — no timers, no separate rAF) ────
 let cdT0=-1; // -1 = inactive; set to `now` on first loop frame
 
-function startCountdown() {
-  isPulling=false; state=S.COUNTDOWN; cdT0=-1;
-  ui.classList.add('hidden'); canvas.style.cursor='default';
+function launchSpoon() {
   const [spScrX,spScrY]=partScreenCent(PARTS.spoon);
   let sdx=spScrX-bodyCentX, sdy=spScrY-bodyCentY;
   const slen=Math.sqrt(sdx*sdx+sdy*sdy)||1; sdx/=slen; sdy/=slen;
@@ -782,6 +781,12 @@ function startCountdown() {
         life:0.9+Math.random()*.1,decay:0.028+Math.random()*0.018,
         hue:(modelHue+20+Math.random()*40)%360,size:1.2+Math.random()*1.4,depth:1,spawned:true});
   }
+}
+
+function startCountdown() {
+  isPulling=false; state=S.COUNTDOWN; cdT0=-1;
+  ui.classList.add('hidden'); canvas.style.cursor='default';
+  launchSpoon();
   showNum(3);
 }
 
