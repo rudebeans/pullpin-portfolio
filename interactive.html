@@ -179,6 +179,34 @@
       color: #fff; white-space: nowrap;
       opacity: 0; transition: opacity 0.2s; pointer-events: none;
     }
+
+    /* ── Mobile: pull direction hint (replaces off-screen canvas arrow) ── */
+    #pull-hint {
+      position: fixed;
+      top: 68%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none; z-index: 21;
+      opacity: 0; transition: opacity 0.35s ease;
+      display: flex; align-items: center; gap: 12px;
+      white-space: nowrap;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.65);
+    }
+    #pull-hint.show { opacity: 1; }
+    #pull-hint .ph-arrow {
+      display: inline-block; font-size: 17px; line-height: 1;
+    }
+    #pull-hint.dir-left  .ph-arrow { animation: ph-nudge-left  1s ease-in-out infinite; }
+    #pull-hint.dir-right .ph-arrow { animation: ph-nudge-right 1s ease-in-out infinite; }
+    @keyframes ph-nudge-left  {
+      0%,100% { transform: translateX(0);    opacity: 0.45; }
+      50%     { transform: translateX(-8px); opacity: 1;    }
+    }
+    @keyframes ph-nudge-right {
+      0%,100% { transform: translateX(0);   opacity: 0.45; }
+      50%     { transform: translateX(8px); opacity: 1;    }
+    }
   </style>
 </head>
 <body>
@@ -221,6 +249,7 @@
 </div>
 
 <div id="ui">Make a wish &nbsp;·&nbsp; Pull the Pin</div>
+<div id="pull-hint"></div>
 <div id="btn-row">
   <a id="explore-btn" href="index.html#work">Explore Work</a>
   <button id="reset-btn">↺ &nbsp;Pull Again</button>
@@ -257,6 +286,8 @@ const fortuneText  = document.getElementById('fortune-text');
 const fortuneTag   = document.getElementById('fortune-tag');
 const cursorDot    = document.getElementById('cursor-dot');
 const cursorRing   = document.getElementById('cursor-ring');
+const pullHint     = document.getElementById('pull-hint');
+const isTouch      = window.matchMedia('(pointer:coarse)').matches;
 
 // ─── Custom cursor ────────────────────────────────────────────
 const cursorLabel = document.getElementById('cursor-label');
@@ -508,6 +539,19 @@ function updatePinHit(focal,cx,cy) {
 
 function onPin(mx,my) { const dx=mx-pinHitX,dy=my-pinHitY; return Math.sqrt(dx*dx+dy*dy)<pinHitR; }
 
+// ─── Mobile pull-direction hint ───────────────────────────────
+function showPullHint() {
+  if (!isTouch) return;
+  if (pullDirX < 0) {
+    pullHint.innerHTML='<span class="ph-arrow">←</span><span class="ph-label">Pull</span>';
+    pullHint.className='dir-left show';
+  } else {
+    pullHint.innerHTML='<span class="ph-label">Pull</span><span class="ph-arrow">→</span>';
+    pullHint.className='dir-right show';
+  }
+}
+function hidePullHint() { pullHint.classList.remove('show'); }
+
 function drawTensionLine(cx,cy) {
   if (pullProgress<.06) return;
   const rx=pinHitX,ry=pinHitY,a=pullProgress*.55;
@@ -542,10 +586,10 @@ function drawPinGlow(now) {
   ctx.shadowBlur=8; ctx.lineWidth=0.6;
   ctx.beginPath(); ctx.arc(pinHitX,pinHitY,ringR*0.72,0,Math.PI*2); ctx.stroke();
 
-  // ── Directional pull arrow (hover only) ──────────────────────
+  // ── Directional pull arrow (desktop hover only — mobile uses #pull-hint) ──
   // Arrow lives entirely on ONE side: tail starts at the ring edge,
   // head points outward — no stub on the opposite side.
-  if (!isPull) {
+  if (!isPull && !isTouch) {
     const dir    = pullDirX;
     const tailX0 = pinHitX + dir * (ringR * 1.3);
     const tailLen = 28, aw = 12, al = 18;
@@ -747,6 +791,7 @@ let cdT0=-1; // -1 = inactive; set to `now` on first loop frame
 
 function startCountdown() {
   isPulling=false; state=S.COUNTDOWN; cdT0=-1;
+  hidePullHint();
   ui.classList.add('hidden'); canvas.style.cursor='default';
   const [spScrX,spScrY]=partScreenCent(PARTS.spoon);
   let sdx=spScrX-bodyCentX, sdy=spScrY-bodyCentY;
@@ -947,6 +992,7 @@ canvas.addEventListener('touchstart', e=>{
   if(modelReady&&onPin(t.clientX,t.clientY)){
     state=S.HOVER_PIN;
     ui.textContent='Hold to pull the pin…'; ui.classList.remove('hidden');
+    showPullHint();
     longPressTimer=setTimeout(()=>{
       longPressTimer=null;  // clear so touchmove guard doesn't fire after timer completes
       if(state===S.HOVER_PIN){
@@ -981,6 +1027,7 @@ canvas.addEventListener('touchmove', e=>{
   if(longPressTimer&&Math.sqrt(mdx*mdx+mdy*mdy)>10){
     clearTimeout(longPressTimer); longPressTimer=null;
     state=S.IDLE; isDragging=true; lastX=touchLastX; lastY=touchLastY;
+    hidePullHint();
   }
   if(isDragging){
     const vx=(t.clientX-lastX)*DRAG_SENS, vy=(t.clientY-lastY)*DRAG_SENS;
@@ -993,6 +1040,7 @@ canvas.addEventListener('touchmove', e=>{
 
 window.addEventListener('touchend', e=>{
   clearTimeout(longPressTimer); longPressTimer=null;
+  hidePullHint();
   if(isLongPress&&isPulling&&state===S.PULLING){
     // Released before countdown fires — snap back
     isPulling=false; state=S.IDLE; pullProgress=0; pullDX=pullDY=0;
