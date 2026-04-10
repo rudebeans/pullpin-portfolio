@@ -146,18 +146,17 @@
       transition: width 0.35s cubic-bezier(0.16,1,0.3,1),
                   height 0.35s cubic-bezier(0.16,1,0.3,1), border-color 0.3s;
     }
-    body.cursor-hover #cursor-ring { width: 72px; height: 72px; border-color: rgba(255,255,255,0.8); }
+    body.cursor-hover #cursor-ring { width: 80px; height: 80px; border-color: rgba(255,255,255,0.9); }
     body.cursor-hover #cursor-dot  { transform: translate(-50%,-50%) scale(0); }
 
-    /* ── Cursor label ── */
+    /* ── Cursor label (inside ring, centered) ── */
     #cursor-label {
-      position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999;
+      position: absolute;
+      transform: translate(-50%, -50%);
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 9px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase;
-      color: rgba(255,255,255,0.85);
-      transform: translate(-50%, 28px);
-      opacity: 0; transition: opacity 0.2s;
-      white-space: nowrap;
+      font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+      color: #fff; white-space: nowrap;
+      opacity: 0; transition: opacity 0.2s; pointer-events: none;
     }
     body.cursor-hover #cursor-label { opacity: 1; }
   </style>
@@ -167,9 +166,10 @@
 <!-- Custom cursor -->
 <div id="cursor">
   <div id="cursor-dot"></div>
-  <div id="cursor-ring"></div>
+  <div id="cursor-ring">
+    <div id="cursor-label"></div>
+  </div>
 </div>
-<div id="cursor-label"></div>
 
 <!-- Nav -->
 <nav class="nav" id="nav">
@@ -249,7 +249,6 @@ document.addEventListener('mousemove', e => {
 (function animCursor() {
   crx+=(cmx-crx)*0.12; cry+=(cmy-cry)*0.12;
   cursorRing.style.left=`${crx|0}px`; cursorRing.style.top=`${cry|0}px`;
-  cursorLabel.style.left=`${crx|0}px`; cursorLabel.style.top=`${cry|0}px`;
   requestAnimationFrame(animCursor);
 })();
 
