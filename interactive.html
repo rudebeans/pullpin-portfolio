@@ -19,42 +19,58 @@
 
     /* ── Navigation ── */
     #nav {
-      position: fixed; top: 0; left: 0; right: 0; height: 72px;
+      position: fixed; top: 0; left: 0; right: 0; height: 64px;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 32px; z-index: 50; pointer-events: none;
+      padding: 0 40px; z-index: 100; pointer-events: none;
     }
-    /* Left block: logo stacked above "← Home" */
+    /* Left: logo stacked above ← Home */
     #nav-left {
-      display: flex; flex-direction: column; gap: 4px;
+      display: flex; flex-direction: column; gap: 3px;
       pointer-events: auto;
     }
     #nav-logo {
-      display: flex; align-items: center; gap: 10px;
-      text-decoration: none; color: rgba(255,255,255,0.7);
-      font-size: 13px; font-weight: 500; letter-spacing: 0.04em;
-      transition: color 0.2s;
+      display: flex; align-items: center; gap: 6px;
+      text-decoration: none; color: #fff;
     }
-    #nav-logo:hover { color: #fff; }
-    #nav-logo img { width: 28px; height: 28px; object-fit: contain; }
+    #nav-logo img { width: 42px; height: 42px; flex-shrink: 0; opacity: 0.9; margin-right: -14px; }
+    #nav-logo span {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px; font-weight: 600; letter-spacing: -0.01em; color: #fff;
+    }
     #nav-back {
-      font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
-      color: rgba(255,255,255,0.28); text-decoration: none;
-      padding-left: 38px; /* align with logo text, past icon + gap */
-      transition: color 0.2s;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px; letter-spacing: 0.04em; text-transform: none;
+      color: rgba(255,255,255,0.4); text-decoration: none;
+      padding-left: 30px; /* align with logo text past icon */
+      transition: color 0.2s; pointer-events: auto;
     }
-    #nav-back:hover { color: rgba(255,255,255,0.65); }
+    #nav-back:hover { color: rgba(255,255,255,0.8); }
     /* Centre: Work / About / Contact */
     #nav-links {
       position: absolute; left: 50%; transform: translateX(-50%);
-      display: flex; gap: 40px; list-style: none;
+      display: flex; gap: 36px; list-style: none;
       pointer-events: auto;
     }
     #nav-links a {
-      font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
-      color: rgba(255,255,255,0.35); text-decoration: none;
-      transition: color 0.2s;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase;
+      color: rgba(255,255,255,0.65); text-decoration: none;
+      position: relative; transition: color 0.2s;
     }
-    #nav-links a:hover { color: rgba(255,255,255,0.8); }
+    #nav-links a::after {
+      content: ''; position: absolute; bottom: -3px; left: 0;
+      width: 0; height: 1px; background: #fff;
+      transition: width 0.3s ease;
+    }
+    #nav-links a:hover { color: #fff; }
+    #nav-links a:hover::after { width: 100%; }
+    /* Right: Creative Direction */
+    #nav-status {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px; letter-spacing: 0.02em;
+      color: rgba(255,255,255,0.65);
+      pointer-events: none;
+    }
 
     /* ── Canvas ── */
     canvas {
@@ -200,6 +216,7 @@
     <li><a href="index.html#about">About</a></li>
     <li><a href="index.html#contact">Contact</a></li>
   </ul>
+  <div id="nav-status">Creative Direction</div>
 </nav>
 
 <canvas id="c"></canvas>
