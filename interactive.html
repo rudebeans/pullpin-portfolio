@@ -149,7 +149,7 @@
     body.cursor-hover #cursor-ring { width: 80px; height: 80px; border-color: rgba(255,255,255,0.9); }
     body.cursor-hover #cursor-dot  { transform: translate(-50%,-50%) scale(0); }
 
-    /* ── Cursor label (inside ring, centered) ── */
+    /* ── Cursor label (sibling of ring, follows same coords) ── */
     #cursor-label {
       position: absolute;
       transform: translate(-50%, -50%);
@@ -158,7 +158,6 @@
       color: #fff; white-space: nowrap;
       opacity: 0; transition: opacity 0.2s; pointer-events: none;
     }
-    body.cursor-hover #cursor-label { opacity: 1; }
   </style>
 </head>
 <body>
@@ -166,9 +165,8 @@
 <!-- Custom cursor -->
 <div id="cursor">
   <div id="cursor-dot"></div>
-  <div id="cursor-ring">
-    <div id="cursor-label"></div>
-  </div>
+  <div id="cursor-ring"></div>
+  <div id="cursor-label"></div>
 </div>
 
 <!-- Nav -->
@@ -249,6 +247,7 @@ document.addEventListener('mousemove', e => {
 (function animCursor() {
   crx+=(cmx-crx)*0.12; cry+=(cmy-cry)*0.12;
   cursorRing.style.left=`${crx|0}px`; cursorRing.style.top=`${cry|0}px`;
+  cursorLabel.style.left=`${crx|0}px`; cursorLabel.style.top=`${cry|0}px`;
   requestAnimationFrame(animCursor);
 })();
 
@@ -257,10 +256,12 @@ document.querySelectorAll('[data-cursor]').forEach(el => {
   el.addEventListener('mouseenter', () => {
     document.body.classList.add('cursor-hover');
     cursorLabel.textContent = el.dataset.cursor;
+    cursorLabel.style.opacity = '1';
   });
   el.addEventListener('mouseleave', () => {
     document.body.classList.remove('cursor-hover');
     cursorLabel.textContent = '';
+    cursorLabel.style.opacity = '0';
   });
 });
 
@@ -851,7 +852,7 @@ window.addEventListener('mousemove', e => {
       ui.textContent='Hold your wish · Don\'t let go'; ui.classList.remove('hidden');
     } else {
       state=S.IDLE; canvas.style.cursor='grab';
-      document.body.classList.remove('cursor-hover');
+      if (!document.querySelector('[data-cursor]:hover')) document.body.classList.remove('cursor-hover');
       ui.textContent='Make a wish · Pull the Pin';
     }
   }
