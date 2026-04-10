@@ -714,9 +714,10 @@ function partScreenCent(pt) {
   return [(mnX+mxX)*.5,(mnY+mxY)*.5];
 }
 
-let cdTimers=[];
+// rAF-based countdown — immune to iOS setTimeout throttling under heavy rAF load
+let cdCancelled=false;
 function startCountdown() {
-  isPulling=false; state=S.COUNTDOWN;
+  isPulling=false; state=S.COUNTDOWN; cdCancelled=false;
   ui.classList.add('hidden'); canvas.style.cursor='default';
   const [spScrX,spScrY]=partScreenCent(PARTS.spoon);
   let sdx=spScrX-bodyCentX, sdy=spScrY-bodyCentY;
@@ -743,19 +744,29 @@ function showNum(n) {
 }
 
 function tickCd(n) {
-  if (state!==S.COUNTDOWN) return;
+  if (state!==S.COUNTDOWN||cdCancelled) return;
   showNum(n);
-  if (n>1) {
-    cdTimers.push(setTimeout(()=>{if(state===S.COUNTDOWN){countdownNum.classList.remove('pop');countdownNum.classList.add('fade');}},540));
-    cdTimers.push(setTimeout(()=>tickCd(n-1),750));
-  } else {
-    cdTimers.push(setTimeout(()=>{if(state===S.COUNTDOWN){countdownNum.classList.remove('pop');countdownNum.classList.add('fade');}},540));
-    cdTimers.push(setTimeout(()=>{countdownEl.classList.remove('show');if(state===S.COUNTDOWN)fire();},780));
+  let t0=null, fadeDone=false;
+  function frame(now) {
+    if (state!==S.COUNTDOWN||cdCancelled) return;
+    if (!t0) t0=now;
+    const el=now-t0;
+    if (!fadeDone&&el>=540) {
+      fadeDone=true;
+      countdownNum.classList.remove('pop'); countdownNum.classList.add('fade');
+    }
+    if (el>=750) {
+      if (n>1) { tickCd(n-1); }
+      else { countdownEl.classList.remove('show'); if(state===S.COUNTDOWN&&!cdCancelled) fire(); }
+      return;
+    }
+    requestAnimationFrame(frame);
   }
+  requestAnimationFrame(frame);
 }
 
 function cancelCd() {
-  cdTimers.forEach(clearTimeout); cdTimers=[];
+  cdCancelled=true;
   countdownEl.classList.remove('show'); countdownNum.classList.remove('pop','fade');
 }
 
