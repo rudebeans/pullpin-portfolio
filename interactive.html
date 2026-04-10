@@ -101,18 +101,31 @@
       color: rgba(255,255,255,0.25);
     }
 
-    /* ── Pull Again ── */
-    #reset-btn {
+    /* ── Button row (Explore Work + Pull Again) ── */
+    #btn-row {
       position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+      display: none; opacity: 0; gap: 16px;
+      align-items: center; z-index: 30;
+      transition: opacity 0.5s;
+    }
+    #btn-row.visible { opacity: 1; display: flex; }
+    #explore-btn, #reset-btn {
       padding: 12px 32px; border: 1px solid rgba(255,255,255,0.25);
       background: transparent; color: rgba(255,255,255,0.6);
       font-family: 'Space Grotesk', sans-serif;
       font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
-      cursor: none; display: none; opacity: 0;
-      transition: opacity 0.5s, border-color 0.3s, color 0.3s; z-index: 30;
+      cursor: none; overflow: hidden; position: relative;
+      transition: border-color 0.3s, color 0.3s;
+      text-decoration: none; display: inline-block;
     }
-    #reset-btn.visible { opacity: 1; }
-    #reset-btn:hover { border-color: rgba(255,255,255,0.7); color: #fff; }
+    #explore-btn::before, #reset-btn::before {
+      content: ''; position: absolute; inset: 0;
+      background: #fff; transform: translateX(-101%);
+      transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      z-index: -1;
+    }
+    #explore-btn:hover, #reset-btn:hover { border-color: #fff; color: #000; }
+    #explore-btn:hover::before, #reset-btn:hover::before { transform: translateX(0); }
 
     /* ── Loading ── */
     #loading {
@@ -181,7 +194,10 @@
 </div>
 
 <div id="ui">Make a wish &nbsp;·&nbsp; Pull the Pin</div>
-<button id="reset-btn">↺ &nbsp;Pull Again</button>
+<div id="btn-row">
+  <a id="explore-btn" href="index.html#work">Explore Work</a>
+  <button id="reset-btn">↺ &nbsp;Pull Again</button>
+</div>
 
 <!-- CDN Three.js + Draco (ES modules) -->
 <script type="importmap">
@@ -204,6 +220,7 @@ const canvas       = document.getElementById('c');
 const ctx          = canvas.getContext('2d');
 const ui           = document.getElementById('ui');
 const resetBtn     = document.getElementById('reset-btn');
+const btnRow       = document.getElementById('btn-row');
 const countdownEl  = document.getElementById('countdown');
 const countdownNum = document.getElementById('countdown-num');
 const loadingEl    = document.getElementById('loading');
@@ -559,8 +576,8 @@ function draw(now) {
       fortuneEl.classList.add('show');
     }
     if (!resetShown&&el>1400) {
-      resetShown=true; resetBtn.style.display='block';
-      requestAnimationFrame(()=>resetBtn.classList.add('visible'));
+      resetShown=true; btnRow.style.display='flex';
+      requestAnimationFrame(()=>btnRow.classList.add('visible'));
     }
   }
 }
@@ -764,8 +781,8 @@ resetBtn.addEventListener('click', () => {
     pt.ox=0;pt.oy=0;pt.vx=0;pt.vy=0;pt.alpha=1;pt.flying=false;
     if (pt.spinV!==undefined){pt.spin=0;pt.spinV=0;}
   }
-  resetBtn.classList.remove('visible');
-  setTimeout(()=>{resetBtn.style.display='none';},500);
+  btnRow.classList.remove('visible');
+  setTimeout(()=>{btnRow.style.display='none';},500);
   fortuneEl.classList.remove('show');
   document.body.classList.remove('cursor-hover');
   ui.textContent='Make a wish · Pull the Pin';

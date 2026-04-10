@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All Projects · PullPin</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="media/favicon/PullPin_Favicon_32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="media/favicon/PullPin_Favicon_16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="media/favicon/PullPin_Favicon_180x180.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="PullPin" />
+  <meta property="og:title" content="PullPin — Creative Direction &amp; Design" />
+  <meta property="og:description" content="Brand identity, experiential design, campaigns, and creative direction across sports, gaming, lifestyle and beyond." />
+  <meta property="og:image" content="https://pullpin.com/media/og/pullpin-og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:url" content="https://pullpin.com/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://pullpin.com/media/og/pullpin-og.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+
+    /* ─── PAGE HEADER ─── */
+    .projects-header {
+      padding: 140px 48px 60px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 32px;
+    }
+    .projects-header__title {
+      font-family: var(--font-sans);
+      font-size: clamp(48px, 8vw, 96px);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 0.95;
+      color: var(--white);
+    }
+    .projects-header__title span {
+      display: block;
+      color: transparent;
+      -webkit-text-stroke: 1.5px var(--white);
+    }
+    .projects-header__meta {
+      text-align: right;
+      padding-bottom: 8px;
+    }
+    .projects-header__count {
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .projects-header__divider {
+      width: 40px;
+      height: 1px;
+      background: var(--border);
+      margin: 12px 0 12px auto;
+    }
+    .projects-header__sub {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 260px;
+    }
+
+    /* ─── GRID ─── */
+    .pg-wrap {
+      padding: 0 2px 120px;
+    }
+
+    /* Hero tile */
+    .pg-hero {
+      position: relative;
+      overflow: hidden;
+      height: 70vh;
+      min-height: 480px;
+      cursor: none;
+      margin-bottom: 2px;
+    }
+    .pg-hero__media {
+      position: absolute;
+      inset: 0;
+    }
+    .pg-hero__media video,
+    .pg-hero__media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.9s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .pg-hero:hover .pg-hero__media video,
+    .pg-hero:hover .pg-hero__media img { transform: scale(1.03); }
+    .pg-hero__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 60%, transparent 100%);
+      z-index: 1;
+    }
+    .pg-hero__info {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      z-index: 2;
+      padding: 32px 40px;
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+    }
+    .pg-hero__left { flex: 1; }
+    .pg-hero__eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .pg-hero__title {
+      font-family: var(--font-sans);
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      line-height: 1.1;
+    }
+    .pg-hero__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 16px;
+    }
+    .pg-hero__tags span {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 3px 8px;
+      border-radius: 2px;
+    }
+    .pg-hero__right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+      padding-top: 4px;
+    }
+    .pg-hero__num {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.2);
+    }
+    .pg-hero__link {
+      width: 44px; height: 44px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: var(--white);
+      transition: border-color 0.2s, transform 0.3s var(--ease-out);
+      text-decoration: none;
+    }
+    .pg-hero__link:hover { border-color: var(--white); transform: rotate(45deg); }
+
+    /* Main grid */
+    .pg-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 2px;
+    }
+
+    /* Tile sizes */
+    .pg-tile             { grid-column: span 4; }   /* 1/3 */
+    .pg-tile--wide       { grid-column: span 8; }   /* 2/3 */
+    .pg-tile--half       { grid-column: span 6; }   /* 1/2 */
+    .pg-tile--full       { grid-column: span 12; }  /* full */
+    .pg-tile--quarter    { grid-column: span 3; }   /* 1/4 */
+
+    /* Tile base styles */
+    .pg-tile {
+      position: relative;
+      overflow: hidden;
+      background: #0c0c0c;
+      cursor: none;
+    }
+    .pg-tile__media {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+    }
+    .pg-tile__media video,
+    .pg-tile__media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.9s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .pg-tile:hover .pg-tile__media video,
+    .pg-tile:hover .pg-tile__media img { transform: scale(1.04); }
+    .pg-tile__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.15) 55%, transparent 100%);
+      z-index: 1;
+    }
+    .pg-tile__body {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      z-index: 2;
+      padding: 20px 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .pg-tile__left { flex: 1; min-width: 0; }
+    .pg-tile__eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .pg-tile__title {
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--white);
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+    }
+    .pg-tile__sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .pg-tile__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 10px;
+    }
+    .pg-tile__tags span {
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      border-radius: 2px;
+    }
+    .pg-tile__num {
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.15);
+      flex-shrink: 0;
+      align-self: flex-end;
+    }
+    .pg-tile__link {
+      flex-shrink: 0;
+      align-self: flex-start;
+      width: 32px; height: 32px;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s, transform 0.3s var(--ease-out);
+    }
+    .pg-tile__link:hover { border-color: var(--white); color: var(--white); transform: rotate(45deg); }
+
+    /* Height variants */
+    .pg-tile--tall   { height: 520px; }
+    .pg-tile--mid    { height: 380px; }
+    .pg-tile--short  { height: 280px; }
+    .pg-tile--cinema { height: 420px; }
+    .pg-tile--wide.pg-tile--tall { height: 520px; }
+
+    /* Placeholder tile */
+    .pg-tile--placeholder .pg-tile__media { display: none; }
+    .pg-tile--placeholder {
+      background: #0a0a0a;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .pg-tile--placeholder .pg-tile__overlay { display: none; }
+    .pg-tile--placeholder .pg-tile__body {
+      top: 0;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      gap: 8px;
+    }
+    .pg-tile--placeholder .pg-tile__title { opacity: 0.3; }
+    .pg-tile--placeholder .pg-tile__sub { opacity: 0.2; }
+    .pg-tile__coming {
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.15);
+      margin-top: 4px;
+    }
+
+    /* On the Horizon section */
+    .pg-horizon {
+      margin-top: 80px;
+      padding: 0 2px;
+    }
+    .pg-horizon__header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 0 4px 24px;
+    }
+    .pg-horizon__label {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .pg-horizon__line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .pg-horizon__count {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.15);
+      white-space: nowrap;
+    }
+    .pg-horizon__grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 2px;
+    }
+    @media (max-width: 900px) {
+      .pg-horizon__grid .pg-tile { grid-column: span 6; }
+    }
+
+    /* Footer */
+    .projects-footer {
+      padding: 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border);
+    }
+    .projects-footer__label {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .projects-footer__back {
+      font-size: 13px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .projects-footer__back:hover { color: var(--white); }
+
+    @media (max-width: 900px) {
+      .pg-tile, .pg-tile--wide, .pg-tile--half, .pg-tile--full, .pg-tile--quarter { grid-column: span 12; }
+      .pg-hero { height: 50vh; }
+      .projects-header { flex-direction: column; align-items: flex-start; padding: 120px 24px 40px; }
+      .projects-header__meta { text-align: left; }
+      .projects-header__divider { margin: 12px 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CUSTOM CURSOR -->
+  <div class="cursor" id="cursor">
+    <div class="cursor__dot"></div>
+    <div class="cursor__ring"></div>
+  </div>
+  <div class="cursor__label" id="cursorLabel"></div>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <a href="index.html" class="nav__logo" data-cursor="Home">
+      <img src="media/z_early_test_images/PullPin_Icon.svg" alt="PullPin" class="nav__icon" />
+      <span class="nav__name">PullPin.com</span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="index.html#work">Work</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+    <div class="nav__status">
+      <span>Creative Direction</span>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <header class="projects-header">
+    <h1 class="projects-header__title">
+      All<br><span>Projects</span>
+    </h1>
+    <div class="projects-header__meta">
+      <p class="projects-header__count">31 Projects · 2020–2025</p>
+      <div class="projects-header__divider"></div>
+      <p class="projects-header__sub">Brand identity, experiential design, campaigns, and creative direction across sports, gaming, lifestyle and beyond.</p>
+    </div>
+  </header>
+
+  <div class="pg-wrap">
+
+    <!-- ─── HERO TILE: RED DOT ─── -->
+    <article class="pg-hero" data-cursor="View" onclick="location.href='work/red-dot.html'" style="cursor:none;">
+      <div class="pg-hero__media">
+        <video autoplay muted loop playsinline>
+          <source src="media/work/campaigns/Red_Dot/DontTreadOnMe.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <div class="pg-hero__overlay"></div>
+      <div class="pg-hero__info">
+        <div class="pg-hero__left">
+          <p class="pg-hero__eyebrow">Brand Identity · 2024</p>
+          <h2 class="pg-hero__title">Red Dot, Veteran<br>Owned Hot Sauce</h2>
+          <div class="pg-hero__tags">
+            <span>Brand Identity</span>
+            <span>Packaging</span>
+            <span>Creative Direction</span>
+          </div>
+        </div>
+        <div class="pg-hero__right">
+          <a href="work/red-dot.html" class="pg-hero__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </div>
+    </article>
+
+    <!-- ─── MAIN GRID ─── -->
+    <div class="pg-grid">
+
+      <!-- ─── ROW 1: Army (wide) + Fat Goblin (narrow) ─── -->
+      <article class="pg-tile pg-tile--wide pg-tile--tall" data-cursor="View" onclick="location.href='work/army.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <video autoplay muted loop playsinline>
+            <source src="media/z_early_test_images/videos/Impos_Shot_Edit.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Brand &amp; Marketing</p>
+            <h3 class="pg-tile__title">U.S. Army Brand &amp; Marketing</h3>
+            <p class="pg-tile__sub">Brand system · 2024–2025</p>
+            <div class="pg-tile__tags"><span>Creative Direction</span><span>Experiential Design</span></div>
+          </div>
+          <a href="work/army.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <article class="pg-tile pg-tile--tall" data-cursor="View" onclick="location.href='work/fat-goblin.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <img src="media/work/campaigns/Fat_Goblin/6.png" alt="Fat Goblin Games" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Brand Identity</p>
+            <h3 class="pg-tile__title">Fat Goblin Games</h3>
+            <p class="pg-tile__sub">Brand · Illustration</p>
+            <div class="pg-tile__tags"><span>Brand</span><span>Illustration</span></div>
+          </div>
+          <a href="work/fat-goblin.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <!-- ─── ROW 2: BSB — full-width ─── -->
+      <article class="pg-tile pg-tile--full pg-tile--cinema" data-cursor="View" onclick="location.href='work/bsb.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <img src="media/work/campaigns/BSB/BSB_Banner.png" alt="Brown Sugar Bourbon" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Brand Identity · Packaging</p>
+            <h3 class="pg-tile__title">Brown Sugar Bourbon, Brand Redesign</h3>
+            <p class="pg-tile__sub">Brand identity · Packaging · 2024</p>
+            <div class="pg-tile__tags"><span>Brand Identity</span><span>Packaging</span></div>
+          </div>
+          <a href="work/bsb.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <!-- ─── ROW 3: Chuckle + PureWine + NASCAR ─── -->
+      <article class="pg-tile pg-tile--mid" data-cursor="View" onclick="location.href='work/chuckle.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <img src="media/work/campaigns/Chuckle/1.png" alt="Chuckle Rum" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Brand Identity</p>
+            <h3 class="pg-tile__title">Chuckle Rum</h3>
+            <p class="pg-tile__sub">Brand · Packaging</p>
+          </div>
+          <a href="work/chuckle.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <article class="pg-tile pg-tile--mid" data-cursor="View" onclick="location.href='work/purewine.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <img src="media/z_early_test_images/Wand_Banner.png" alt="PureWine" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Brand &amp; Packaging</p>
+            <h3 class="pg-tile__title">PureWine</h3>
+            <p class="pg-tile__sub">Brand · Packaging</p>
+          </div>
+          <a href="work/purewine.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <article class="pg-tile pg-tile--mid" data-cursor="View" onclick="location.href='work/nascar.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <img src="media/work/campaigns/NASCAR/94.png" alt="NASCAR" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Experiential Design</p>
+            <h3 class="pg-tile__title">NASCAR Hospitality</h3>
+            <p class="pg-tile__sub">Experiential · Spatial</p>
+          </div>
+          <a href="work/nascar.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <!-- ─── ROW 4: Stone Cellars + AT&T + Lululemon ─── -->
+      <article class="pg-tile pg-tile--quarter pg-tile--short" data-cursor="View" onclick="location.href='work/stone-cellars.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <img src="media/work/campaigns/Stone_Cellars_Ad_Bowl/Beringer_AdBowl.jpg.webp" alt="Stone Cellars Ad Bowl" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Campaign · Broadcast</p>
+            <h3 class="pg-tile__title">Stone Cellars</h3>
+            <p class="pg-tile__sub">Ad Bowl · Campaign</p>
+          </div>
+          <a href="work/stone-cellars.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <article class="pg-tile pg-tile--quarter pg-tile--short" data-cursor="View" onclick="location.href='work/att.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <video autoplay muted loop playsinline>
+            <source src="media/work/campaigns/ATT/video/ATT_CFP-trimmed.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Campaign</p>
+            <h3 class="pg-tile__title">AT&amp;T CFP</h3>
+            <p class="pg-tile__sub">Campaign · Experiential</p>
+          </div>
+          <a href="work/att.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <article class="pg-tile pg-tile--half pg-tile--short" data-cursor="View" onclick="location.href='work/lululemon.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <video autoplay muted loop playsinline style="object-position: center right;">
+            <source src="media/work/campaigns/Lulu/Lulu.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Experiential Design</p>
+            <h3 class="pg-tile__title">Lululemon, Experiential</h3>
+            <p class="pg-tile__sub">Experiential design · 2024</p>
+            <div class="pg-tile__tags"><span>Experiential</span><span>3D Design</span></div>
+          </div>
+          <a href="work/lululemon.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <!-- ─── ROW 5: Big Russ (narrow) + Packaging (wide) ─── -->
+      <article class="pg-tile pg-tile--tall" data-cursor="View" onclick="location.href='work/bigruss.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <img src="media/work/campaigns/BigRuss/BigRussThumbnail.png" alt="Big Russ" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Brand</p>
+            <h3 class="pg-tile__title">Big Russ</h3>
+            <p class="pg-tile__sub">Brand Identity · Art Direction</p>
+            <div class="pg-tile__tags"><span>Brand Identity</span><span>Art Direction</span><span>Print</span></div>
+          </div>
+          <a href="work/bigruss.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <article class="pg-tile pg-tile--wide pg-tile--tall" data-cursor="View" onclick="location.href='work/packaging.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <img src="media/work/campaigns/Packaging/Packaging_Thumbnail.jpg" alt="Packaging" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Packaging Design</p>
+            <h3 class="pg-tile__title">Packaging</h3>
+            <p class="pg-tile__sub">Packaging Design · Art Direction · Brand</p>
+            <div class="pg-tile__tags"><span>Packaging</span><span>Art Direction</span><span>Brand</span></div>
+          </div>
+          <a href="work/packaging.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <!-- ─── ROW 6: Texas Rangers — full width ─── -->
+      <article class="pg-tile pg-tile--full pg-tile--tall" data-cursor="View" onclick="location.href='work/texas-rangers.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <img src="media/z_early_test_images/PullPinSamples_2024_Page_19.jpg.webp" alt="Texas Rangers" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Identity System</p>
+            <h3 class="pg-tile__title">Texas Rangers, Uniform Redesign</h3>
+            <p class="pg-tile__sub">Brand Identity · Uniform Design · 2024</p>
+            <div class="pg-tile__tags"><span>Brand Identity</span><span>Creative Direction</span><span>Uniform Design</span></div>
+          </div>
+          <a href="work/texas-rangers.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <!-- ─── ROW 7: PointMobl + Children's Advocacy + Addys ─── -->
+      <article class="pg-tile pg-tile--mid" data-cursor="View" onclick="location.href='work/pointmobl.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <img src="media/work/campaigns/PointMobl/2.jpg" alt="PointMobl" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Brand · Digital</p>
+            <h3 class="pg-tile__title">PointMobl</h3>
+            <p class="pg-tile__sub">Brand · UI Design</p>
+          </div>
+          <a href="work/pointmobl.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <article class="pg-tile pg-tile--mid" data-cursor="View" onclick="location.href='work/childrens-advocacy.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <img src="media/work/campaigns/ChildrensAdvocacy/CAC_thumbnail.png" alt="Children's Advocacy" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Campaign</p>
+            <h3 class="pg-tile__title">Children's Advocacy</h3>
+            <p class="pg-tile__sub">Campaign · Nonprofit</p>
+          </div>
+          <a href="work/childrens-advocacy.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <article class="pg-tile pg-tile--mid" data-cursor="View" onclick="location.href='work/addys.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <img src="media/work/campaigns/Addys_2011/Addys_Thumbnail.png" alt="Addys 2011" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Award Campaign</p>
+            <h3 class="pg-tile__title">Addys 2011</h3>
+            <p class="pg-tile__sub">Art Direction · Illustration</p>
+          </div>
+          <a href="work/addys.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <!-- ─── ROW 8: Zelus (wide) + Fit Everywhere (narrow) ─── -->
+      <article class="pg-tile pg-tile--wide pg-tile--cinema" data-cursor="View" onclick="location.href='work/zelus.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <video autoplay muted loop playsinline>
+            <source src="media/work/campaigns/Zelus/CYAN_r.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Brand · Campaign · Film</p>
+            <h3 class="pg-tile__title">Zelus</h3>
+            <p class="pg-tile__sub">Brand · Campaign · Creative Direction</p>
+            <div class="pg-tile__tags"><span>Brand</span><span>Campaign</span><span>Film</span></div>
+          </div>
+          <a href="work/zelus.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <article class="pg-tile pg-tile--cinema" data-cursor="View" onclick="location.href='work/fiteverywhere.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <img src="media/work/campaigns/FitEverywhere/3.jpg" alt="Fit Everywhere" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">App Design</p>
+            <h3 class="pg-tile__title">Fit Everywhere</h3>
+            <p class="pg-tile__sub">App Design · UX</p>
+          </div>
+          <a href="work/fiteverywhere.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <!-- ─── ROW 9: Experiential (wide) + HuduRX (narrow) ─── -->
+      <article class="pg-tile pg-tile--wide pg-tile--cinema" data-cursor="View" onclick="location.href='work/experiential.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <img src="media/work/campaigns/Experiential/9.png" alt="Experiential" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Experiential Design</p>
+            <h3 class="pg-tile__title">Experiential</h3>
+            <p class="pg-tile__sub">Spatial Design · Brand Activation</p>
+            <div class="pg-tile__tags"><span>Experiential</span><span>Spatial Design</span><span>Environmental</span></div>
+          </div>
+          <a href="work/experiential.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <article class="pg-tile pg-tile--cinema" data-cursor="View" onclick="location.href='work/hudurx.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <img src="media/work/campaigns/HuduRX/1.jpg" alt="HuduRX" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Brand Identity</p>
+            <h3 class="pg-tile__title">HuduRX</h3>
+            <p class="pg-tile__sub">Brand · Packaging</p>
+            <div class="pg-tile__tags"><span>Brand Identity</span><span>Packaging</span></div>
+          </div>
+          <a href="work/hudurx.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <!-- ─── ROW 10: Brand Identity — full-width editorial break ─── -->
+      <article class="pg-tile pg-tile--full pg-tile--cinema" data-cursor="View" onclick="location.href='work/brand-identity.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <video autoplay muted loop playsinline style="object-position: center center;">
+            <source src="PullPin_Grenade_1.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Identity Design · 2020–2025</p>
+            <h3 class="pg-tile__title">Brand Identity</h3>
+            <p class="pg-tile__sub">Identity design · 2020–2025</p>
+            <div class="pg-tile__tags"><span>Brand Identity</span><span>Illustration Design</span></div>
+          </div>
+          <a href="work/brand-identity.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <!-- ─── ROW 11: Bataan (narrow) + GLO (wide) ─── -->
+      <article class="pg-tile pg-tile--tall" data-cursor="View" onclick="location.href='work/bataan.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <img src="media/work/campaigns/Bataan_Death_March/Bataan_Thumbnail.png" alt="Bataan Death March" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Campaign</p>
+            <h3 class="pg-tile__title">Bataan Death March</h3>
+            <p class="pg-tile__sub">Art Direction · Campaign · Print</p>
+            <div class="pg-tile__tags"><span>Campaign</span><span>Art Direction</span><span>Print</span></div>
+          </div>
+          <a href="work/bataan.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <article class="pg-tile pg-tile--wide pg-tile--tall" data-cursor="View" onclick="location.href='work/glo.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <video autoplay muted loop playsinline>
+            <source src="media/z_early_test_images/GLO_animated_bumper.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Game Dev · 3D Design</p>
+            <h3 class="pg-tile__title">GLO, Game Like Objects</h3>
+            <p class="pg-tile__sub">Video game development · 2024</p>
+            <div class="pg-tile__tags"><span>Game Dev</span><span>3D Design</span></div>
+          </div>
+          <a href="work/glo.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <!-- ─── ROW 12: Interactive Tools — LARGE full-width closer ─── -->
+      <article class="pg-tile pg-tile--full pg-tile--tall" data-cursor="View" style="cursor:none;" onclick="window.location='work/interactive-tools.html'">
+        <div class="pg-tile__media">
+          <img src="media/work/campaigns/Interactive_Tools/Tools_Tile_Image.png" alt="Interactive Tools" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">UI/UX · Product Design · Interactive</p>
+            <h3 class="pg-tile__title">Interactive Tools</h3>
+            <p class="pg-tile__sub">Functional design · 2024</p>
+            <div class="pg-tile__tags"><span>UI/UX</span><span>Product Design</span><span>Productivity</span></div>
+          </div>
+          <a href="work/interactive-tools.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <!-- ─── BOTTOM: Legacy / Archive Work ─── -->
+      <article class="pg-tile pg-tile--wide pg-tile--tall" data-cursor="View" onclick="location.href='work/night-knight.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <img src="media/work/campaigns/NightKnightBooks/1.jpg" alt="Night Knight Books" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Brand · Illustration</p>
+            <h3 class="pg-tile__title">Night Knight Books</h3>
+            <p class="pg-tile__sub">Brand Identity · Illustration · Publishing</p>
+            <div class="pg-tile__tags"><span>Brand Identity</span><span>Illustration</span><span>Publishing</span></div>
+          </div>
+          <a href="work/night-knight.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <article class="pg-tile pg-tile--tall" data-cursor="View" onclick="location.href='work/mercedes.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <img src="media/work/campaigns/MercedesBenz/Header.jpg" alt="Mercedes-Benz" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Campaign</p>
+            <h3 class="pg-tile__title">Mercedes-Benz</h3>
+            <p class="pg-tile__sub">Campaign · Art Direction</p>
+            <div class="pg-tile__tags"><span>Campaign</span><span>Creative Direction</span></div>
+          </div>
+          <a href="work/mercedes.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <article class="pg-tile pg-tile--half pg-tile--cinema" data-cursor="View" onclick="location.href='work/food-photo.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <img src="media/work/campaigns/Food_Photo_Art_Direction/4.jpg" alt="Food Photography" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Photography · Art Direction</p>
+            <h3 class="pg-tile__title">Food Photography</h3>
+            <p class="pg-tile__sub">Food Photography · Styling</p>
+            <div class="pg-tile__tags"><span>Photography</span><span>Art Direction</span><span>Styling</span></div>
+          </div>
+          <a href="work/food-photo.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+      <article class="pg-tile pg-tile--half pg-tile--cinema" data-cursor="View" onclick="location.href='work/mundo-earwood.html'" style="cursor:none;">
+        <div class="pg-tile__media">
+          <img src="media/work/campaigns/Mundo_Earwood/2.png" alt="Mundo Earwood" loading="lazy" />
+        </div>
+        <div class="pg-tile__overlay"></div>
+        <div class="pg-tile__body">
+          <div class="pg-tile__left">
+            <p class="pg-tile__eyebrow">Brand</p>
+            <h3 class="pg-tile__title">Mundo Earwood</h3>
+            <p class="pg-tile__sub">Brand Identity · Art Direction</p>
+            <div class="pg-tile__tags"><span>Brand Identity</span><span>Art Direction</span></div>
+          </div>
+          <a href="work/mundo-earwood.html" class="pg-tile__link" onclick="event.stopPropagation()"><svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </article>
+
+    </div><!-- /pg-grid -->
+
+    <!-- ─── ON THE HORIZON ─── -->
+    <div class="pg-horizon">
+      <div class="pg-horizon__header">
+        <span class="pg-horizon__label">On the Horizon</span>
+        <div class="pg-horizon__line"></div>
+        <span class="pg-horizon__count">3 projects in progress</span>
+      </div>
+      <div class="pg-horizon__grid">
+
+        <article class="pg-tile pg-tile--quarter pg-tile--short pg-tile--placeholder"><div class="pg-tile__body"><div class="pg-tile__left"><h3 class="pg-tile__title">Cheetos</h3><p class="pg-tile__sub">Campaign</p><p class="pg-tile__coming">Coming Soon</p></div></div></article>
+
+        <article class="pg-tile pg-tile--quarter pg-tile--short pg-tile--placeholder"><div class="pg-tile__body"><div class="pg-tile__left"><h3 class="pg-tile__title">Cracker Barrel</h3><p class="pg-tile__sub">Brand</p><p class="pg-tile__coming">Coming Soon</p></div></div></article>
+
+        <article class="pg-tile pg-tile--quarter pg-tile--short pg-tile--placeholder"><div class="pg-tile__body"><div class="pg-tile__left"><h3 class="pg-tile__title">Red Rocket</h3><p class="pg-tile__sub">Campaign</p><p class="pg-tile__coming">Coming Soon</p></div></div></article>
+
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="projects-footer">
+    <span class="projects-footer__label">PullPin · 2020–2025</span>
+    <a href="index.html" class="projects-footer__back">← Back to Home</a>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const nav = document.getElementById('nav');
+      window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 60);
+      }, { passive: true });
+
+      /* ── CUSTOM CURSOR ── */
+      const cursor      = document.getElementById('cursor');
+      const cursorDot   = cursor.querySelector('.cursor__dot');
+      const cursorRing  = cursor.querySelector('.cursor__ring');
+      const cursorLabel = document.getElementById('cursorLabel');
+
+      let mx = -100, my = -100, rx = -100, ry = -100;
+
+      document.addEventListener('mousemove', e => {
+        mx = e.clientX; my = e.clientY;
+        cursorDot.style.transform = `translate3d(${mx - 3}px, ${my - 3}px, 0)`;
+      }, { passive: true });
+
+      (function animateCursor() {
+        rx += (mx - rx) * 0.12;
+        ry += (my - ry) * 0.12;
+        const tx = (rx - 18) | 0;
+        const ty = (ry - 18) | 0;
+        cursorRing.style.transform  = `translate3d(${tx}px, ${ty}px, 0)`;
+        cursorLabel.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+        requestAnimationFrame(animateCursor);
+      })();
+
+      document.querySelectorAll('[data-cursor]').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          cursor.classList.add('cursor--hover');
+          cursorLabel.textContent = el.dataset.cursor;
+        });
+        el.addEventListener('mouseleave', () => {
+          cursor.classList.remove('cursor--hover');
+          cursorLabel.textContent = '';
+        });
+      });
+
+      document.querySelectorAll('a, button').forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('cursor--hover'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('cursor--hover'));
+      });
+
+      /* ── SCROLL REVEAL ── */
+      const tiles = document.querySelectorAll('.pg-tile, .pg-hero');
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            const vid = entry.target.querySelector('video');
+            if (vid) vid.play().catch(() => {});
+            obs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
+
+      tiles.forEach((el, i) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = `opacity 0.6s ease ${i * 0.04}s, transform 0.6s ease ${i * 0.04}s`;
+        obs.observe(el);
+      });
+
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.pg-tile, .pg-hero').forEach(el => {
+          if (el.classList.contains('visible')) {
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+          }
+        });
+      });
+
+    })();
+
+    // Patch IntersectionObserver to also apply styles
+    const _orig = IntersectionObserver;
+  </script>
+  <style>
+    .pg-tile.visible, .pg-hero.visible {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }
+  </style>
+
+</body>
+</html>
