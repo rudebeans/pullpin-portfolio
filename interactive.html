@@ -19,24 +19,42 @@
 
     /* ── Navigation ── */
     #nav {
-      position: fixed; top: 0; left: 0; right: 0; height: 64px;
+      position: fixed; top: 0; left: 0; right: 0; height: 72px;
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 32px; z-index: 50; pointer-events: none;
+    }
+    /* Left block: logo stacked above "← Home" */
+    #nav-left {
+      display: flex; flex-direction: column; gap: 4px;
+      pointer-events: auto;
     }
     #nav-logo {
       display: flex; align-items: center; gap: 10px;
       text-decoration: none; color: rgba(255,255,255,0.7);
       font-size: 13px; font-weight: 500; letter-spacing: 0.04em;
-      pointer-events: auto; transition: color 0.2s;
+      transition: color 0.2s;
     }
     #nav-logo:hover { color: #fff; }
     #nav-logo img { width: 28px; height: 28px; object-fit: contain; }
     #nav-back {
-      font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
-      color: rgba(255,255,255,0.3); text-decoration: none;
-      pointer-events: auto; transition: color 0.2s;
+      font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(255,255,255,0.28); text-decoration: none;
+      padding-left: 38px; /* align with logo text, past icon + gap */
+      transition: color 0.2s;
     }
-    #nav-back:hover { color: rgba(255,255,255,0.7); }
+    #nav-back:hover { color: rgba(255,255,255,0.65); }
+    /* Centre: Work / About / Contact */
+    #nav-links {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 40px; list-style: none;
+      pointer-events: auto;
+    }
+    #nav-links a {
+      font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(255,255,255,0.35); text-decoration: none;
+      transition: color 0.2s;
+    }
+    #nav-links a:hover { color: rgba(255,255,255,0.8); }
 
     /* ── Canvas ── */
     canvas {
@@ -170,11 +188,18 @@
 
 <!-- Nav -->
 <nav id="nav">
-  <a href="index.html" id="nav-logo">
-    <img src="media/z_early_test_images/PullPin_Icon.svg" alt="PullPin" />
-    <span>PullPin.com</span>
-  </a>
-  <a href="index.html" id="nav-back">← Home</a>
+  <div id="nav-left">
+    <a href="interactive.html" id="nav-logo">
+      <img src="media/z_early_test_images/PullPin_Icon.svg" alt="PullPin" />
+      <span>PullPin.com</span>
+    </a>
+    <a href="index.html#work" id="nav-back">← Home</a>
+  </div>
+  <ul id="nav-links">
+    <li><a href="index.html#work">Work</a></li>
+    <li><a href="index.html#about">About</a></li>
+    <li><a href="index.html#contact">Contact</a></li>
+  </ul>
 </nav>
 
 <canvas id="c"></canvas>
