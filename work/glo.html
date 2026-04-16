@@ -32,6 +32,13 @@
       opacity: 0.80;
       transition: opacity 0.6s ease;
     }
+    /* Mobile — tighten hero so video fills more of the visible screen */
+    @media (max-width: 768px) {
+      #glo-hero {
+        min-height: 72vh;
+        padding-bottom: 48px;
+      }
+    }
 
     /* Richer dark overlay — game aesthetic */
     .project-hero__bg::after {
