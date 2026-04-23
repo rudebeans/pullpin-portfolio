@@ -477,6 +477,9 @@
           // Focus iframe once loaded
           gameFrame.addEventListener('load', () => {
             gameFrame.contentWindow.focus();
+            // Force Three.js to re-measure dimensions now the iframe is fully
+            // laid out in the parent DOM (Chrome iframe timing fix).
+            gameFrame.contentWindow.dispatchEvent(new Event('resize'));
           }, { once: true });
         } else {
           gameFrame.contentWindow.focus();
