@@ -39,6 +39,52 @@ canvas { display: block; }
   80%  { color: #FF2020; transform: translateX(3px); }
   100% { color: #FF2020; transform: translateX(0); }
 }
+/* ── Countdown overlay ── */
+#countdown-overlay {
+  position:fixed; inset:0; z-index:200;
+  background:rgba(0,0,0,0.52);
+  display:none; align-items:center; justify-content:center;
+  flex-direction:column; gap:18px; pointer-events:all;
+}
+#countdown-overlay.cd-active { display:flex; }
+#countdown-num {
+  font-family:'Courier New',monospace; font-weight:400;
+  font-size:210px; letter-spacing:0.04em;
+  color:#FECC02; opacity:0;
+  text-shadow:0 0 50px rgba(254,204,2,0.55), 0 0 100px rgba(254,204,2,0.22);
+  line-height:1;
+}
+#countdown-num.cd-tick { animation:cd-tick 0.82s ease-out forwards; }
+#countdown-num.cd-go {
+  font-size:110px; letter-spacing:0.28em;
+  color:#00FF66;
+  text-shadow:0 0 50px rgba(0,255,102,0.65), 0 0 100px rgba(0,255,102,0.28);
+  animation:cd-go 0.72s ease-out forwards;
+}
+#countdown-drone-label {
+  font-family:'Courier New',monospace; font-size:11px;
+  letter-spacing:0.35em; color:#FECC02; opacity:0;
+  text-transform:uppercase; text-align:center;
+}
+#countdown-drone-label.cd-tick { animation:cd-label-fade 0.82s ease-out forwards; }
+#countdown-drone-label.cd-go   { animation:cd-label-fade 0.72s ease-out forwards; color:#00FF66; }
+@keyframes cd-tick {
+  0%  { opacity:0; transform:scale(1.75); }
+  14% { opacity:1; transform:scale(1.0); }
+  72% { opacity:1; transform:scale(1.0); }
+  100%{ opacity:0; transform:scale(0.82); }
+}
+@keyframes cd-go {
+  0%  { opacity:0; transform:scale(0.78) translateY(6px); }
+  16% { opacity:1; transform:scale(1.06) translateY(0); }
+  42% { transform:scale(1.0); }
+  78% { opacity:1; }
+  100%{ opacity:0; transform:scale(1.12); }
+}
+@keyframes cd-label-fade {
+  0%,10%{ opacity:0; } 20%{ opacity:0.55; } 72%{ opacity:0.55; } 100%{ opacity:0; }
+}
+
 #overlay {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -285,6 +331,10 @@ canvas { display: block; }
   <div id="hud-time-row">TIME &nbsp;&nbsp;<span id="hud-time">30.0</span>s</div>
   <div id="emp-hud" class="">EMP ×<span id="emp-count">0</span></div>
   <div style="margin-top:10px;opacity:0.4;font-size:11px">[SPACE] FIRE</div>
+</div>
+<div id="countdown-overlay">
+  <div id="countdown-num"></div>
+  <div id="countdown-drone-label"></div>
 </div>
 <div id="overlay">
   <div id="go-card">
@@ -849,7 +899,7 @@ function _disposeGroupDeep(grp) {
   }
 }
 function cycleDrone(dir) {
-  _initAudio().then(_playSelectSound);
+  _playSelectSound();
   // Snap any in-progress transition immediately
   if (hangarSwipe) {
     _disposeGroupDeep(hangarSwipe.outGroup);
@@ -904,8 +954,11 @@ function startGame() {
   // Gyro: only request permission when player chose GYRO mode
   gyroBaseGamma = null; gyroBaseBeta = null; gyroAX = 0; gyroAY = 0;
   if (preferGyro && !gyroEnabled) window.enableGyro();
-  _initAudio().then(_startRotorAudio);
   restartGame();
+  _initAudio().then(() => {
+    _startRotorAudio();
+    _startCountdown(() => { /* input + timer unlock handled by countdownActive flag */ });
+  });
 }
 
 
@@ -1257,14 +1310,32 @@ let score = 0;
 let timeLeft = START_TIME;
 let gameOver = false;
 
+let countdownActive = false; // blocks input + timer during 3-2-1-GO
+
 // ── Rotor audio state ─────────────────────────────────────────────────────────
 let _audioCtx      = null;
-let _rotorBuffer   = null;
-let _ringBuffer    = null;
-let _selectBuffer  = null;
-let _denyBuffer    = null;
-let _powerUpBuffer = null;
-let _explosionBuffer = null;
+let _rotorBuffer    = null;
+let _ringBuffer     = null;
+let _denyBuffer     = null;
+let _powerUpBuffer  = null;
+let _explosionBuffer= null;
+let _selectBuffer   = null;
+
+// Pre-fetch all audio files immediately on page load — fetch() needs no user gesture.
+// By the time the player first interacts, bytes are already in memory; decoding is instant.
+const _rawAudioCache = {};
+(function _prefetchAudio() {
+  const files = [
+    'Drone_Rotor.wav','Ring_Passthrough.wav',
+    'Deny.wav','PowerUp.wav','Tank_Explosion.wav','Select_Drone.wav'
+  ];
+  files.forEach(f =>
+    fetch(`media/z_early_test_images/${f}`)
+      .then(r => r.arrayBuffer())
+      .then(b => { _rawAudioCache[f] = b; })
+      .catch(() => {})
+  );
+})();
 let _rotorSource   = null;
 let _rotorGain     = null;
 let _rotorFilter   = null;
@@ -1779,10 +1850,10 @@ const RC_FADE_OUT = 1; // terrain dissolving, normal rings still spawning
 const RC_SEQ      = 2; // RC ring corridor active
 const RC_FADE_IN  = 3; // terrain returning, normal rings resume
 
-const RC_DIVE_RINGS   = 12;  // rings descending
-const RC_ASCEND_RINGS = 12;  // rings ascending
+const RC_DIVE_RINGS   = 8;   // rings descending
+const RC_ASCEND_RINGS = 8;   // rings ascending
 const RC_TOTAL_RINGS  = RC_DIVE_RINGS + RC_ASCEND_RINGS;
-const RC_RING_SPACING = 3.6; // tight spacing for corridor feel
+const RC_RING_SPACING = 5.2; // breathing room so player can react
 const RC_FADE_DUR     = 1.8; // seconds to fade terrain in/out
 
 let rcPhase       = RC_IDLE;
@@ -1882,6 +1953,8 @@ function restartGame() {
 
 // Triggered from game-over screen — back to hangar
 function returnToHangar() {
+  countdownActive = false;
+  document.getElementById('countdown-overlay').classList.remove('cd-active');
   _stopRotorAudio(0.9);
   document.getElementById('hud').style.display = 'none';
   overlay.classList.remove('visible');
@@ -1952,21 +2025,43 @@ function returnToHangar() {
 
 // ── Rotor audio system ────────────────────────────────────────────────────────
 async function _initAudio() {
-  if (_audioCtx && _rotorBuffer && _ringBuffer && _selectBuffer) return;
+  if (_audioCtx && _rotorBuffer && _ringBuffer && _denyBuffer && _powerUpBuffer && _explosionBuffer) return;
   if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const load = (url, ref) => fetch(url)
-    .then(r => r.arrayBuffer())
-    .then(b => _audioCtx.decodeAudioData(b))
-    .then(b => { ref(b); })
-    .catch(e => console.warn(`Audio failed (${url}):`, e));
+  // Decode from pre-fetched cache — instant since bytes are already in memory
+  const decode = (filename, setter) => {
+    const raw = _rawAudioCache[filename];
+    if (!raw || setter()) return Promise.resolve();
+    return _audioCtx.decodeAudioData(raw).then(b => setter(b)).catch(() => {});
+  };
   await Promise.all([
-    _rotorBuffer  ? Promise.resolve() : load('media/z_early_test_images/Drone_Rotor.wav',      b => _rotorBuffer  = b),
-    _ringBuffer   ? Promise.resolve() : load('media/z_early_test_images/Ring_Passthrough.wav', b => _ringBuffer   = b),
-    _selectBuffer ? Promise.resolve() : load('media/z_early_test_images/Select_Drone.wav',     b => _selectBuffer = b),
-    _denyBuffer     ? Promise.resolve() : load('media/z_early_test_images/Deny.wav',             b => _denyBuffer     = b),
-    _powerUpBuffer  ? Promise.resolve() : load('media/z_early_test_images/PowerUp.wav',          b => _powerUpBuffer  = b),
-    _explosionBuffer? Promise.resolve() : load('media/z_early_test_images/Tank_Explosion.wav',   b => _explosionBuffer= b),
+    decode('Drone_Rotor.wav',      b => b ? (_rotorBuffer    = b) : _rotorBuffer),
+    decode('Ring_Passthrough.wav', b => b ? (_ringBuffer     = b) : _ringBuffer),
+    decode('Deny.wav',             b => b ? (_denyBuffer     = b) : _denyBuffer),
+    decode('PowerUp.wav',          b => b ? (_powerUpBuffer  = b) : _powerUpBuffer),
+    decode('Tank_Explosion.wav',   b => b ? (_explosionBuffer= b) : _explosionBuffer),
   ]);
+}
+
+// Drone selection chime — self-contained, works before startGame() is called.
+// 2× speed so it reads as a quick UI blip; 0.30 gain keeps it subtle.
+async function _playSelectSound() {
+  try {
+    if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (_audioCtx.state === 'suspended') await _audioCtx.resume();
+    if (!_selectBuffer) {
+      const raw = _rawAudioCache['Select_Drone.wav'];
+      if (!raw) return;
+      _selectBuffer = await _audioCtx.decodeAudioData(raw.slice(0)); // slice → fresh copy
+    }
+    const src  = _audioCtx.createBufferSource();
+    const gain = _audioCtx.createGain();
+    src.buffer = _selectBuffer;
+    src.playbackRate.value = 2.0;
+    gain.gain.value = 0.30;
+    src.connect(gain);
+    gain.connect(_audioCtx.destination);
+    src.start(0);
+  } catch(e) { /* audio unavailable — fail silently */ }
 }
 
 function _playRingSound(streakLen) {
@@ -2020,17 +2115,50 @@ function _playExplosionSound() {
   src.start(0);
 }
 
-function _playSelectSound() {
-  if (!_audioCtx || !_selectBuffer) return;
-  if (_audioCtx.state === 'suspended') _audioCtx.resume();
-  const src  = _audioCtx.createBufferSource();
-  const gain = _audioCtx.createGain();
-  src.buffer = _selectBuffer;
-  src.playbackRate.value = 1.0;
-  gain.gain.value = 0.3;
-  src.connect(gain);
-  gain.connect(_audioCtx.destination);
-  src.start(0);
+
+// ── 3-2-1-GO! countdown ───────────────────────────────────────────────────────
+function _startCountdown(onComplete) {
+  countdownActive = true;
+  const overlay   = document.getElementById('countdown-overlay');
+  const numEl     = document.getElementById('countdown-num');
+  const labelEl   = document.getElementById('countdown-drone-label');
+  const droneName = DRONE_CONFIGS[selectedDrone].name.toUpperCase();
+  overlay.classList.add('cd-active');
+
+  const steps    = ['3','2','1','GO!'];
+  const durations = [900, 900, 900, 750]; // ms per step
+  let i = 0;
+
+  function tick() {
+    if (i >= steps.length) {
+      overlay.classList.remove('cd-active');
+      countdownActive = false;
+      onComplete();
+      return;
+    }
+    const val  = steps[i];
+    const isGo = val === 'GO!';
+
+    // Restart animations cleanly
+    numEl.className   = '';
+    labelEl.className = '';
+    void numEl.offsetWidth; // force reflow
+    numEl.textContent   = val;
+    labelEl.textContent = isGo ? 'MISSION  ACTIVE' : droneName;
+    numEl.className   = isGo ? 'cd-go'   : 'cd-tick';
+    labelEl.className = isGo ? 'cd-go'   : 'cd-tick';
+
+    // Audio — silent on 3/2/1, ring chime on GO!
+    if (isGo) _playRingSound(0);
+
+    // Screen flash on GO!
+    if (isGo) { passFlashTimer = 0.25; }
+
+    i++;
+    setTimeout(tick, durations[i - 1]);
+  }
+
+  tick();
 }
 
 function _startRotorAudio() {
@@ -2682,6 +2810,7 @@ function animate(ts) {
   if (!gameOver) {
     // Input
     let ax = 0, ay = 0;
+    if (countdownActive) { ax = 0; ay = 0; } // lock controls during countdown
     if (keys['ArrowLeft']  || keys['KeyA']) ax = -1;
     if (keys['ArrowRight'] || keys['KeyD']) ax =  1;
     if (keys['ArrowUp']    || keys['KeyW']) ay =  1;
@@ -2732,18 +2861,6 @@ function animate(ts) {
     droneVel.x += ax * MOVE_SPEED * dt;
     droneVel.y += ay * MOVE_SPEED * dt;
     _updateRotorAudio(dt, ax, ay);
-    // ── RC roller-coaster auto-guide ─────────────────────────────────────────
-    // Gently push the drone toward each ring's Y so the player rides the
-    // arc like a rollercoaster rather than scrambling to catch up.
-    if (rcPhase === RC_SEQ) {
-      const ri = Math.min(rcRingIdx, RC_TOTAL_RINGS - 1);
-      const rcTargetY = ri < RC_DIVE_RINGS
-        ? -1.5 - 3.0 * (ri / (RC_DIVE_RINGS - 1))
-        : -4.5 + 6.0 * ((ri - RC_DIVE_RINGS) / (RC_ASCEND_RINGS - 1));
-      const gap = rcTargetY - dronePos.y;
-      // Up to 65% of full player force, scales with remaining gap — won't overshoot
-      droneVel.y += Math.sign(gap) * Math.min(1, Math.abs(gap) * 0.55) * MOVE_SPEED * 0.65 * dt;
-    }
     droneVel.x *= MOVE_DAMPING;
     droneVel.y *= MOVE_DAMPING;
 
@@ -2752,7 +2869,9 @@ function animate(ts) {
     // Boss encounter: smooth speed throttle (lerps to 25% during encounter)
     const _bossEncounterActive = bossPhase !== 'none' && bossPhase !== 'dead';
     bossSpeedMult += ((_bossEncounterActive ? 0.50 : 1.0) - bossSpeedMult) * Math.min(1, dt * 2.5);
-    dronePos.z -= speed * bossSpeedMult * dt;
+    // RC corridor gets a speed kick — makes it feel like a thrill ride
+    const _rcBoost = (rcPhase === RC_SEQ) ? 1.28 : 1.0;
+    dronePos.z -= speed * bossSpeedMult * _rcBoost * dt;
 
     // Clamp position
     dronePos.x = Math.max(-6, Math.min(6, dronePos.x));
@@ -2762,7 +2881,8 @@ function animate(ts) {
     // Visual tilt — suppress normal banking roll when knife-edging (90° owns the rotation)
     const targetRoll  = knifeEdge ? 0 : -ax * 0.6;
     // During RC corridor, add nose-pitch bias so drone visually dives/climbs with the arc
-    const rcPitchBias = (rcPhase === RC_SEQ) ? rcCamTarget * -0.022 : 0;
+    // rcCamTarget is negative on dive → positive here = nose tilts down (correct)
+    const rcPitchBias = (rcPhase === RC_SEQ) ? rcCamTarget * 0.028 : 0;
     const targetPitch =  ay * 0.25 + rcPitchBias;
     droneRoll  += (targetRoll  - droneRoll)  * TILT_SPEED * dt * 10;
     dronePitch += (targetPitch - dronePitch) * TILT_SPEED * dt * 10;
@@ -2904,7 +3024,7 @@ function animate(ts) {
     speed = 12 + currentLevel * 3 + distance * 0.001; // level bump + distance ramp
 
     // ── Countdown clock ───────────────────────────────────────────────────────
-    timeLeft -= dt;
+    if (!countdownActive) timeLeft -= dt;
     if (timeLeft <= 0) {
       timeLeft = 0;
       gameOver = true;
@@ -2944,13 +3064,9 @@ function animate(ts) {
         rcSpawnZ  = lastRingSpawnZ;
       }
     } else if (rcPhase === RC_SEQ) {
-      // Camera dynamically tracks the next ring's Y relative to the drone —
-      // so it naturally follows the arc rather than snapping to a fixed angle.
-      const _rcRi = Math.min(rcRingIdx, RC_TOTAL_RINGS - 1);
-      const _rcRingY = _rcRi < RC_DIVE_RINGS
-        ? -1.5 - 3.0 * (_rcRi / (RC_DIVE_RINGS - 1))
-        : -4.5 + 6.0 * ((_rcRi - RC_DIVE_RINGS) / (RC_ASCEND_RINGS - 1));
-      rcCamTarget = (_rcRingY - dronePos.y) * 1.4;
+      // Fixed phase-based tilt — clear signal to the player, no jitter.
+      // Nose-down on the dive half, level on the climb back up.
+      rcCamTarget = (rcRingIdx < RC_DIVE_RINGS) ? -2.2 : 0.5;
     } else if (rcPhase === RC_FADE_IN) {
       rcTimer += dt;
       rcCamTarget = 0; // ease horizon back to level
@@ -2976,12 +3092,12 @@ function animate(ts) {
 
         let ry;
         if (ri < RC_DIVE_RINGS) {
-          // Start well below drone (-1.5), dive deep (-4.5) — rings are below you from ring 1
-          ry = -1.5 - 3.0 * (ri / (RC_DIVE_RINGS - 1));
+          // Ring 0 at drone level (0), smooth arc down to -3.5 — player reads the dive, then commits
+          ry = -3.5 * (ri / (RC_DIVE_RINGS - 1));
         } else {
-          // Ascent: -4.5 → 1.5 — pull back up to just above nominal
+          // Ascent: -3.5 → 0.5 — slight overshoot so the pull-up feels satisfying
           const ai = ri - RC_DIVE_RINGS;
-          ry = -4.5 + 6.0 * (ai / (RC_ASCEND_RINGS - 1));
+          ry = -3.5 + 4.0 * (ai / (RC_ASCEND_RINGS - 1));
         }
 
         spawnRing(rcSpawnZ, rx, ry);
