@@ -956,6 +956,7 @@ function startGame() {
   if (preferGyro && !gyroEnabled) window.enableGyro();
   restartGame();
   _initAudio().then(() => {
+    _startMusic();
     _startRotorAudio();
     _startCountdown(() => { /* input + timer unlock handled by countdownActive flag */ });
   });
@@ -1320,6 +1321,9 @@ let _denyBuffer     = null;
 let _powerUpBuffer  = null;
 let _explosionBuffer= null;
 let _selectBuffer   = null;
+let _musicBuffer    = null;
+let _musicSource    = null;
+let _musicGain      = null;
 
 // Pre-fetch all audio files immediately on page load — fetch() needs no user gesture.
 // By the time the player first interacts, bytes are already in memory; decoding is instant.
@@ -1327,7 +1331,8 @@ const _rawAudioCache = {};
 (function _prefetchAudio() {
   const files = [
     'Drone_Rotor.wav','Ring_Passthrough.wav',
-    'Deny.wav','PowerUp.wav','Tank_Explosion.wav','Select_Drone.wav'
+    'Deny.wav','PowerUp.wav','Tank_Explosion.wav','Select_Drone.wav',
+    'Neon Apex Run-2.mp3'
   ];
   files.forEach(f =>
     fetch(`media/z_early_test_images/${f}`)
@@ -1341,8 +1346,8 @@ let _rotorGain     = null;
 let _rotorFilter   = null;
 let _rotorStrain   = 0;
 let _rotorLfoT     = 0;
-const ROTOR_BASE_GAIN   = 0.22;
-const ROTOR_STRAIN_GAIN = 0.14;  // extra gain at full strain
+const ROTOR_BASE_GAIN   = 0.11;
+const ROTOR_STRAIN_GAIN = 0.07;  // extra gain at full strain
 const ROTOR_STRAIN_RATE = 0.11;  // +11% pitch at full strain
 let distance = 0;
 let speed = 12; // units per second
@@ -1956,6 +1961,7 @@ function returnToHangar() {
   countdownActive = false;
   document.getElementById('countdown-overlay').classList.remove('cd-active');
   _stopRotorAudio(0.9);
+  _stopMusic(1.5);
   document.getElementById('hud').style.display = 'none';
   overlay.classList.remove('visible');
   // Hide in-game logo lockup
@@ -2039,7 +2045,36 @@ async function _initAudio() {
     decode('Deny.wav',             b => b ? (_denyBuffer     = b) : _denyBuffer),
     decode('PowerUp.wav',          b => b ? (_powerUpBuffer  = b) : _powerUpBuffer),
     decode('Tank_Explosion.wav',   b => b ? (_explosionBuffer= b) : _explosionBuffer),
+    decode('Neon Apex Run-2.mp3',  b => b ? (_musicBuffer    = b) : _musicBuffer),
   ]);
+}
+
+// Background music — looping, fades in over 1.5 s so it eases in under the countdown
+function _startMusic() {
+  if (!_audioCtx || !_musicBuffer) return;
+  // Stop any track already playing (e.g. player restarted mid-run)
+  if (_musicSource) {
+    try { _musicSource.stop(); } catch(e) {}
+    _musicSource = null; _musicGain = null;
+  }
+  if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  _musicSource = _audioCtx.createBufferSource();
+  _musicGain   = _audioCtx.createGain();
+  _musicSource.buffer = _musicBuffer;
+  _musicSource.loop   = true;
+  _musicGain.gain.setValueAtTime(0, _audioCtx.currentTime);
+  _musicGain.gain.linearRampToValueAtTime(0.4, _audioCtx.currentTime + 1.5);
+  _musicSource.connect(_musicGain);
+  _musicGain.connect(_audioCtx.destination);
+  _musicSource.start(0);
+}
+
+function _stopMusic(fadeSec) {
+  if (!_musicSource || !_audioCtx || !_musicGain) return;
+  _musicGain.gain.setTargetAtTime(0, _audioCtx.currentTime, fadeSec * 0.3);
+  const src = _musicSource;
+  _musicSource = null; _musicGain = null;
+  setTimeout(() => { try { src.stop(); } catch(e) {} }, fadeSec * 1400);
 }
 
 // Drone selection chime — self-contained, works before startGame() is called.
