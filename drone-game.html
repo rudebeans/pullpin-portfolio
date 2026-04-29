@@ -290,17 +290,16 @@ canvas { display: block; }
   pointer-events: none; user-select: none;
   display: block;
 }
-/* Button sits over where PLAY THE GAME appears in the design SVG */
+/* Button position set by JS to track the SVG content under object-fit:cover */
 #intro-play-btn {
   position: absolute;
-  left: 11%; top: 70%;
   background: none; border: none; padding: 0;
   cursor: pointer;
   transition: transform 0.15s ease, filter 0.15s ease;
 }
 #intro-play-btn:hover  { transform: translateX(5px); filter: brightness(1.15); }
 #intro-play-btn:active { transform: translateX(8px) scale(0.97); }
-#intro-play-btn svg { width: min(204px, 17vw); height: auto; display: block; }
+#intro-play-btn svg { width: 204px; height: auto; display: block; }
 @media (hover: none) and (pointer: coarse) {
   #intro-screen { display: none !important; }
 }
@@ -1768,6 +1767,34 @@ document.addEventListener('click', () => {
   var introBtn = document.getElementById('intro-play-btn');
   var hangarEl = document.getElementById('hangar');
   if (!introBtn || !hangarEl) return;
+
+  // SVG canvas size (Drone_Racer_Game_Screen_Elements.svg is 1920×1080)
+  var SVG_W = 1920, SVG_H = 1080;
+  // Left edge of the button text content in SVG coordinates (x≈208, y≈756)
+  var BTN_X = 208, BTN_Y = 756;
+
+  function _positionIntroBtn() {
+    var screen = document.getElementById('intro-screen');
+    if (!screen || !introBtn) return;
+    var cw = screen.offsetWidth, ch = screen.offsetHeight;
+    var svgRatio = SVG_W / SVG_H;
+    var cRatio   = cw / ch;
+    var scale, ox, oy;
+    if (cRatio >= svgRatio) {
+      // container wider than SVG — letterbox on sides
+      scale = ch / SVG_H; ox = (cw - SVG_W * scale) / 2; oy = 0;
+    } else {
+      // container taller than SVG — letterbox on top/bottom
+      scale = cw / SVG_W; ox = 0; oy = (ch - SVG_H * scale) / 2;
+    }
+    introBtn.style.left = (ox + BTN_X * scale) + 'px';
+    introBtn.style.top  = (oy + BTN_Y * scale) + 'px';
+  }
+
+  window.addEventListener('resize', _positionIntroBtn);
+  // Run once now, and again after fonts/layout settle
+  _positionIntroBtn();
+  setTimeout(_positionIntroBtn, 100);
 
   introBtn.addEventListener('click', function() {
     _startHangarMusic();                     // lobby music starts here
