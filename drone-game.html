@@ -114,11 +114,15 @@ canvas { display: block; }
 }
 #hangar {
   position:fixed;bottom:0;left:0;right:0;
-  display:flex;flex-direction:column;align-items:center;
+  display:none;flex-direction:column;align-items:center;
   padding-bottom:36px;gap:10px;
   color:#FECC02;font-family:monospace;text-align:center;
   background:linear-gradient(transparent,rgba(0,0,0,0.75) 40%);
   pointer-events:all;z-index:20;
+}
+/* Mobile has no intro screen — show hangar immediately */
+@media (hover: none) and (pointer: coarse) {
+  #hangar { display: flex; }
 }
 #hangar-label{font-size:10px;letter-spacing:4px;color:#6B5200;margin-top:32px}
 #hangar-name{font-size:28px;letter-spacing:3px;text-shadow:0 0 18px rgba(254,204,2,0.5)}
@@ -274,7 +278,7 @@ canvas { display: block; }
 #intro-screen {
   position: fixed; inset: 0; z-index: 400;
   background: #111;
-  opacity: 0; transition: opacity 0.7s ease;
+  opacity: 0; transition: opacity 0.5s ease;
   pointer-events: none; overflow: hidden;
 }
 #intro-screen.is-visible { opacity: 1; pointer-events: all; }
@@ -289,7 +293,7 @@ canvas { display: block; }
 /* Button sits over where PLAY THE GAME appears in the design SVG */
 #intro-play-btn {
   position: absolute;
-  left: 3.8%; top: 70%;
+  left: 11%; top: 70%;
   background: none; border: none; padding: 0;
   cursor: pointer;
   transition: transform 0.15s ease, filter 0.15s ease;
@@ -624,13 +628,14 @@ canvas { display: block; }
   if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
     sp.classList.add('ls-hidden'); return;
   }
-  // Fade logo at 1.9s, reveal intro screen at 2.5s
-  setTimeout(function() { sp.classList.add('ls-gone'); }, 1900);
+  // At 1.9s: fade logo out AND fade intro screen in simultaneously — no gap where 3D canvas shows
   setTimeout(function() {
-    sp.classList.add('ls-hidden'); sp.style.display = 'none';
+    sp.classList.add('ls-gone');
     var is = document.getElementById('intro-screen');
     if (is) is.classList.add('is-visible');
-  }, 2500);
+  }, 1900);
+  // At 2.5s: fully remove logo from DOM
+  setTimeout(function() { sp.classList.add('ls-hidden'); sp.style.display = 'none'; }, 2500);
 })();
 </script>
 <script>
@@ -1764,9 +1769,6 @@ document.addEventListener('click', () => {
   var hangarEl = document.getElementById('hangar');
   if (!introBtn || !hangarEl) return;
 
-  // Hide hangar while intro screen is up — prevents it flashing through during fade
-  hangarEl.style.display = 'none';
-
   introBtn.addEventListener('click', function() {
     _startHangarMusic();                     // lobby music starts here
     hangarEl.style.display = 'flex';         // reveal hangar before intro fades
@@ -2180,8 +2182,8 @@ function _startLobbyMusic() {
   _lobbyEl.play().catch(() => {});
   // Fade in to 0.5 over ~1.2 s
   _lobbyFadeTimer = setInterval(() => {
-    _lobbyEl.volume = Math.min(0.5, _lobbyEl.volume + 0.5 / 72);
-    if (_lobbyEl.volume >= 0.5) clearInterval(_lobbyFadeTimer);
+    _lobbyEl.volume = Math.min(0.65, _lobbyEl.volume + 0.65 / 72);
+    if (_lobbyEl.volume >= 0.65) clearInterval(_lobbyFadeTimer);
   }, 16);
 }
 
@@ -2220,7 +2222,7 @@ async function _playSelectSound() {
     const gain = _audioCtx.createGain();
     src.buffer = _selectBuffer;
     src.playbackRate.value = 2.0;
-    gain.gain.value = 0.30;
+    gain.gain.value = 0.15;
     src.connect(gain);
     gain.connect(_audioCtx.destination);
     src.start(0);
