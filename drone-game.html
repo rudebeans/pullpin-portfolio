@@ -324,6 +324,10 @@ canvas { display: block; }
 </style>
 </head>
 <body>
+<!-- Lobby music — plain <audio> so it obeys iframe allow="autoplay" without a user gesture -->
+<audio id="lobby-audio" loop preload="auto" style="display:none">
+  <source src="media/z_early_test_images/Neon Drift Lobby_Short_01.mp3" type="audio/mpeg">
+</audio>
 <div id="hud">
   <div>RINGS &nbsp;<span id="hud-rings">0</span></div>
   <div>SCORE &nbsp;<span id="hud-score">0</span></div>
@@ -562,8 +566,8 @@ canvas { display: block; }
   if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
     sp.classList.add('ls-hidden'); return;
   }
-  // Fade out after 1.9s, remove after 2.5s
-  setTimeout(function() { sp.classList.add('ls-gone'); }, 1900);
+  // Fade out after 1.9s — start lobby music at the same moment the logo dissolves
+  setTimeout(function() { sp.classList.add('ls-gone'); _startHangarMusic(); }, 1900);
   setTimeout(function() { sp.classList.add('ls-hidden'); sp.style.display = 'none'; }, 2500);
 })();
 </script>
@@ -956,7 +960,8 @@ function startGame() {
   if (preferGyro && !gyroEnabled) window.enableGyro();
   restartGame();
   _initAudio().then(() => {
-    _startMusic();
+    _stopLobbyMusic(1.2);              // fade lobby out as game begins
+    if (!_musicSource) _startMusic();  // bring game track in
     _startRotorAudio();
     _startCountdown(() => { /* input + timer unlock handled by countdownActive flag */ });
   });
@@ -1321,9 +1326,10 @@ let _denyBuffer     = null;
 let _powerUpBuffer  = null;
 let _explosionBuffer= null;
 let _selectBuffer   = null;
-let _musicBuffer    = null;
+let _musicBuffer    = null;  // in-game track (AudioContext)
 let _musicSource    = null;
 let _musicGain      = null;
+// Lobby track uses a plain <audio> element — see #lobby-audio
 
 // Pre-fetch all audio files immediately on page load — fetch() needs no user gesture.
 // By the time the player first interacts, bytes are already in memory; decoding is instant.
@@ -1690,6 +1696,10 @@ document.addEventListener('click', () => {
   else tryFire();
 });
 
+// Kick off hangar music on the player's very first interaction with the page
+document.addEventListener('pointerdown', _startHangarMusic, { once: true });
+document.addEventListener('keydown',     _startHangarMusic, { once: true });
+
 // ── Touch controls ────────────────────────────────────────────────────────────
 const joystickEl   = document.getElementById('touch-joystick');
 const joystickBase = document.getElementById('touch-base');
@@ -1961,7 +1971,8 @@ function returnToHangar() {
   countdownActive = false;
   document.getElementById('countdown-overlay').classList.remove('cd-active');
   _stopRotorAudio(0.9);
-  _stopMusic(1.5);
+  _stopMusic(1.2);       // fade game track out
+  _startHangarMusic();   // bring lobby track back in
   document.getElementById('hud').style.display = 'none';
   overlay.classList.remove('visible');
   // Hide in-game logo lockup
@@ -2045,7 +2056,7 @@ async function _initAudio() {
     decode('Deny.wav',             b => b ? (_denyBuffer     = b) : _denyBuffer),
     decode('PowerUp.wav',          b => b ? (_powerUpBuffer  = b) : _powerUpBuffer),
     decode('Tank_Explosion.wav',   b => b ? (_explosionBuffer= b) : _explosionBuffer),
-    decode('Neon Apex Run-2.mp3',  b => b ? (_musicBuffer    = b) : _musicBuffer),
+    decode('Neon Apex Run-2.mp3',          b => b ? (_musicBuffer = b) : _musicBuffer),
   ]);
 }
 
@@ -2076,6 +2087,43 @@ function _stopMusic(fadeSec) {
   _musicSource = null; _musicGain = null;
   setTimeout(() => { try { src.stop(); } catch(e) {} }, fadeSec * 1400);
 }
+
+// ── Lobby music — plain <audio> element, plays without user gesture in iframe ──
+const _lobbyEl = document.getElementById('lobby-audio');
+let   _lobbyFadeTimer = null;
+
+function _startLobbyMusic() {
+  if (!_lobbyEl || !_lobbyEl.paused) return;
+  clearInterval(_lobbyFadeTimer);
+  _lobbyEl.currentTime = 0;
+  _lobbyEl.volume = 0;
+  _lobbyEl.play().catch(() => {});
+  // Fade in to 0.5 over ~1.2 s
+  _lobbyFadeTimer = setInterval(() => {
+    _lobbyEl.volume = Math.min(0.5, _lobbyEl.volume + 0.5 / 72);
+    if (_lobbyEl.volume >= 0.5) clearInterval(_lobbyFadeTimer);
+  }, 16);
+}
+
+function _stopLobbyMusic(fadeSec) {
+  if (!_lobbyEl || _lobbyEl.paused) return;
+  clearInterval(_lobbyFadeTimer);
+  const step = _lobbyEl.volume / (fadeSec * 60);
+  _lobbyFadeTimer = setInterval(() => {
+    _lobbyEl.volume = Math.max(0, _lobbyEl.volume - step);
+    if (_lobbyEl.volume <= 0) { clearInterval(_lobbyFadeTimer); _lobbyEl.pause(); }
+  }, 16);
+}
+
+// Called by logo-fade timeout, postMessage from parent, or first-interaction fallback
+function _startHangarMusic() {
+  _startLobbyMusic();
+}
+
+// Relay from glo.html PLAY A DEMO button (backup path)
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'startHangarMusic') _startHangarMusic();
+});
 
 // Drone selection chime — self-contained, works before startGame() is called.
 // 2× speed so it reads as a quick UI blip; 0.30 gain keeps it subtle.

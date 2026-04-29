@@ -477,6 +477,9 @@
           // Focus iframe once loaded
           gameFrame.addEventListener('load', () => {
             gameFrame.contentWindow.focus();
+            // Relay the user's click gesture into the iframe so it can start
+            // lobby music immediately — no second interaction required.
+            gameFrame.contentWindow.postMessage({ type: 'startHangarMusic' }, '*');
             // Force Three.js to re-measure dimensions now the iframe is fully
             // laid out in the parent DOM (Chrome iframe timing fix).
             gameFrame.contentWindow.dispatchEvent(new Event('resize'));
