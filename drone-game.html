@@ -306,8 +306,16 @@ canvas { display: block; }
   background: transparent; border: none; padding: 0; margin: 0;
   cursor: pointer;
 }
-#intro-play-btn:hover  { background: rgba(255,204,1,0.06); }
-#intro-play-btn:active { background: rgba(255,204,1,0.12); }
+/* Hover overlay — PLAY_BUTTON_NEW.svg fades in over the artboard */
+#intro-hover-bg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  pointer-events: none; user-select: none; display: block;
+  opacity: 0; transition: opacity 0.15s ease;
+}
+#intro-screen:has(#intro-play-btn:hover)  #intro-hover-bg { opacity: 1; }
+#intro-screen:has(#intro-play-btn:active) #intro-hover-bg { opacity: 0.75; }
 
 /* ── Boss encounter messages ── */
 #boss-msg {
@@ -505,6 +513,8 @@ canvas { display: block; }
 <div id="intro-screen">
   <img id="intro-bg" src="media/z_early_test_images/Drone_Game_Artboard.svg"
        alt="Welcome to Army Drone Racer Training" draggable="false">
+  <img id="intro-hover-bg" src="media/z_early_test_images/PLAY_BUTTON_NEW.svg"
+       alt="" draggable="false">
   <button id="intro-play-btn" aria-label="Play the game"></button>
 </div>
 
