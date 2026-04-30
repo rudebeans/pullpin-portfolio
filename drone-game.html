@@ -292,31 +292,35 @@ canvas { display: block; }
   width: 100%; height: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 58fr 42fr;
-  padding: clamp(16px, 2.5vw, 40px);
-  gap: clamp(6px, 0.8vw, 14px);
+  grid-template-rows: 1fr 1fr;
+  padding: 0;
+  gap: 3px;               /* thin gap = visible grid line between cells */
+  background: #0a0a0a;   /* gap color bleeds through */
   box-sizing: border-box;
 }
 
 .igrid-cell { overflow: hidden; display: flex; }
 
-/* S1 – Logo + Copy: full SVG, anchored top-left */
-#igrid-s1 { align-items: flex-start; }
+/* S1 – Logo + Copy: cover, anchor top so bottom whitespace clips not content */
+#igrid-s1 { align-items: stretch; }
 #igrid-s1 img {
   width: 100%; height: 100%;
-  object-fit: contain; object-position: top left;
+  object-fit: cover; object-position: top left;
   pointer-events: none; user-select: none; display: block;
 }
 
 /* S2 – Masked hero: cover-fills the cell */
 #igrid-s2 img {
   width: 100%; height: 100%;
-  object-fit: cover; object-position: center;
+  object-fit: cover; object-position: center top;
   pointer-events: none; user-select: none; display: block;
 }
 
-/* S3 – Play button: top-left of its cell, inherits left column edge = auto-aligned with S1 */
-#igrid-s3 { align-items: flex-start; justify-content: flex-start; }
+/* S3 – Play button: left padding matches S1 content x-offset (SVG x≈106/720 × 50vw) */
+#igrid-s3 {
+  align-items: flex-start; justify-content: flex-start;
+  padding: clamp(20px, 3.5vw, 56px) 2vw 2vw 7.36vw;
+}
 #intro-play-btn {
   background: none; border: none; padding: 0; margin: 0;
   cursor: pointer; display: block;
@@ -326,11 +330,11 @@ canvas { display: block; }
 #intro-play-btn:active { transform: translateX(8px) scale(0.97); }
 #intro-play-btn svg { width: clamp(180px, 22vw, 310px); height: auto; display: block; }
 
-/* S4 – Stats: full-width contain within its cell */
+/* S4 – Stats: shift object-position up so SVG y≈283 content appears near top of cell */
 #igrid-s4 { align-items: stretch; }
 #igrid-s4 img {
   width: 100%; height: 100%;
-  object-fit: contain; object-position: center;
+  object-fit: cover; object-position: left 85%;
   pointer-events: none; user-select: none; display: block;
 }
 
