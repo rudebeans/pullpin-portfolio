@@ -1392,16 +1392,15 @@ let _musicGain      = null;
 // Lobby track uses a plain <audio> element — see #lobby-audio
 
 // Pre-fetch SFX immediately on page load — fetch() needs no user gesture.
-// Music (Neon Apex Run-2.mp3) is fetched at game-start to avoid holding a large
-// buffer in memory while the player is still in the lobby.
 const _rawAudioCache = {};
 (function _prefetchAudio() {
   const files = [
     'Drone_Rotor.mp3','Ring_Passthrough.mp3',
-    'Deny.mp3','PowerUp.mp3','Tank_Explosion.mp3','Select_Drone.mp3'
+    'Deny.mp3','PowerUp.mp3','Tank_Explosion.mp3','Select_Drone.mp3',
+    'Neon Apex Run-2.mp3',
   ];
   files.forEach(f =>
-    fetch(`media/z_early_test_images/${f}`)
+    fetch(`media/z_early_test_images/${encodeURIComponent(f)}`)
       .then(r => r.arrayBuffer())
       .then(b => { _rawAudioCache[f] = b; })
       .catch(() => {})
@@ -2124,12 +2123,6 @@ function returnToHangar() {
 async function _initAudio() {
   if (_audioCtx && _rotorBuffer && _ringBuffer && _denyBuffer && _powerUpBuffer && _explosionBuffer && _musicBuffer) return;
   if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  // Decode from pre-fetched cache — instant since bytes are already in memory.
-  // Music is fetched here at game-start rather than at page-load.
-  if (!_rawAudioCache['Neon Apex Run-2.mp3']) {
-    fetch('media/z_early_test_images/Neon Apex Run-2.mp3')
-      .then(r => r.arrayBuffer()).then(b => { _rawAudioCache['Neon Apex Run-2.mp3'] = b; }).catch(() => {});
-  }
   const decode = (filename, setter) => {
     const raw = _rawAudioCache[filename];
     if (!raw || setter()) return Promise.resolve();
