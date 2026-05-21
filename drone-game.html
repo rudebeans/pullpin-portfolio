@@ -1456,6 +1456,17 @@ let currentLevel = 0;
 let gameColorHex = LEVEL_PALETTES[0].hex;
 let gameColorRGB = LEVEL_PALETTES[0];
 
+// ── Overdrive: score-milestone hyperspeed tiers (advanced-player challenge) ──
+// Each tier multiplies world speed and slams the player into warp. Top tier ≈ 3×.
+const OVERDRIVE_TIERS = [
+  { score:  2500, mult: 1.6, name: 'OVERDRIVE'  },
+  { score:  5000, mult: 2.1, name: 'HYPERDRIVE' },
+  { score: 10000, mult: 2.6, name: 'LUDICROUS'  },
+  { score: 20000, mult: 3.0, name: 'WARP SPEED' },
+];
+let overdrive     = 1.0;  // current multiplier — smoothly lerped toward tier target
+let overdriveTier = 0;    // highest tier reached this run
+
 // ── Warp effect state ─────────────────────────────────────────────────────────
 const BASE_FOV   = 65;
 const WARP_DUR   = 1.5;
@@ -1508,6 +1519,21 @@ function showLevelUp(level, name, hex) {
   const _luName  = document.createElement('span'); _luName.className  = 'lu-name';  _luName.textContent  = name;
   _luName.style.cssText = `color:${col};text-shadow:0 0 40px ${col}`;
   el.append(_luLabel, _luName);
+  document.body.appendChild(el);
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('lu-show')));
+  setTimeout(() => el.classList.remove('lu-show'), 1800);
+  setTimeout(() => el.remove(), 2300);
+}
+
+// Speed-tier unlock banner — reuses the level-up styling
+function showOverdrive(name, hex) {
+  const col = '#' + hex.toString(16).padStart(6, '0');
+  const el = document.createElement('div');
+  el.className = 'level-up';
+  const _l = document.createElement('span'); _l.className = 'lu-label'; _l.textContent = 'SPEED TIER';
+  const _n = document.createElement('span'); _n.className = 'lu-name';  _n.textContent = name;
+  _n.style.cssText = `color:${col};text-shadow:0 0 40px ${col}`;
+  el.append(_l, _n);
   document.body.appendChild(el);
   requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('lu-show')));
   setTimeout(() => el.classList.remove('lu-show'), 1800);
@@ -2004,6 +2030,7 @@ function restartGame() {
   const saEl = document.getElementById('streak-announce');
   if (saEl) saEl.classList.remove('sa-show');
   currentLevel = 0; gameColorHex = LEVEL_PALETTES[0].hex; gameColorRGB = LEVEL_PALETTES[0];
+  overdrive = 1.0; overdriveTier = 0;
   setGameColor(0, false);
   dronePos.set(0, 0, 0);
   droneVel.set(0, 0);
@@ -2109,6 +2136,7 @@ function returnToHangar() {
   if (saEl2) saEl2.classList.remove('sa-show');
   clearDroneGroup();
   currentLevel = 0; gameColorHex = LEVEL_PALETTES[0].hex; gameColorRGB = LEVEL_PALETTES[0];
+  overdrive = 1.0; overdriveTier = 0;
   DRONE_CONFIGS[selectedDrone].buildFn();
   setGameColor(0, false); // apply lime green to freshly-built drone/line/tunnel mats
   droneGroup.position.set(0, 0, 0);
@@ -3099,22 +3127,24 @@ function animate(ts) {
       _camShake.set(0, 0, 0);
     }
 
-    // ── Warp FOV punch ─────────────────────────────────────────────────────────
+    // ── Warp FOV punch + sustained overdrive wide-angle ──────────────────────────
+    // Base FOV widens with overdrive (the faster you go, the wider the field),
+    // and each warp tier-up adds a temporary spike on top. Speed lines brighten
+    // with both, so high tiers feel like tearing through space-time.
+    const _odFov = BASE_FOV + (overdrive - 1.0) * 12;
+    let _warpAdd = 0;
     if (warpActive) {
       warpT += dt / WARP_DUR;
-      if (warpT >= 1) {
-        warpT = 1; warpActive = false;
-        camera.fov = BASE_FOV; camera.updateProjectionMatrix();
-        lineMat.opacity = 0.5;
-      } else {
-        // FOV spikes in first 15% of warp, eases back over remaining 85%
+      if (warpT >= 1) { warpT = 1; warpActive = false; }
+      else {
         const fovT = warpT < 0.15 ? warpT / 0.15 : 1 - (warpT - 0.15) / 0.85;
-        camera.fov = BASE_FOV + fovT * 35;
-        camera.updateProjectionMatrix();
-        // Speed lines surge bright at warp start, fade back to normal
-        lineMat.opacity = 0.5 + Math.max(0, 1 - warpT * 2) * 0.5;
+        _warpAdd = fovT * 35;
       }
     }
+    camera.fov += ((_odFov + _warpAdd) - camera.fov) * Math.min(1, dt * 6);
+    camera.updateProjectionMatrix();
+    const _warpLine = warpActive ? Math.max(0, 1 - warpT * 2) * 0.5 : 0;
+    lineMat.opacity = Math.min(1, 0.5 + (overdrive - 1.0) * 0.18 + _warpLine);
 
     // Camera follows drone (fixed offset + shake)
     camera.position.set(
@@ -3176,7 +3206,20 @@ function animate(ts) {
     }
 
     distance += speed * dt;
-    speed = 12 + currentLevel * 3 + distance * 0.001; // level bump + distance ramp
+    // ── Overdrive: score milestones unlock escalating speed tiers ──
+    let _odTarget = 0;
+    for (let i = 0; i < OVERDRIVE_TIERS.length; i++) {
+      if (score >= OVERDRIVE_TIERS[i].score) _odTarget = i + 1;
+    }
+    if (_odTarget > overdriveTier) {            // crossed into a new tier
+      overdriveTier = _odTarget;
+      const _t = OVERDRIVE_TIERS[overdriveTier - 1];
+      triggerWarp(gameColorRGB);                // radial burst + FOV punch + shake
+      showOverdrive(_t.name, gameColorHex);     // banner
+    }
+    const _odMult = overdriveTier > 0 ? OVERDRIVE_TIERS[overdriveTier - 1].mult : 1.0;
+    overdrive += (_odMult - overdrive) * Math.min(1, dt * 1.0); // ease into hyperspeed
+    speed = (12 + currentLevel * 3 + distance * 0.001) * overdrive;
 
     // ── Countdown clock ───────────────────────────────────────────────────────
     if (!countdownActive) timeLeft -= dt;
@@ -3290,9 +3333,12 @@ function animate(ts) {
         rings.splice(i, 1);
         continue;
       }
-      // Check if drone is at ring's Z plane
+      // Check if drone is at ring's Z plane.
+      // Catch window scales with per-frame travel so high overdrive speeds
+      // don't tunnel straight through a ring without registering the pass.
       const rz = r.mesh.position.z;
-      if (!r.passed && !r.hit && dronePos.z <= rz + 0.1 && dronePos.z >= rz - 2.5) {
+      const _catchBack = Math.max(2.5, speed * dt + 1.0);
+      if (!r.passed && !r.hit && dronePos.z <= rz + 0.1 && dronePos.z >= rz - _catchBack) {
         const dx = dronePos.x - r.x;
         const dy = dronePos.y - r.y;
         const dist2D = Math.sqrt(dx * dx + dy * dy);
