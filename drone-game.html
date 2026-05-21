@@ -2890,8 +2890,8 @@ function drawDepthGauge() {
 // ── Main loop ─────────────────────────────────────────────────────────────────
 let lastTime = null;
 let bobTime   = 0; // drives hover bob
-const MOVE_SPEED = 5;
-const MOVE_DAMPING = 0.88;
+const MOVE_SPEED = 6.5;       // bumped from 5 — more punch on initial press
+const MOVE_DAMPING = 0.80;    // dropped from 0.88 — momentum bleeds 2× faster, taps don't drift
 const TILT_SPEED = 1.8;
 const TILT_RETURN = 0.12;
 
