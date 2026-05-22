@@ -465,9 +465,19 @@ function relayUnlockAudio() {
   const f = $('game-frame');
   try { f.contentWindow.postMessage({ type: 'unlockAudio' }, '*'); } catch (e) {}
 }
+// Focus the game iframe so its keydown listener receives arrow keys immediately
+// (no need to click an arrow button first). Re-focus on a tick in case the
+// iframe wasn't focusable the instant it became visible.
+function focusGame() {
+  const f = $('game-frame');
+  const doFocus = () => { try { f.focus(); f.contentWindow.focus(); } catch (e) {} };
+  doFocus();
+  setTimeout(doFocus, 50);
+}
 function showGame() {
   showScreen('game');
   relayUnlockAudio();
+  focusGame();
 }
 
 // Receive final score from the game iframe (same-origin in local + prod).
@@ -498,6 +508,7 @@ $('score-again').addEventListener('click', () => {
   showScreen('game');
   relayUnlockAudio();
   try { $('game-frame').contentWindow.postMessage({ type: 'activationPlayAgain' }, '*'); } catch (e) {}
+  focusGame();
 });
 $('score-lb').addEventListener('click', () => { renderLeaderboard($('full-lb'), 25); showScreen('leaderboard'); });
 $('lb-back').addEventListener('click', () => showScreen('score'));
