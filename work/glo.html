@@ -474,7 +474,7 @@
         // (landing → profile → game → score → leaderboard). The wrapper
         // embeds drone-game.html?activation=1 internally.
         if (!gameLoaded) {
-          gameFrame.src = '../activation.html';
+          gameFrame.src = '../activation.html?embedded=1';
           gameLoaded = true;
           // Focus iframe once loaded
           gameFrame.addEventListener('load', () => {

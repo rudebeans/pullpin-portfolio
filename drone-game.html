@@ -1872,6 +1872,10 @@ if (isTouchDevice) {
     tOX = t.clientX; tOY = t.clientY;
     tDX = 0; tDY = 0;
     tActive = true; tMoved = false;
+    // Prime Web Audio inside the gesture so the FIRST swipe's select SFX fires.
+    // Without this, _playSelectSound()'s resume()+decode awaits break the iOS
+    // user-gesture chain and the first swipe is silent until an arrow is tapped.
+    _primeSelectAudio();
   }, { passive: false });
 
   document.addEventListener('touchmove', e => {
@@ -2235,27 +2239,33 @@ function _stopMusic(fadeSec) {
 const _lobbyEl = document.getElementById('lobby-audio');
 let   _lobbyFadeTimer = null;
 
+// Lobby fades are driven by ELAPSED TIME, not by reading back .volume.
+// iOS Safari makes HTMLMediaElement.volume read-only, so a volume-threshold
+// loop never reaches 0 and pause()/full-volume is never hit. Time-based ramps
+// fade on desktop and still hard-cut at the right moment on iOS.
+const _LOBBY_VOL = 0.65;
 function _startLobbyMusic() {
   if (!_lobbyEl || !_lobbyEl.paused) return;
   clearInterval(_lobbyFadeTimer);
   _lobbyEl.currentTime = 0;
   _lobbyEl.volume = 0;
   _lobbyEl.play().catch(() => {});
-  // Fade in to 0.5 over ~1.2 s
+  const t0 = performance.now(), dur = 1200;
   _lobbyFadeTimer = setInterval(() => {
-    _lobbyEl.volume = Math.min(0.65, _lobbyEl.volume + 0.65 / 72);
-    if (_lobbyEl.volume >= 0.65) clearInterval(_lobbyFadeTimer);
+    const p = Math.min(1, (performance.now() - t0) / dur);
+    _lobbyEl.volume = _LOBBY_VOL * p;
+    if (p >= 1) clearInterval(_lobbyFadeTimer);
   }, 16);
 }
 
 function _stopLobbyMusic(fadeSec) {
   clearInterval(_lobbyFadeTimer);
   if (!_lobbyEl || _lobbyEl.paused) return;
-  clearInterval(_lobbyFadeTimer);
-  const step = _lobbyEl.volume / (fadeSec * 60);
+  const startVol = _lobbyEl.volume, dur = (fadeSec || 1.0) * 1000, t0 = performance.now();
   _lobbyFadeTimer = setInterval(() => {
-    _lobbyEl.volume = Math.max(0, _lobbyEl.volume - step);
-    if (_lobbyEl.volume <= 0) { clearInterval(_lobbyFadeTimer); _lobbyEl.pause(); }
+    const p = Math.min(1, (performance.now() - t0) / dur);
+    _lobbyEl.volume = Math.max(0, startVol * (1 - p));
+    if (p >= 1) { clearInterval(_lobbyFadeTimer); _lobbyEl.pause(); } // pause on TIME, not volume
   }, 16);
 }
 
@@ -2283,6 +2293,19 @@ function _emitGameOver() {
 
 // Drone selection chime — self-contained, works before startGame() is called.
 // 2× speed so it reads as a quick UI blip; 0.30 gain keeps it subtle.
+// Synchronously warm the audio context + decode the select buffer within a
+// user gesture, so _playSelectSound() can fire instantly on the first swipe.
+function _primeSelectAudio() {
+  try {
+    if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (_audioCtx.state === 'suspended') _audioCtx.resume();
+    if (!_selectBuffer && _rawAudioCache['Select_Drone.mp3']) {
+      _audioCtx.decodeAudioData(_rawAudioCache['Select_Drone.mp3'].slice(0))
+        .then(b => { _selectBuffer = b; }).catch(() => {});
+    }
+  } catch (e) { /* audio unavailable — fail silently */ }
+}
+
 async function _playSelectSound() {
   try {
     if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();

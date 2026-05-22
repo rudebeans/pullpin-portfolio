@@ -35,6 +35,10 @@
     padding: 24px 22px; max-width: 520px; width: 100%; margin: 0 auto;
     overflow-y: auto; -webkit-overflow-scrolling: touch;
   }
+  /* When embedded in the GLO portfolio page (?embedded=1), push the chrome
+     screens down so titles clear the host site's fixed nav + EXIT GAME button
+     (~90px). Standalone QR usage stays tight — no host chrome there. */
+  body.embedded .screen-inner { padding-top: 132px; }
 
   /* ── Shared brand bits ── */
   .brand-star { color: var(--gold); font-size: 13px; letter-spacing: 0.3em; }
@@ -460,6 +464,8 @@ $('score-share').addEventListener('click', async () => {
 });
 
 // ── Boot ──
+// Embedded in the GLO portfolio page? Add top offset so screens clear host nav.
+if (new URLSearchParams(location.search).has('embedded')) document.body.classList.add('embedded');
 seedDemoIfEmpty();
 initLanding();
 </script>
