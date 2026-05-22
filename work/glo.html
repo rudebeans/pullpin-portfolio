@@ -470,9 +470,11 @@
       let gameLoaded = false;
 
       function enterGame() {
-        // Lazy-load the game on first play
+        // Lazy-load the full activation experience on first play
+        // (landing → profile → game → score → leaderboard). The wrapper
+        // embeds drone-game.html?activation=1 internally.
         if (!gameLoaded) {
-          gameFrame.src = '../drone-game.html';
+          gameFrame.src = '../activation.html';
           gameLoaded = true;
           // Focus iframe once loaded
           gameFrame.addEventListener('load', () => {
