@@ -370,6 +370,8 @@ function initLanding() {
   showScreen('landing');
 }
 $('landing-play').addEventListener('click', () => {
+  // First gesture of the flow: unlock + load all audio now (lobby starts here).
+  relayUnlockAudio();
   if (DB.getProfile()) showGame();
   else { showScreen('profile'); loadProfileIntoForm(); }
 });
@@ -415,12 +417,25 @@ $('profile-submit').addEventListener('click', () => {
 });
 
 // ── Game (iframe) ──
+// Preload the game up-front so it's loaded & listening before the PLAY tap.
+// That single gesture can then unlock + load ALL audio (lobby + SFX + music)
+// with no in-game tap/swipe required and no lag.
 let gameLoaded = false;
+function preloadGame() {
+  if (gameLoaded) return;
+  $('game-frame').src = 'drone-game.html?activation=1';
+  gameLoaded = true;
+}
+// Relay the parent gesture to the game iframe so it unlocks iOS Web Audio,
+// decodes every buffer, and starts the lobby track. allow="autoplay" + the
+// freshly-activated parent let this succeed without a touch inside the game.
+function relayUnlockAudio() {
+  const f = $('game-frame');
+  try { f.contentWindow.postMessage({ type: 'unlockAudio' }, '*'); } catch (e) {}
+}
 function showGame() {
   showScreen('game');
-  const frame = $('game-frame');
-  if (!gameLoaded) { frame.src = 'drone-game.html?activation=1'; gameLoaded = true; }
-  else { try { frame.contentWindow.postMessage({ type: 'activationPlayAgain' }, '*'); } catch (e) {} }
+  relayUnlockAudio();
 }
 
 // Receive final score from the game iframe (same-origin in local + prod).
@@ -447,7 +462,11 @@ function handleGameOver(score) {
   showScreen('score');
 }
 
-$('score-again').addEventListener('click', showGame);
+$('score-again').addEventListener('click', () => {
+  showScreen('game');
+  relayUnlockAudio();
+  try { $('game-frame').contentWindow.postMessage({ type: 'activationPlayAgain' }, '*'); } catch (e) {}
+});
 $('score-lb').addEventListener('click', () => { renderLeaderboard($('full-lb'), 25); showScreen('leaderboard'); });
 $('lb-back').addEventListener('click', () => showScreen('score'));
 $('score-share').addEventListener('click', async () => {
@@ -468,6 +487,9 @@ $('score-share').addEventListener('click', async () => {
 if (new URLSearchParams(location.search).has('embedded')) document.body.classList.add('embedded');
 seedDemoIfEmpty();
 initLanding();
+// Preload the game iframe immediately so it's loaded & listening before the
+// PLAY tap — that gesture can then unlock + load all audio with zero lag.
+preloadGame();
 </script>
 </body>
 </html>

@@ -2268,16 +2268,28 @@ function _stopLobbyMusic(fadeSec) {
   }, 16);
 }
 
-// Relay from parent wrapper (glo.html / activation.html) — restrict to known origins
-const _ALLOWED_ORIGINS = [
-  'https://pullpin.com', 'https://rudebeans.github.io',
-  'http://localhost:3456', 'http://127.0.0.1:3456'
-];
+// Relay from parent wrapper (glo.html / activation.html) — restrict to known
+// origins in production; allow any localhost port for local dev.
+const _ALLOWED_ORIGINS = ['https://pullpin.com', 'https://rudebeans.github.io'];
+function _originAllowed(o) {
+  return _ALLOWED_ORIGINS.includes(o) || /^https?:\/\/(localhost|127\.0\.0\.1):\d+$/.test(o);
+}
 window.addEventListener('message', e => {
-  if (!_ALLOWED_ORIGINS.includes(e.origin)) return;
+  if (!_originAllowed(e.origin)) return;
   if (e.data && e.data.type === 'startHangarMusic')    _startLobbyMusic();
   if (e.data && e.data.type === 'activationPlayAgain') returnToHangar();
+  if (e.data && e.data.type === 'unlockAudio')         _unlockAndPreloadAudio();
 });
+
+// Activation wrapper relays the PLAY-button gesture here so we unlock iOS Web
+// Audio and preload everything up-front — no in-game tap/swipe needed to start
+// sound. allow="autoplay" + the freshly-activated parent make this succeed.
+function _unlockAndPreloadAudio() {
+  _unlockAudioCtx();   // iOS unlock: silent buffer + resume (resume alone won't do it)
+  _primeSelectAudio(); // decode the hangar select blip
+  _initAudio();        // decode all SFX + in-game music (async, fire-and-forget)
+  _startLobbyMusic();  // begin the lobby track now
+}
 
 // Activation wrapper integration: post final score to parent on game-over.
 // Score is non-sensitive; only meaningful when embedded in an iframe.
