@@ -2486,6 +2486,10 @@ function _updateRotorAudio(dt, ax, ay) {
 // ── Camera offset ─────────────────────────────────────────────────────────────
 const CAM_OFFSET = new THREE.Vector3(0, 0.4, 2.5);
 
+// Lift the rotating hangar drone ~50px on mobile only (clears the bottom
+// controls). 0.17 world units ≈ 50px at the hangar camera distance/FOV.
+const HANGAR_DRONE_Y = window.matchMedia('(hover: none) and (pointer: coarse)').matches ? 0.17 : 0;
+
 // ── Particle system ────────────────────────────────────────────────────────────
 const passEffects = [];
 let shakeTimer = 0, shakeAmt = 0;
@@ -3055,6 +3059,8 @@ function animate(ts) {
       camera.position.x += (Math.random() - 0.5) * sf;
       camera.position.y += (Math.random() - 0.5) * sf;
     }
+    // Mobile lift — applied last so it overrides the swipe animation's resting Y.
+    droneGroup.position.y = HANGAR_DRONE_Y;
     composer.render();
     return;
   }

@@ -502,6 +502,10 @@
         document.body.classList.remove('glo-playing');
         // Return focus to parent page so cursor/scroll work again
         document.body.focus();
+        // Reload the activation iframe: instantly silences ALL audio (the audio
+        // context + lobby <audio> are torn down) and resets the experience to a
+        // fresh start, so the next "Play A Demo" begins the loop over again.
+        if (gameLoaded) { gameFrame.src = '../activation.html?embedded=1'; }
       }
 
       playBtn.addEventListener('click', enterGame);
