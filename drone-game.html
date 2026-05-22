@@ -387,7 +387,7 @@ canvas { display: block; }
 <body>
 <!-- Lobby music — plain <audio> so it obeys iframe allow="autoplay" without a user gesture -->
 <audio id="lobby-audio" loop preload="auto" style="display:none">
-  <source src="media/z_early_test_images/Neon Drift Lobby_Short_01.mp3" type="audio/mpeg">
+  <source src="media/z_early_test_images/Neon_Drift_Lobby_Short_01.mp3" type="audio/mpeg">
 </audio>
 <div id="hud">
   <div>RINGS &nbsp;<span id="hud-rings">0</span></div>
@@ -525,9 +525,9 @@ canvas { display: block; }
 </div>
 <!-- Army intro — 2×2 grid, desktop only, shown after logo fades -->
 <div id="intro-screen">
-  <img id="intro-bg" src="media/z_early_test_images/Drone_Game_Artboard.svg"
+  <img id="intro-bg" data-src="media/z_early_test_images/Drone_Game_Artboard.svg"
        alt="Welcome to Army Drone Racer Training" draggable="false">
-  <img id="intro-hover-bg" src="media/z_early_test_images/PLAY_BUTTON_NEW.svg"
+  <img id="intro-hover-bg" data-src="media/z_early_test_images/PLAY_BUTTON_NEW.svg"
        alt="" draggable="false">
   <button id="intro-play-btn" aria-label="Play the game"></button>
 </div>
@@ -633,11 +633,23 @@ canvas { display: block; }
 (function() {
   var sp = document.getElementById('logo-splash');
   if (!sp) return;
-  // Desktop check — hide immediately on touch/mobile devices
-  if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
-    sp.classList.add('ls-hidden'); return;
+  // Activation mode (embedded in activation.html wrapper) OR touch/mobile:
+  // skip the splash + intro screen and drop straight into the hangar.
+  var activationMode = new URLSearchParams(location.search).has('activation');
+  if (activationMode || window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+    sp.classList.add('ls-hidden'); sp.style.display = 'none';
+    var introEl = document.getElementById('intro-screen');
+    if (introEl) introEl.classList.add('is-hidden');
+    var hangarEl = document.getElementById('hangar');
+    if (hangarEl) hangarEl.style.display = 'flex';
+    return;
   }
-  // At 1.9s: fade logo out AND fade intro screen in simultaneously — no gap where 3D canvas shows
+  // Desktop only: lazy-load the intro artboard SVGs now (skipped entirely in
+  // activation mode + mobile, saving ~668 KB on those paths).
+  document.querySelectorAll('#intro-screen img[data-src]').forEach(function(img) {
+    img.src = img.dataset.src;
+  });
+  // Desktop: at 1.9s fade logo out AND fade intro screen in simultaneously
   setTimeout(function() {
     sp.classList.add('ls-gone');
     var is = document.getElementById('intro-screen');
@@ -1421,7 +1433,7 @@ const _rawAudioCache = {};
   const files = [
     'Drone_Rotor.mp3','Ring_Passthrough.mp3',
     'Deny.mp3','PowerUp.mp3','Tank_Explosion.mp3','Select_Drone.mp3',
-    'Neon Apex Run-2.mp3',
+    'Neon_Apex_Run-2.mp3',
   ];
   files.forEach(f =>
     fetch(`media/z_early_test_images/${encodeURIComponent(f)}`)
@@ -2187,7 +2199,7 @@ async function _initAudio() {
     decode('Deny.mp3',             b => b ? (_denyBuffer     = b) : _denyBuffer),
     decode('PowerUp.mp3',          b => b ? (_powerUpBuffer  = b) : _powerUpBuffer),
     decode('Tank_Explosion.mp3',   b => b ? (_explosionBuffer= b) : _explosionBuffer),
-    decode('Neon Apex Run-2.mp3',  b => b ? (_musicBuffer    = b) : _musicBuffer),
+    decode('Neon_Apex_Run-2.mp3',  b => b ? (_musicBuffer    = b) : _musicBuffer),
   ]);
 }
 
@@ -2247,12 +2259,27 @@ function _stopLobbyMusic(fadeSec) {
   }, 16);
 }
 
-// Relay from glo.html PLAY A DEMO button (backup path) — restrict to known parent origins
-const _ALLOWED_ORIGINS = ['https://pullpin.com', 'https://rudebeans.github.io'];
+// Relay from parent wrapper (glo.html / activation.html) — restrict to known origins
+const _ALLOWED_ORIGINS = [
+  'https://pullpin.com', 'https://rudebeans.github.io',
+  'http://localhost:3456', 'http://127.0.0.1:3456'
+];
 window.addEventListener('message', e => {
   if (!_ALLOWED_ORIGINS.includes(e.origin)) return;
-  if (e.data && e.data.type === 'startHangarMusic') _startLobbyMusic();
+  if (e.data && e.data.type === 'startHangarMusic')    _startLobbyMusic();
+  if (e.data && e.data.type === 'activationPlayAgain') returnToHangar();
 });
+
+// Activation wrapper integration: post final score to parent on game-over.
+// Score is non-sensitive; only meaningful when embedded in an iframe.
+function _emitGameOver() {
+  if (window.parent && window.parent !== window) {
+    window.parent.postMessage({ type: 'droneGameOver', score: score, rings: ringsPassed }, '*');
+    // Activation only: silence the rotor hum under the score screen.
+    // It restarts fresh via startGame() → _startRotorAudio() on Play Again.
+    _stopRotorAudio(0.4);
+  }
+}
 
 // Drone selection chime — self-contained, works before startGame() is called.
 // 2× speed so it reads as a quick UI blip; 0.30 gain keeps it subtle.
@@ -3236,6 +3263,7 @@ function animate(ts) {
       const goLockup1 = document.getElementById('ingame-lockup');
       if (goLockup1) goLockup1.style.display = 'none';
       overlay.classList.add('visible');
+      _emitGameOver();
     }
     hTime.textContent = Math.max(0, timeLeft).toFixed(1);
     const _timeLow = timeLeft < 10;
@@ -3409,6 +3437,7 @@ function animate(ts) {
               const goLockup2 = document.getElementById('ingame-lockup');
               if (goLockup2) goLockup2.style.display = 'none';
               overlay.classList.add('visible');
+              _emitGameOver();
             }
           }
         }

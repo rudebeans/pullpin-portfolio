@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Drone Racer — Activation</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --gold: #FECC02;
+    --gold-dim: #C9A000;
+    --gold-faint: rgba(254,204,2,0.35);
+    --bg: #0a0a0a;
+    --panel: #141414;
+    --row: #1c1c1c;
+    --text-dim: #7A6000;
+  }
+  html, body {
+    height: 100%; background: var(--bg); color: var(--gold);
+    font-family: 'Courier New', monospace; overflow: hidden;
+    overscroll-behavior: none;
+  }
+  body { display: flex; flex-direction: column; }
+
+  /* ── Screen system ── */
+  .screen {
+    position: fixed; inset: 0;
+    display: none; flex-direction: column;
+    padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+    background: var(--bg);
+  }
+  .screen.active { display: flex; }
+  .screen-inner {
+    flex: 1; display: flex; flex-direction: column;
+    padding: 24px 22px; max-width: 520px; width: 100%; margin: 0 auto;
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── Shared brand bits ── */
+  .brand-star { color: var(--gold); font-size: 13px; letter-spacing: 0.3em; }
+  .kicker { font-size: 10px; letter-spacing: 0.35em; color: var(--text-dim); text-transform: uppercase; }
+  h1.title {
+    font-size: 30px; line-height: 1.05; letter-spacing: 0.04em; font-weight: 700;
+    text-transform: uppercase; text-shadow: 0 0 24px rgba(254,204,2,0.4); margin: 6px 0 2px;
+  }
+  .subtitle { font-size: 11px; letter-spacing: 0.18em; color: var(--gold-dim); text-transform: uppercase; }
+
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; min-height: 58px; padding: 16px;
+    background: var(--gold); color: #111; border: none;
+    font-family: inherit; font-size: 17px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; cursor: pointer; border-radius: 2px;
+    transition: transform 0.12s ease, filter 0.12s ease;
+  }
+  .btn:active { transform: scale(0.97); filter: brightness(1.1); }
+  .btn.secondary {
+    background: transparent; color: var(--gold);
+    border: 1px solid var(--gold-faint); min-height: 52px; font-size: 14px;
+  }
+  .btn.secondary:active { background: rgba(254,204,2,0.08); }
+  .btn:disabled { opacity: 0.35; pointer-events: none; }
+
+  .link-reset {
+    background: none; border: none; color: var(--text-dim);
+    font-family: inherit; font-size: 12px; letter-spacing: 0.1em;
+    text-decoration: underline; cursor: pointer; padding: 8px;
+  }
+
+  /* ── Leaderboard list ── */
+  .lb-list { display: flex; flex-direction: column; gap: 3px; }
+  .lb-row {
+    display: grid; grid-template-columns: 38px 1fr auto; align-items: center; gap: 10px;
+    background: var(--row); padding: 11px 14px; border-radius: 2px;
+    font-size: 15px; letter-spacing: 0.06em;
+  }
+  .lb-row .rank { color: var(--text-dim); font-size: 13px; }
+  .lb-row .initials { font-weight: 700; letter-spacing: 0.18em; }
+  .lb-row .score { font-weight: 700; color: var(--gold); }
+  .lb-row.top1 .rank, .lb-row.top1 .initials { color: var(--gold); }
+  .lb-row.top1 { box-shadow: inset 0 0 0 1px var(--gold-faint); }
+  .lb-row.is-me {
+    background: rgba(254,204,2,0.12);
+    box-shadow: inset 0 0 0 1px var(--gold);
+  }
+  .lb-row.is-me .initials { color: var(--gold); }
+  .lb-empty { color: var(--text-dim); font-size: 12px; text-align: center; padding: 24px; letter-spacing: 0.1em; }
+
+  /* ── Profile form ── */
+  .field { margin-bottom: 22px; }
+  .field-label { font-size: 11px; letter-spacing: 0.22em; color: var(--gold-dim); text-transform: uppercase; margin-bottom: 8px; display: block; }
+  .initials-input {
+    width: 100%; background: var(--panel); border: 1px solid var(--gold-faint);
+    color: var(--gold); font-family: inherit; font-size: 32px; font-weight: 700;
+    letter-spacing: 0.4em; text-align: center; text-transform: uppercase;
+    padding: 14px; border-radius: 2px;
+  }
+  .initials-input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 14px rgba(254,204,2,0.2); }
+  .zip-input {
+    width: 100%; background: var(--panel); border: 1px solid var(--gold-faint);
+    color: var(--gold); font-family: inherit; font-size: 24px; font-weight: 700;
+    letter-spacing: 0.3em; text-align: center; padding: 14px; border-radius: 2px;
+  }
+  .zip-input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 14px rgba(254,204,2,0.2); }
+  .age-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .age-btn {
+    background: var(--panel); border: 1px solid var(--gold-faint); color: var(--gold-dim);
+    font-family: inherit; font-size: 14px; font-weight: 700; letter-spacing: 0.06em;
+    padding: 16px 4px; cursor: pointer; border-radius: 2px; transition: all 0.12s ease;
+  }
+  .age-btn:active { transform: scale(0.96); }
+  .age-btn.selected {
+    background: rgba(254,204,2,0.14); border-color: var(--gold); color: var(--gold);
+    box-shadow: 0 0 12px rgba(254,204,2,0.18);
+  }
+  .field-err { color: #ff5544; font-size: 11px; letter-spacing: 0.08em; margin-top: 6px; min-height: 14px; }
+  .privacy-note {
+    font-size: 10px; letter-spacing: 0.06em; color: var(--text-dim);
+    line-height: 1.5; text-align: center; margin-top: 4px;
+  }
+
+  /* ── Score screen ── */
+  .score-big {
+    font-size: 64px; font-weight: 700; letter-spacing: 0.02em; color: var(--gold);
+    text-shadow: 0 0 36px rgba(254,204,2,0.5); line-height: 1; text-align: center;
+  }
+  .score-label { font-size: 11px; letter-spacing: 0.3em; color: var(--text-dim); text-transform: uppercase; text-align: center; }
+  .stat-row {
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--row); padding: 14px 16px; border-radius: 2px;
+    font-size: 14px; letter-spacing: 0.08em;
+  }
+  .stat-row .stat-k { color: var(--gold-dim); text-transform: uppercase; font-size: 12px; }
+  .stat-row .stat-v { color: var(--gold); font-weight: 700; }
+  .new-best-badge {
+    align-self: center; background: var(--gold); color: #111;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 6px 16px; border-radius: 2px; animation: nb-pulse 1s ease-in-out infinite;
+  }
+  @keyframes nb-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+
+  /* ── Game screen (iframe) ── */
+  #screen-game { padding: 0; background: #000; }
+  #game-frame { width: 100%; height: 100%; border: none; display: block; }
+
+  .spacer { flex: 1; }
+  .stack { display: flex; flex-direction: column; gap: 12px; }
+  .mt-auto { margin-top: auto; }
+  .center { text-align: center; }
+</style>
+</head>
+<body>
+
+<!-- ════════════ 1. LANDING ════════════ -->
+<div class="screen active" id="screen-landing">
+  <div class="screen-inner">
+    <div class="center">
+      <div class="brand-star">★ U.S. ARMY</div>
+      <h1 class="title">Drone Racer</h1>
+      <div class="subtitle">Daily Leaderboard · Top 10</div>
+    </div>
+    <div class="lb-list" id="landing-lb" style="margin:22px 0;"></div>
+    <div class="spacer"></div>
+    <div class="stack mt-auto">
+      <button class="btn" id="landing-play">▶ Play</button>
+      <button class="link-reset" id="landing-reset" style="display:none;">Not you? Reset profile</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ 2. PROFILE ════════════ -->
+<div class="screen" id="screen-profile">
+  <div class="screen-inner">
+    <div class="center">
+      <div class="kicker">Enter the Race</div>
+      <h1 class="title" style="font-size:24px;">Your Profile</h1>
+    </div>
+    <div style="margin-top:28px;">
+      <div class="field">
+        <label class="field-label">Initials (3 letters)</label>
+        <input class="initials-input" id="in-initials" maxlength="3" autocomplete="off"
+               autocapitalize="characters" inputmode="text" placeholder="AAA">
+        <div class="field-err" id="err-initials"></div>
+      </div>
+      <div class="field">
+        <label class="field-label">Zip Code</label>
+        <input class="zip-input" id="in-zip" maxlength="5" inputmode="numeric"
+               pattern="[0-9]*" autocomplete="off" placeholder="00000">
+        <div class="field-err" id="err-zip"></div>
+      </div>
+      <div class="field">
+        <label class="field-label">Age Range</label>
+        <div class="age-grid" id="age-grid">
+          <button class="age-btn" data-age="13-17">13–17</button>
+          <button class="age-btn" data-age="18-24">18–24</button>
+          <button class="age-btn" data-age="25-34">25–34</button>
+          <button class="age-btn" data-age="35-44">35–44</button>
+          <button class="age-btn" data-age="45-54">45–54</button>
+          <button class="age-btn" data-age="55+">55+</button>
+        </div>
+        <div class="field-err" id="err-age"></div>
+      </div>
+    </div>
+    <div class="stack mt-auto">
+      <button class="btn" id="profile-submit">Start Racing ▶</button>
+      <p class="privacy-note">Zip and age are used for activation analytics only.<br>No personal contact information is collected.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ 3. GAME ════════════ -->
+<div class="screen" id="screen-game">
+  <iframe id="game-frame" allow="autoplay; gyroscope; accelerometer" title="Drone Racer"></iframe>
+</div>
+
+<!-- ════════════ 4. SCORE / RANK ════════════ -->
+<div class="screen" id="screen-score">
+  <div class="screen-inner">
+    <div class="center" style="margin-top:8px;">
+      <div class="score-label">Final Score</div>
+      <div class="score-big" id="score-value">0</div>
+    </div>
+    <div id="score-newbest" style="display:none; margin-top:14px;">
+      <div class="new-best-badge">★ New Personal Best ★</div>
+    </div>
+    <div class="stack" style="margin-top:22px;">
+      <div class="stat-row"><span class="stat-k">Today's Rank</span><span class="stat-v" id="score-rank">—</span></div>
+      <div class="stat-row"><span class="stat-k">Personal Best</span><span class="stat-v" id="score-pb">—</span></div>
+      <div class="stat-row" id="score-gap-row"><span class="stat-k">To Crack Top 10</span><span class="stat-v" id="score-gap">—</span></div>
+    </div>
+    <div class="stack mt-auto">
+      <button class="btn" id="score-again">↻ Play Again</button>
+      <button class="btn secondary" id="score-share">⇪ Challenge a Friend</button>
+      <button class="btn secondary" id="score-lb">View Full Leaderboard</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ 5. LEADERBOARD ════════════ -->
+<div class="screen" id="screen-leaderboard">
+  <div class="screen-inner">
+    <div class="center">
+      <div class="kicker">Daily Standings</div>
+      <h1 class="title" style="font-size:24px;">Leaderboard</h1>
+      <div class="subtitle">Top 25 · Resets at Midnight</div>
+    </div>
+    <div class="lb-list" id="full-lb" style="margin-top:20px;"></div>
+    <div class="stack mt-auto">
+      <button class="btn" id="lb-back">◀ Back</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ════════════════════════════════════════════════════════════════════════════
+//  DATA LAYER — localStorage-backed (Phase 1).
+//  Every read/write goes through DB so Phase 2 can swap to a real API
+//  by reimplementing these methods, leaving all UI code untouched.
+// ════════════════════════════════════════════════════════════════════════════
+const DB = {
+  K: { profile: 'dra_profile', device: 'dra_device', lb: 'dra_lb_', play: 'dra_play_' },
+
+  today() { return new Date().toLocaleDateString('en-CA'); }, // YYYY-MM-DD, local tz
+
+  deviceId() {
+    let id = localStorage.getItem(this.K.device);
+    if (!id) {
+      id = 'd_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+      localStorage.setItem(this.K.device, id);
+    }
+    return id;
+  },
+
+  getProfile() { try { return JSON.parse(localStorage.getItem(this.K.profile)); } catch (e) { return null; } },
+  saveProfile(p) { localStorage.setItem(this.K.profile, JSON.stringify(p)); },
+  clearProfile() { localStorage.removeItem(this.K.profile); },
+
+  _lbKey() { return this.K.lb + this.today(); },
+  getLeaderboard() { try { return JSON.parse(localStorage.getItem(this._lbKey())) || []; } catch (e) { return []; } },
+  _saveLb(arr) { localStorage.setItem(this._lbKey(), JSON.stringify(arr)); },
+
+  // Best-score-per-device. Returns { rank, personalBest, isNewBest, total }.
+  submitScore(score) {
+    const did = this.deviceId();
+    const prof = this.getProfile() || {};
+    const lb = this.getLeaderboard();
+    const mine = lb.find(e => e.deviceId === did);
+    let isNewBest = false;
+    if (mine) {
+      if (score > mine.score) { mine.score = score; mine.ts = Date.now(); mine.initials = prof.initials || mine.initials; isNewBest = true; }
+    } else {
+      lb.push({ deviceId: did, initials: prof.initials || 'AAA', score, ts: Date.now() });
+      isNewBest = true;
+    }
+    lb.sort((a, b) => b.score - a.score || a.ts - b.ts);
+    this._saveLb(lb);
+    const rank = lb.findIndex(e => e.deviceId === did) + 1;
+    const pbEntry = lb.find(e => e.deviceId === did);
+    return { rank, personalBest: pbEntry ? pbEntry.score : score, isNewBest, total: lb.length };
+  },
+
+  getPersonalBest() {
+    const e = this.getLeaderboard().find(x => x.deviceId === this.deviceId());
+    return e ? e.score : 0;
+  },
+
+  // Points needed to reach #10 (0 if already top-10 or fewer than 10 players).
+  gapToTop10() {
+    const lb = this.getLeaderboard();
+    if (lb.length < 10) return 0;
+    const myRank = lb.findIndex(e => e.deviceId === this.deviceId()) + 1;
+    if (myRank > 0 && myRank <= 10) return 0;
+    return Math.max(0, lb[9].score - this.getPersonalBest() + 1);
+  },
+
+  incPlayCount() {
+    const k = this.K.play + this.today();
+    const n = (parseInt(localStorage.getItem(k), 10) || 0) + 1;
+    localStorage.setItem(k, n);
+    return n;
+  },
+};
+
+// Basic client-side profanity guard for 3-letter initials (server validates in Phase 2).
+const BANNED_INITIALS = ['ASS','FUK','FUC','FAG','SEX','CUM','TIT','DIK','COK','NIG','CNT','JIZ','POO','GAY','XXX'];
+function initialsClean(s) { return !BANNED_INITIALS.includes(s.toUpperCase()); }
+
+// Demo seed so the leaderboard isn't empty during local testing.
+// Clearly fake seed_* deviceIds — harmless, and a real backend replaces this in Phase 2.
+function seedDemoIfEmpty() {
+  if (DB.getLeaderboard().length > 0) return;
+  const demo = [['ACE',9450],['VIP',8720],['NEO',8100],['ZAP',7650],['FLY',7200],
+                ['JET',6800],['SKY',6300],['BLT',5900],['ROO',5400],['MAX',4950],
+                ['KAI',4400],['REX',3850],['FOX',3200]];
+  DB._saveLb(demo.map((d, i) => ({ deviceId: 'seed_' + i, initials: d[0].slice(0, 3), score: d[1], ts: Date.now() - i * 1000 })));
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  UI / FLOW
+// ════════════════════════════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $('screen-' + name).classList.add('active');
+}
+
+function renderLeaderboard(el, limit) {
+  const lb = DB.getLeaderboard().slice(0, limit);
+  const did = DB.deviceId();
+  if (lb.length === 0) { el.innerHTML = '<div class="lb-empty">No scores yet — be the first!</div>'; return; }
+  el.innerHTML = lb.map((e, i) => {
+    const cls = ['lb-row', i === 0 ? 'top1' : '', e.deviceId === did ? 'is-me' : ''].filter(Boolean).join(' ');
+    return `<div class="${cls}"><span class="rank">#${i + 1}</span>` +
+           `<span class="initials">${escapeHtml(e.initials)}</span>` +
+           `<span class="score">${e.score.toLocaleString()}</span></div>`;
+  }).join('');
+}
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// ── Landing ──
+function initLanding() {
+  renderLeaderboard($('landing-lb'), 10);
+  $('landing-reset').style.display = DB.getProfile() ? 'block' : 'none';
+  showScreen('landing');
+}
+$('landing-play').addEventListener('click', () => {
+  if (DB.getProfile()) showGame();
+  else { showScreen('profile'); loadProfileIntoForm(); }
+});
+$('landing-reset').addEventListener('click', () => { DB.clearProfile(); resetProfileForm(); initLanding(); });
+
+// ── Profile ──
+let selectedAge = null;
+$('age-grid').addEventListener('click', e => {
+  const b = e.target.closest('.age-btn'); if (!b) return;
+  document.querySelectorAll('.age-btn').forEach(x => x.classList.remove('selected'));
+  b.classList.add('selected'); selectedAge = b.dataset.age; $('err-age').textContent = '';
+});
+$('in-initials').addEventListener('input', e => {
+  e.target.value = e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(0, 3);
+});
+$('in-zip').addEventListener('input', e => {
+  e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 5);
+});
+function resetProfileForm() {
+  $('in-initials').value = ''; $('in-zip').value = ''; selectedAge = null;
+  document.querySelectorAll('.age-btn').forEach(x => x.classList.remove('selected'));
+  $('err-initials').textContent = ''; $('err-zip').textContent = ''; $('err-age').textContent = '';
+}
+function loadProfileIntoForm() {
+  const p = DB.getProfile(); if (!p) { resetProfileForm(); return; }
+  $('in-initials').value = p.initials || '';
+  $('in-zip').value = p.zip || '';
+  selectedAge = p.age || null;
+  document.querySelectorAll('.age-btn').forEach(x => x.classList.toggle('selected', x.dataset.age === selectedAge));
+}
+$('profile-submit').addEventListener('click', () => {
+  const initials = $('in-initials').value.trim().toUpperCase();
+  const zip = $('in-zip').value.trim();
+  let ok = true;
+  $('err-initials').textContent = ''; $('err-zip').textContent = ''; $('err-age').textContent = '';
+  if (initials.length !== 3) { $('err-initials').textContent = 'Enter exactly 3 letters.'; ok = false; }
+  else if (!initialsClean(initials)) { $('err-initials').textContent = 'Please choose different initials.'; ok = false; }
+  if (!/^\d{5}$/.test(zip)) { $('err-zip').textContent = 'Enter a 5-digit zip code.'; ok = false; }
+  if (!selectedAge) { $('err-age').textContent = 'Select an age range.'; ok = false; }
+  if (!ok) return;
+  DB.saveProfile({ initials, zip, age: selectedAge, deviceId: DB.deviceId(), createdAt: Date.now() });
+  showGame();
+});
+
+// ── Game (iframe) ──
+let gameLoaded = false;
+function showGame() {
+  showScreen('game');
+  const frame = $('game-frame');
+  if (!gameLoaded) { frame.src = 'drone-game.html?activation=1'; gameLoaded = true; }
+  else { try { frame.contentWindow.postMessage({ type: 'activationPlayAgain' }, '*'); } catch (e) {} }
+}
+
+// Receive final score from the game iframe (same-origin in local + prod).
+window.addEventListener('message', e => {
+  if (e.origin !== location.origin) return;
+  if (e.data && e.data.type === 'droneGameOver') handleGameOver(e.data.score | 0);
+});
+
+function handleGameOver(score) {
+  DB.incPlayCount();
+  const r = DB.submitScore(score);
+  $('score-value').textContent = score.toLocaleString();
+  $('score-rank').textContent = '#' + r.rank + ' of ' + r.total;
+  $('score-pb').textContent = r.personalBest.toLocaleString();
+  $('score-newbest').style.display = r.isNewBest ? 'block' : 'none';
+  const gap = DB.gapToTop10();
+  if (gap === 0) {
+    $('score-gap-row').querySelector('.stat-k').textContent = 'Status';
+    $('score-gap').textContent = r.rank <= 10 ? '★ Top 10!' : 'In the running';
+  } else {
+    $('score-gap-row').querySelector('.stat-k').textContent = 'To Crack Top 10';
+    $('score-gap').textContent = gap.toLocaleString() + ' pts';
+  }
+  showScreen('score');
+}
+
+$('score-again').addEventListener('click', showGame);
+$('score-lb').addEventListener('click', () => { renderLeaderboard($('full-lb'), 25); showScreen('leaderboard'); });
+$('lb-back').addEventListener('click', () => showScreen('score'));
+$('score-share').addEventListener('click', async () => {
+  const score = $('score-value').textContent;
+  const shareData = {
+    title: 'U.S. Army Drone Racer',
+    text: `I scored ${score} on Army Drone Racer! Can you beat me?`,
+    url: location.origin + location.pathname,
+  };
+  try {
+    if (navigator.share) await navigator.share(shareData);
+    else { await navigator.clipboard.writeText(shareData.text + ' ' + shareData.url); alert('Challenge link copied to clipboard!'); }
+  } catch (e) { /* user cancelled share — ignore */ }
+});
+
+// ── Boot ──
+seedDemoIfEmpty();
+initLanding();
+</script>
+</body>
+</html>
