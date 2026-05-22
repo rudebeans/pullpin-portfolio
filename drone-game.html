@@ -1865,6 +1865,9 @@ if (isTouchDevice) {
   }
 
   document.addEventListener('touchstart', e => {
+    // Unlock iOS Web Audio on the VERY FIRST touch (any target, including the
+    // arrow/control buttons) so the first swipe or tap produces the select SFX.
+    _primeSelectAudio();
     if (e.target.id === 'h-prev' || e.target.id === 'h-next' ||
         e.target.id === 'ctrl-touch' || e.target.id === 'ctrl-gyro') return;
     e.preventDefault();
@@ -1872,10 +1875,6 @@ if (isTouchDevice) {
     tOX = t.clientX; tOY = t.clientY;
     tDX = 0; tDY = 0;
     tActive = true; tMoved = false;
-    // Prime Web Audio inside the gesture so the FIRST swipe's select SFX fires.
-    // Without this, _playSelectSound()'s resume()+decode awaits break the iOS
-    // user-gesture chain and the first swipe is silent until an arrow is tapped.
-    _primeSelectAudio();
   }, { passive: false });
 
   document.addEventListener('touchmove', e => {
@@ -2293,12 +2292,27 @@ function _emitGameOver() {
 
 // Drone selection chime — self-contained, works before startGame() is called.
 // 2× speed so it reads as a quick UI blip; 0.30 gain keeps it subtle.
-// Synchronously warm the audio context + decode the select buffer within a
-// user gesture, so _playSelectSound() can fire instantly on the first swipe.
+// iOS Web Audio unlock: resume() ALONE does not unlock iOS — you must start()
+// a real buffer source inside a user gesture. We play one silent 1-sample
+// buffer on the first touch; after that the context is unlocked for its whole
+// lifetime, so later start()s work even from async callbacks (post-await).
+let _audioUnlocked = false;
+function _unlockAudioCtx() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  if (!_audioUnlocked) {
+    const b = _audioCtx.createBuffer(1, 1, 22050);
+    const s = _audioCtx.createBufferSource();
+    s.buffer = b; s.connect(_audioCtx.destination); s.start(0);
+    _audioUnlocked = true;
+  }
+}
+
+// Called inside the touchstart gesture: unlock audio + pre-decode the select
+// blip so it's ready (and playable) by the time the swipe/tap completes.
 function _primeSelectAudio() {
   try {
-    if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (_audioCtx.state === 'suspended') _audioCtx.resume();
+    _unlockAudioCtx();
     if (!_selectBuffer && _rawAudioCache['Select_Drone.mp3']) {
       _audioCtx.decodeAudioData(_rawAudioCache['Select_Drone.mp3'].slice(0))
         .then(b => { _selectBuffer = b; }).catch(() => {});
@@ -2306,24 +2320,18 @@ function _primeSelectAudio() {
   } catch (e) { /* audio unavailable — fail silently */ }
 }
 
-async function _playSelectSound() {
+// No awaits: once the context is unlocked, a decode-then-play callback fires
+// fine even though it's async — so the first swipe is audible.
+function _playSelectSound() {
   try {
-    if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (_audioCtx.state === 'suspended') await _audioCtx.resume();
-    if (!_selectBuffer) {
-      const raw = _rawAudioCache['Select_Drone.mp3'];
-      if (!raw) return;
-      _selectBuffer = await _audioCtx.decodeAudioData(raw.slice(0)); // slice → fresh copy
-    }
-    const src  = _audioCtx.createBufferSource();
-    const gain = _audioCtx.createGain();
-    src.buffer = _selectBuffer;
-    src.playbackRate.value = 2.0;
-    gain.gain.value = 0.15;
-    src.connect(gain);
-    gain.connect(_audioCtx.destination);
-    src.start(0);
-  } catch(e) { /* audio unavailable — fail silently */ }
+    _unlockAudioCtx();
+    if (_selectBuffer) { _playOneShot(_selectBuffer, 0.15, 2.0); return; }
+    const raw = _rawAudioCache['Select_Drone.mp3'];
+    if (!raw) return;
+    _audioCtx.decodeAudioData(raw.slice(0))
+      .then(b => { _selectBuffer = b; _playOneShot(b, 0.15, 2.0); })
+      .catch(() => {});
+  } catch (e) { /* audio unavailable — fail silently */ }
 }
 
 function _playRingSound(streakLen) {
