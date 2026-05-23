@@ -864,9 +864,13 @@ function buildSSDroneMesh() {
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(m.pos, 3));
     geo.setIndex(new THREE.BufferAttribute(m.idx, 1));
-    // Solid black occluder — blocks geometry behind the drone (TRON effect)
+    // Solid black occluder — blocks geometry behind the drone (TRON effect).
+    // DoubleSide because the SS mesh has inconsistent face winding; FrontSide
+    // (used by Widow/Vesper, whose winding is clean) would cull its outward
+    // faces and make the drone see-through.
     const fillMat = new THREE.MeshBasicMaterial({
       color: 0x000000,
+      side: THREE.DoubleSide,
       polygonOffset: true,
       polygonOffsetFactor: 1,
       polygonOffsetUnits: 1
