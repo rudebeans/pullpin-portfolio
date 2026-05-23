@@ -1345,8 +1345,6 @@ function updateValley(dt, dz, spd) {
       tile.mesh.position.z -= totalD;
       _regenTile(tile, _tSeed++ * 31);
     }
-    // Bend the canyon laterally onto the curving track
-    tile.mesh.position.x = trackCenterX(tile.mesh.position.z);
 
     // Step 1: compute Y for every grid vertex
     const gY = tile.gY, gNX = tile.gNX, gNH = tile.gNH;
@@ -1367,7 +1365,6 @@ function updateValley(dt, dz, spd) {
   for (const gt of gridTiles) {
     gt.position.z += spd * dt;
     if (gt.position.z > dz + TERR_TILE_D) gt.position.z -= gridTotalD;
-    gt.position.x = trackCenterX(gt.position.z);
   }
 }
 
@@ -1404,37 +1401,8 @@ const RING_TUBE = 0.05;
 const rings = [];
 const ringMat = new THREE.MeshBasicMaterial({ color: 0xFECC02, wireframe: true });
 
-// ── Curving track ──────────────────────────────────────────────────────────
-// The world is a -z corridor; this bends it laterally into flowing S-curves.
-// trackCenterX(z) is the lateral centre of the track at depth z. Rings, tunnel,
-// speed-lines and terrain all follow it, and the camera banks into the curve.
-// Tunable: amp = how far it swings, freq = how often it turns.
-const TURN = {
-  enabled:    true,
-  amp:        4.0,    // lateral swing (world units)
-  freq:       0.035,  // base turn frequency (per z unit) — higher = more turns
-  halfWidth:  4.0,    // how far the drone may steer from the track centre
-  bankGain:   6.0,    // camera roll per unit slope (turn-into feel)
-  bankMax:    0.32,   // max camera roll (radians ≈ 18°)
-};
-function trackCenterX(z) {
-  if (!TURN.enabled) return 0;
-  const t = -z; // forward progression (0 at start → centred)
-  return TURN.amp * (0.65 * Math.sin(t * TURN.freq) +
-                     0.35 * Math.sin(t * TURN.freq * 0.43));
-}
-function trackSlopeX(z) {
-  // dx/dz of the centreline — drives the camera bank.
-  if (!TURN.enabled) return 0;
-  const t = -z, f = TURN.freq;
-  const dDt = TURN.amp * (0.65 * Math.cos(t * f) * f +
-                          0.35 * Math.cos(t * f * 0.43) * (f * 0.43));
-  return -dDt;
-}
-
 function spawnRing(zBase, forceX, forceY) {
-  // Ring x is relative to the curving track centre at this depth.
-  const x = trackCenterX(zBase) + ((forceX !== undefined) ? forceX : (Math.random() - 0.5) * 4);
+  const x = (forceX !== undefined) ? forceX : (Math.random() - 0.5) * 6;
   const y = (forceY !== undefined) ? forceY : (Math.random() - 0.5) * 4 + 0.5;
   const geo = new THREE.TorusGeometry(RING_RADIUS, RING_TUBE, 8, 32);
   const mesh = new THREE.Mesh(geo, ringMat);
@@ -1703,7 +1671,7 @@ function _updateCrosshair() {
 function spawnBossTank() {
   if (bossTank) return;
   const worldZ = dronePos.z - 70;
-  const x = trackCenterX(worldZ) + (Math.random() - 0.5) * 3.0; // near track centre
+  const x = (Math.random() - 0.5) * 3.0; // near center
   const { geo, edgeGeo } = _getOpForGeo();
   const group = new THREE.Group();
   const fillMat = new THREE.MeshBasicMaterial({
@@ -2754,9 +2722,9 @@ const TANK_CLUSTER_GAP  = 28;     // distance units between cluster spawns
 const TANK_MAX          = 12;     // max simultaneous ground tanks
 
 function spawnEnemy() {
-  const z = dronePos.z - 72 - Math.random() * 35;
-  const x = trackCenterX(z) + (Math.random() - 0.5) * 6; // on the curving track
+  const x = (Math.random() - 0.5) * 9;
   const y = (Math.random() - 0.5) * 5 + 0.5;
+  const z = dronePos.z - 72 - Math.random() * 35;
   const shapeRand = Math.random();
 
   let rawGeo;
@@ -2834,7 +2802,7 @@ function spawnTankCluster() {
     const side = Math.random() < 0.5 ? -1 : 1;
     const xAbs = 2.5 + Math.random() * 7.5;
     const zJit = (Math.random() - 0.5) * 12;
-    spawnGroundTank(baseZ + zJit, trackCenterX(baseZ + zJit) + side * xAbs, sc);
+    spawnGroundTank(baseZ + zJit, side * xAbs, sc);
   }
 }
 
@@ -2901,17 +2869,16 @@ function _spawnSlab(worldZ, centerY) {
 }
 
 function spawnObstacle(worldZ) {
-  const c = trackCenterX(worldZ); // centre obstacles on the curving track
   const roll = Math.random();
   if (roll < 0.35) {
     // Pillar pair with a gap — thread the needle
-    const gapX = c + (Math.random() - 0.5) * 3.0;
+    const gapX = (Math.random() - 0.5) * 3.0;
     const sep  = 3.0 + Math.random() * 1.8;
     _spawnPillar(worldZ, gapX - sep);
     _spawnPillar(worldZ, gapX + sep);
   } else if (roll < 0.65) {
     // Single center post — hard dodge left or right
-    _spawnPillar(worldZ, c + (Math.random() - 0.5) * 2.5);
+    _spawnPillar(worldZ, (Math.random() - 0.5) * 2.5);
   } else {
     // Wide slab — fly under or yank up to dodge
     const centerY = 0.8 + Math.random() * 0.8;
@@ -3174,9 +3141,8 @@ function animate(ts) {
     const _rcBoost = (rcPhase === RC_SEQ) ? 1.28 : 1.0;
     dronePos.z -= speed * bossSpeedMult * _rcBoost * dt;
 
-    // Clamp position to the curving track — player must steer to follow the bend
-    const _trackC = trackCenterX(dronePos.z);
-    dronePos.x = Math.max(_trackC - TURN.halfWidth, Math.min(_trackC + TURN.halfWidth, dronePos.x));
+    // Clamp position
+    dronePos.x = Math.max(-6, Math.min(6, dronePos.x));
     // Expand Y floor during RC so drone can follow the deep dive arc
     dronePos.y = Math.max(rcPhase === RC_SEQ ? -5.5 : -3, Math.min(5, dronePos.y));
 
@@ -3271,12 +3237,7 @@ function animate(ts) {
       dronePos.y + CAM_OFFSET.y + _camShake.y,
       dronePos.z + CAM_OFFSET.z + _camShake.z
     );
-    // Look down the curving track ahead so the corridor reads as bending
-    const _lookZ = dronePos.z - 8;
-    camera.lookAt(trackCenterX(_lookZ), dronePos.y + rcCamPitch, _lookZ);
-    // Bank into the turn — roll proportional to the curve slope
-    const _bank = Math.max(-TURN.bankMax, Math.min(TURN.bankMax, trackSlopeX(dronePos.z) * TURN.bankGain));
-    camera.rotateZ(_bank);
+    camera.lookAt(dronePos.x, dronePos.y + rcCamPitch, dronePos.z - 8);
 
     // ── Update all particle effects ────────────────────────────────────────────
     for (let i = passEffects.length - 1; i >= 0; i--) {
@@ -3556,12 +3517,9 @@ function animate(ts) {
       } else if (sz < tunnelWindowEnd - tunnelWindowLen) {
         seg.position.z += tunnelWindowLen;
       }
-      // Bend the corridor laterally to follow the curving track
-      seg.position.x = trackCenterX(seg.position.z);
     }
 
-    // Speed lines — shift the whole streak field onto the curving track
-    lineGroup.position.x = trackCenterX(dronePos.z);
+    // Speed lines
     for (const line of lineGroup.children) {
       const posArr = line.geometry.attributes.position.array;
       posArr[2] += speed * dt * 1.4;
