@@ -41,10 +41,11 @@
   body.embedded .screen-inner { padding-top: 132px; }
 
   /* ── Shared brand bits ── */
-  /* Landing logo — same ADR lockup used in-game, scaled down + balanced */
+  /* Landing logo — same ADR lockup used in-game, sized to span the full
+     leaderboard width (matches its left/right edges) for a clean header. */
   .landing-logo {
-    display: block; margin: 0 auto 8px;
-    width: clamp(190px, 52%, 230px); height: auto;
+    display: block; margin: 0 auto 12px;
+    width: 100%; height: auto;
     user-select: none;
   }
   .brand-star { color: var(--gold); font-size: 13px; letter-spacing: 0.3em; }
