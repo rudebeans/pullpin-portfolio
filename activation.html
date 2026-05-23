@@ -56,20 +56,23 @@
   }
   .subtitle { font-size: 11px; letter-spacing: 0.18em; color: var(--gold-dim); text-transform: uppercase; }
 
+  /* Rest: black fill, gold border + gold text/icon. Hover/tap: gold-filled. */
   .btn {
     display: flex; align-items: center; justify-content: center; gap: 10px;
     width: 100%; min-height: 58px; padding: 16px;
-    background: var(--gold); color: #111; border: none;
+    background: transparent; color: var(--gold); border: 1px solid var(--gold);
     font-family: inherit; font-size: 17px; font-weight: 700; letter-spacing: 0.18em;
     text-transform: uppercase; cursor: pointer; border-radius: 2px;
-    transition: transform 0.12s ease, filter 0.12s ease;
+    transition: background 0.12s ease, color 0.12s ease, transform 0.12s ease;
   }
-  .btn:active { transform: scale(0.97); filter: brightness(1.1); }
+  .btn:hover  { background: var(--gold); color: #111; }
+  .btn:active { background: var(--gold); color: #111; transform: scale(0.97); }
   .btn.secondary {
-    background: transparent; color: var(--gold);
-    border: 1px solid var(--gold-faint); min-height: 52px; font-size: 14px;
+    border-color: var(--gold-faint); min-height: 52px; font-size: 14px;
   }
-  .btn.secondary:active { background: rgba(254,204,2,0.08); }
+  /* Secondary stays subtle (don't fully fill) to preserve hierarchy */
+  .btn.secondary:hover  { background: rgba(254,204,2,0.10); color: var(--gold); }
+  .btn.secondary:active { background: rgba(254,204,2,0.10); color: var(--gold); }
   .btn:disabled { opacity: 0.35; pointer-events: none; }
 
   .link-reset {

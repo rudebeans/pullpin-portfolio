@@ -2161,6 +2161,8 @@ function returnToHangar() {
   clearDroneGroup();
   currentLevel = 0; gameColorHex = LEVEL_PALETTES[0].hex; gameColorRGB = LEVEL_PALETTES[0];
   overdrive = 1.0; overdriveTier = 0;
+  // Reset the wide overdrive/warp FOV so the hangar renders at base scale
+  warpActive = false; warpT = 0; camera.fov = BASE_FOV; camera.updateProjectionMatrix();
   DRONE_CONFIGS[selectedDrone].buildFn();
   setGameColor(0, false); // apply lime green to freshly-built drone/line/tunnel mats
   droneGroup.position.set(0, 0, 0);
