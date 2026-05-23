@@ -41,6 +41,12 @@
   body.embedded .screen-inner { padding-top: 132px; }
 
   /* ── Shared brand bits ── */
+  /* Landing logo — same ADR lockup used in-game, scaled down + balanced */
+  .landing-logo {
+    display: block; margin: 0 auto 8px;
+    width: clamp(190px, 52%, 230px); height: auto;
+    user-select: none;
+  }
   .brand-star { color: var(--gold); font-size: 13px; letter-spacing: 0.3em; }
   .kicker { font-size: 10px; letter-spacing: 0.35em; color: var(--text-dim); text-transform: uppercase; }
   h1.title {
@@ -185,8 +191,8 @@
 <div class="screen active" id="screen-landing">
   <div class="screen-inner">
     <div class="center">
-      <div class="brand-star">★ U.S. ARMY</div>
-      <h1 class="title">Drone Racer</h1>
+      <img class="landing-logo" src="media/z_early_test_images/ADR_Top_Logo.svg"
+           alt="Army Drone Racer — Readiness Training" draggable="false">
       <div class="subtitle">Daily Leaderboard · Top 10</div>
     </div>
     <div class="lb-list" id="landing-lb" style="margin:22px 0;"></div>
