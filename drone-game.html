@@ -718,6 +718,11 @@ const bloomPass = new THREE.UnrealBloomPass(
 );
 composer.addPass(bloomPass);
 
+// Depth-only material: writes depth, no color. Used to prime the screen depth
+// buffer with the bloomed scene's geometry before the terrain pass, so terrain
+// can't overdraw the drone/rings (which would make them look see-through).
+const _depthOnlyMat = new THREE.MeshBasicMaterial({ colorWrite: false });
+
 function _applySize() {
   const w = window.innerWidth, h = window.innerHeight;
   if (w > 0 && h > 0) {
@@ -3911,6 +3916,16 @@ function animate(ts) {
   if (valleyGroup.visible) {
     renderer.autoClear = false;
     renderer.clearDepth();
+    // Prime the depth buffer with ONLY the drone (depth only, no color) via
+    // layer 1, so the terrain depth-tests against the drone and can't paint
+    // over it. Limiting to the drone (not the whole scene) keeps the thin
+    // speed-lines/tunnel from occluding — and dimming — the terrain.
+    droneGroup.traverse(o => o.layers.enable(1));
+    camera.layers.set(1);
+    scene.overrideMaterial = _depthOnlyMat;
+    renderer.render(scene, camera);
+    scene.overrideMaterial = null;
+    camera.layers.set(0);
     renderer.render(terrainScene, camera);
     renderer.autoClear = true;
   }
