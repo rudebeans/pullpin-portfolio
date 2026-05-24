@@ -1650,6 +1650,63 @@ function _showBossMsg(text, dur, style) {
 }
 
 // ── Crosshair projection ──────────────────────────────────────────────────────
+// ── Floating nameplates — minimal color-coded labels over enemies & pickups ──
+let _npInit = false, _npLayer = null;
+const _npPool = [];
+const _npVec  = new THREE.Vector3();
+function _updateNameplates() {
+  // Only during active flight (not hangar / game-over)
+  if (selectionMode || gameOver) { for (const el of _npPool) el.style.display = 'none'; return; }
+  if (!_npInit) {
+    _npInit = true;
+    const st = document.createElement('style');
+    st.textContent =
+      "#nameplate-layer{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}" +
+      ".nameplate{position:absolute;transform:translate(-50%,-100%);font-family:'Courier New',monospace;" +
+      "font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;white-space:nowrap;" +
+      "padding:2px 7px;border-radius:2px;background:rgba(5,8,12,0.62);border:1px solid currentColor;" +
+      "line-height:1;text-shadow:0 0 6px currentColor;will-change:transform,opacity}" +
+      ".nameplate::after{content:'';position:absolute;left:50%;top:100%;transform:translateX(-50%);" +
+      "border:4px solid transparent;border-top-color:currentColor}";
+    document.head.appendChild(st);
+    _npLayer = document.createElement('div');
+    _npLayer.id = 'nameplate-layer';
+    document.body.appendChild(_npLayer);
+  }
+  // Build labelled-object list (position object + label + colour + vertical offset)
+  const items = [];
+  for (const p of empPickups)   items.push({ o: p.group.position,       t: 'EMP',     c: '#007722', y: 1.4 });
+  for (const e of enemies)      items.push({ o: e.mesh.position,        t: 'HOSTILE', c: '#ff3b3b', y: 1.0 });
+  for (const t of groundTanks)  items.push({ o: t.mesh.position,        t: 'TANK',    c: '#ff9a3b', y: 1.8 });
+  if (bossTank)                 items.push({ o: bossTank.mesh.position, t: 'BOSS',    c: '#ff2b2b', y: 3.2 });
+
+  const W = window.innerWidth, H = window.innerHeight;
+  let used = 0;
+  for (const it of items) {
+    const o = it.o;
+    const ahead = dronePos.z - o.z;          // forward = -z
+    if (ahead < 1 || ahead > 110) continue;  // passed or too far
+    _npVec.set(o.x, o.y + it.y, o.z).project(camera);
+    if (_npVec.z > 1) continue;              // behind camera
+    const sx = (_npVec.x * 0.5 + 0.5) * W;
+    const sy = (-_npVec.y * 0.5 + 0.5) * H;
+    if (sx < -60 || sx > W + 60 || sy < -40 || sy > H + 40) continue;
+    let op = 1;
+    if (ahead > 75) op = Math.max(0, 1 - (ahead - 75) / 35); // fade in far away
+    else if (ahead < 6) op = Math.max(0, ahead / 6);          // fade out as passed
+    let el = _npPool[used];
+    if (!el) { el = document.createElement('div'); el.className = 'nameplate'; _npLayer.appendChild(el); _npPool[used] = el; }
+    if (el._t !== it.t) { el.textContent = it.t; el._t = it.t; }
+    if (el._c !== it.c) { el.style.color = it.c; el._c = it.c; }
+    el.style.left = sx.toFixed(1) + 'px';
+    el.style.top  = sy.toFixed(1) + 'px';
+    el.style.opacity = op.toFixed(2);
+    el.style.display = 'block';
+    used++;
+  }
+  for (let i = used; i < _npPool.length; i++) _npPool[i].style.display = 'none';
+}
+
 function _updateCrosshair() {
   if (!bossTank || (bossPhase !== 'acquiring' && bossPhase !== 'locked')) {
     xhEl.classList.remove('xh-show', 'xh-locked'); return;
@@ -3913,6 +3970,7 @@ function animate(ts) {
 
   updateValley(dt, dronePos.z, speed * bossSpeedMult * 0.5);
   drawDepthGauge();
+  _updateNameplates();
   composer.render();
   // Terrain rendered after bloom so it receives zero glow
   if (valleyGroup.visible) {
