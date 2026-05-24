@@ -316,20 +316,26 @@ canvas { display: block; }
 #intro-screen:has(#intro-play-btn:hover)  #intro-hover-bg { opacity: 1; }
 #intro-screen:has(#intro-play-btn:active) #intro-hover-bg { opacity: 0.75; }
 
-/* ── Boss red-mode vignette ── */
+/* ── Boss red-mode vignette — elegant but unmistakable (25% alpha) ── */
 #boss-vignette {
   position: fixed; inset: 0;
   pointer-events: none; z-index: 6;
-  background: radial-gradient(ellipse at center,
-    transparent 25%,
-    rgba(180,0,0,0.0) 45%,
-    rgba(180,0,0,0.72) 100%
-  );
+  background:
+    radial-gradient(ellipse at center,
+      rgba(255,12,12,0.0)  10%,
+      rgba(255,8,8,0.26)   46%,
+      rgba(220,0,0,0.58)   76%,
+      rgba(120,0,0,0.96)  100%),
+    rgba(190,0,0,0.16);
   opacity: 0;
-  transition: opacity 1.6s ease;
+  transition: opacity 1.2s ease;
 }
-#boss-vignette.bv-warn   { opacity: 0.45; } /* identified — creeping dread */
-#boss-vignette.bv-danger { opacity: 1;    } /* acquiring / locked — full red mode */
+#boss-vignette.bv-warn   { opacity: 0.6; }
+#boss-vignette.bv-danger { opacity: 1; animation: boss-breathe 1.9s ease-in-out infinite; }
+@keyframes boss-breathe {
+  0%, 100% { opacity: 0.74; }
+  50%      { opacity: 1;    }
+}
 
 /* ── Boss encounter messages ── */
 #boss-msg {
@@ -3393,6 +3399,13 @@ function animate(ts) {
       if (rcTimer >= rcNextTrigger) {
         rcPhase = RC_FADE_OUT;
         rcTimer = 0;
+        // Clear the field so the ring coaster reads clean (no floating tanks/enemies/obstacles)
+        for (const e of enemies)     { scene.remove(e.mesh); e.mat.dispose(); }
+        enemies.length = 0;
+        for (const t of groundTanks) { scene.remove(t.mesh); t.fillMat.dispose(); t.wireMat.dispose(); }
+        groundTanks.length = 0;
+        for (const ob of obstacles)  { scene.remove(ob.mesh); ob.edges.dispose(); ob.mat.dispose(); }
+        obstacles.length = 0;
       }
     } else if (rcPhase === RC_FADE_OUT) {
       rcTimer += dt;
@@ -3664,7 +3677,7 @@ function animate(ts) {
     // ── Enemy spawn ───────────────────────────────────────────────────────────
     if (distance > 25 && distance - lastEnemySpawnDist > 20 + Math.random() * 15
         && enemies.length < MAX_ENEMIES) {
-      spawnEnemy();
+      if (rcPhase === RC_IDLE) spawnEnemy();
       lastEnemySpawnDist = distance;
     }
 
@@ -3673,7 +3686,7 @@ function animate(ts) {
 
     // ── Ground tank spawn + update ────────────────────────────────────────────
     if (distance - lastTankSpawnDist > TANK_CLUSTER_GAP) {
-      if (bossPhase === 'none' || bossPhase === 'dead') spawnTankCluster();
+      if (rcPhase === RC_IDLE && (bossPhase === 'none' || bossPhase === 'dead')) spawnTankCluster();
       lastTankSpawnDist = distance;
     }
     // Tanks ride with the terrain (half-speed parallax) so they stay fixed on the surface
