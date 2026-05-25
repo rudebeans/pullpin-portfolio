@@ -388,6 +388,56 @@ canvas { display: block; }
   text-shadow: 0 0 8px rgba(0,200,255,0.7);
 }
 #emp-hud.eh-show { display:block; }
+
+/* FPV CAMERA HUD */
+#fpv-hud{position:fixed;inset:0;z-index:30;pointer-events:none;display:none;
+  font-family:monospace;color:#e8e8e8;letter-spacing:1px;text-shadow:0 0 4px rgba(0,0,0,0.9);}
+#fpv-hud.fpv-on{display:block;}
+#fpv-hud::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(rgba(255,255,255,0.04) 0 1px,transparent 1px 3px);
+  mix-blend-mode:overlay;opacity:0.55;}
+.fpv-tele{position:absolute;font-size:13px;white-space:nowrap;}
+#fpv-top{position:absolute;top:22px;left:6%;right:6%;display:flex;justify-content:space-between;align-items:center;}
+#fpv-top>div{flex:1;}
+#fpv-top .c{text-align:center;} #fpv-top .r{text-align:right;}
+#fpv-rec{display:inline-flex;align-items:center;gap:7px;}
+#fpv-rec .dot{width:9px;height:9px;border-radius:50%;background:#ff3b3b;
+  box-shadow:0 0 8px #ff3b3b;animation:fpv-rec-blink 1s steps(1) infinite;}
+@keyframes fpv-rec-blink{50%{opacity:0.12;}}
+.fpv-bat{display:inline-flex;align-items:center;gap:6px;}
+.fpv-bat .cell{display:inline-block;width:22px;height:11px;border:1px solid #e8e8e8;border-radius:2px;position:relative;vertical-align:middle;}
+.fpv-bat .cell::after{content:"";position:absolute;right:-3px;top:3px;width:2px;height:5px;background:#e8e8e8;}
+.fpv-bat .fill{position:absolute;left:1px;top:1px;bottom:1px;width:18px;background:#e8e8e8;}
+.fpv-bat.low{color:#ff3b3b;}
+.fpv-bat.low .cell{border-color:#ff3b3b;} .fpv-bat.low .cell::after{background:#ff3b3b;}
+.fpv-bat.low .fill{background:#ff3b3b;}
+#fpv-vs{top:50%;left:7%;transform:translateY(-50%);}
+#fpv-alt{top:50%;right:7%;transform:translateY(-50%);}
+#fpv-dist{bottom:14%;left:26%;}
+#fpv-gs{bottom:14%;right:24%;}
+.fpv-corner{position:absolute;width:70px;height:58px;border:2px solid rgba(232,232,232,0.8);}
+.fpv-corner.tl{top:10%;left:8%;border-right:0;border-bottom:0;}
+.fpv-corner.tr{top:10%;right:8%;border-left:0;border-bottom:0;}
+.fpv-corner.bl{bottom:13%;left:8%;border-right:0;border-top:0;}
+.fpv-corner.br{bottom:13%;right:8%;border-left:0;border-top:0;}
+#fpv-cross{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:360px;height:120px;}
+#fpv-cross .h{position:absolute;top:50%;height:1.5px;background:rgba(232,232,232,0.92);transform:translateY(-50%);}
+#fpv-cross .h.left{left:0;width:42%;} #fpv-cross .h.right{right:0;width:42%;}
+#fpv-cross .v{position:absolute;left:50%;width:1.5px;background:rgba(232,232,232,0.92);transform:translateX(-50%);}
+#fpv-cross .v.top{top:12%;height:25%;} #fpv-cross .v.bot{bottom:12%;height:25%;}
+#fpv-cross .pip{position:absolute;top:50%;left:50%;width:6px;height:6px;background:#ff3b3b;
+  box-shadow:0 0 6px #ff3b3b;transform:translate(-50%,-50%);}
+#fpv-lock{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:none;flex-direction:column;align-items:center;}
+#fpv-lock.locked{display:flex;}
+.fpv-lock-box{width:200px;height:172px;border:2px solid #ff2b2b;border-radius:18px;
+  box-shadow:0 0 14px rgba(255,40,40,0.5);animation:fpv-lock-pulse 0.7s ease-in-out infinite;}
+@keyframes fpv-lock-pulse{50%{box-shadow:0 0 22px rgba(255,40,40,0.9);border-color:#ff6b6b;}}
+.fpv-lock-label{margin-top:9px;color:#ff3b3b;font-size:18px;letter-spacing:4px;text-shadow:0 0 8px rgba(255,40,40,0.6);}
+#view-toggle{position:fixed;top:84px;right:18px;z-index:40;display:none;
+  background:rgba(10,10,10,0.6);border:1px solid rgba(232,232,232,0.4);color:#cfcfcf;
+  font-family:monospace;font-size:11px;letter-spacing:2px;padding:7px 14px;cursor:pointer;
+  pointer-events:all;transition:all 0.15s;}
+#view-toggle:hover{border-color:rgba(232,232,232,0.9);color:#fff;background:rgba(30,30,30,0.7);}
 </style>
 </head>
 <body>
@@ -402,6 +452,28 @@ canvas { display: block; }
   <div id="hud-time-row">TIME &nbsp;&nbsp;<span id="hud-time">30.0</span>s</div>
   <div id="emp-hud" class="">EMP ×<span id="emp-count">0</span></div>
   <div style="margin-top:10px;opacity:0.4;font-size:11px">[SPACE] FIRE</div>
+</div>
+<button id="view-toggle">VIEW: CHASE  [V]</button>
+<div id="fpv-hud">
+  <div class="fpv-corner tl"></div><div class="fpv-corner tr"></div>
+  <div class="fpv-corner bl"></div><div class="fpv-corner br"></div>
+  <div id="fpv-top">
+    <div><span id="fpv-rec"><span class="dot"></span>REC</span></div>
+    <div class="c"><span id="fpv-rssi">RSSI: -72dBm</span></div>
+    <div class="c"><span id="fpv-time">00:00:00</span></div>
+    <div class="c"><span id="fpv-gps">GPS: 14</span></div>
+    <div class="r"><span class="fpv-bat" id="fpv-bat">BAT: <span id="fpv-bat-pct">100%</span> <span class="cell"><span class="fill" id="fpv-bat-fill"></span></span></span></div>
+  </div>
+  <div class="fpv-tele" id="fpv-vs">V.S.:  0.0</div>
+  <div class="fpv-tele" id="fpv-alt">ALT: 150m</div>
+  <div class="fpv-tele" id="fpv-dist">DIST: 0m</div>
+  <div class="fpv-tele" id="fpv-gs">GS: 0km/h</div>
+  <div id="fpv-cross">
+    <div class="h left"></div><div class="h right"></div>
+    <div class="v top"></div><div class="v bot"></div>
+    <div class="pip"></div>
+  </div>
+  <div id="fpv-lock"><div class="fpv-lock-box"></div><div class="fpv-lock-label">TARGET ACQUIRED</div></div>
 </div>
 <div id="countdown-overlay">
   <div id="countdown-num"></div>
@@ -1055,6 +1127,8 @@ function startGame() {
   selectionMode = false;
   document.getElementById('hangar').style.display = 'none';
   document.getElementById('hud').style.display = 'block';
+  { const _vt = document.getElementById('view-toggle'); if (_vt) _vt.style.display = 'block'; }
+  setView(false);
   // Show in-game logo lockup (desktop only — CSS hides on mobile)
   const ingameLockup = document.getElementById('ingame-lockup');
   if (ingameLockup) ingameLockup.style.display = 'block';
@@ -1891,8 +1965,73 @@ document.addEventListener('keydown', e => {
     if (gameOver) returnToHangar();
     else tryFire();
   }
+  if (e.code === 'KeyV') toggleView();
 });
 document.addEventListener('keyup', e => { keys[e.code] = false; });
+
+/* ── FPV / first-person view + camera HUD ─────────────────────────────────── */
+let fpvMode   = false;
+let _camTime  = 0;     // REC timer (s since FPV opened)
+let _fpvAcc   = 0;     // telemetry throttle accumulator
+let _fpvPrevY = 0;     // previous altitude for vertical-speed calc
+const _fpvProj = new THREE.Vector3();
+const FPV_LOCK_RANGE2 = 75 * 75;
+
+function setView(on) {
+  fpvMode = !!on;
+  const hud = document.getElementById('fpv-hud');
+  const btn = document.getElementById('view-toggle');
+  if (hud) hud.classList.toggle('fpv-on', fpvMode);
+  if (btn) btn.textContent = fpvMode ? 'VIEW: FPV    [V]' : 'VIEW: CHASE  [V]';
+  droneGroup.visible = !fpvMode;            // hide own drone at the nose cam
+  if (fpvMode) { _camTime = 0; _fpvAcc = 0; _fpvPrevY = dronePos.y; }
+}
+function toggleView() { if (selectionMode) return; setView(!fpvMode); }
+{ const _vb = document.getElementById('view-toggle'); if (_vb) _vb.addEventListener('click', (e) => { e.stopPropagation(); toggleView(); }); }
+
+function updateFpvHud(dt) {
+  if (!fpvMode) return;
+  _camTime += dt;
+  // Target lock — reuse the homing picker, gated to "ahead + in range"
+  const lockEl = document.getElementById('fpv-lock');
+  if (lockEl) {
+    const tgt = _nearestEnemy();
+    let locked = false;
+    if (tgt && tgt.z < dronePos.z) {
+      const dx = tgt.x - dronePos.x, dy = tgt.y - dronePos.y, dz = tgt.z - dronePos.z;
+      if (dx*dx + dy*dy + dz*dz < FPV_LOCK_RANGE2) {
+        _fpvProj.set(tgt.x, tgt.y, tgt.z).project(camera);
+        if (_fpvProj.z < 1) {
+          lockEl.style.left = ((_fpvProj.x * 0.5 + 0.5) * window.innerWidth) + 'px';
+          lockEl.style.top  = ((-_fpvProj.y * 0.5 + 0.5) * window.innerHeight) + 'px';
+          locked = true;
+        }
+      }
+    }
+    lockEl.classList.toggle('locked', locked);
+  }
+  // Throttle text telemetry (~12 Hz)
+  _fpvAcc += dt;
+  if (_fpvAcc < 0.08) return;
+  const interval = _fpvAcc; _fpvAcc = 0;
+  const vs = (dronePos.y - _fpvPrevY) / interval; _fpvPrevY = dronePos.y;
+  const mm = Math.floor(_camTime / 60), ss = Math.floor(_camTime % 60), cs = Math.floor((_camTime * 100) % 100);
+  const z2 = n => String(n).padStart(2, '0');
+  const set = (id, txt) => { const e = document.getElementById(id); if (e) e.textContent = txt; };
+  set('fpv-time', z2(mm) + ':' + z2(ss) + ':' + z2(cs));
+  set('fpv-rssi', 'RSSI: -' + (70 + Math.round(3 + Math.sin(_camTime * 0.7) * 3)) + 'dBm');
+  set('fpv-gps',  'GPS: ' + (13 + Math.round(1.5 + Math.sin(_camTime * 0.4) * 1.5)));
+  set('fpv-vs',   'V.S.: ' + (vs >= 0 ? ' ' : '') + vs.toFixed(1));
+  set('fpv-alt',  'ALT: ' + Math.round(150 + dronePos.y * 25) + 'm');
+  set('fpv-dist', 'DIST: ' + Math.round(distance) + 'm');
+  set('fpv-gs',   'GS: ' + Math.round(speed * overdrive * 10) + 'km/h');
+  const batPct = Math.max(0, Math.min(100, Math.round(timeLeft / START_TIME * 100)));
+  set('fpv-bat-pct', batPct + '%');
+  const fill = document.getElementById('fpv-bat-fill');
+  if (fill) fill.style.width = Math.max(2, batPct * 0.18) + 'px';
+  const batEl = document.getElementById('fpv-bat');
+  if (batEl) batEl.classList.toggle('low', batPct <= 25);
+}
 document.addEventListener('click', () => {
   if (selectionMode) return;
   if (gameOver) returnToHangar();
@@ -2243,6 +2382,8 @@ function returnToHangar() {
   droneGroup.position.set(0, 0, 0);
   droneGroup.rotation.set(0, Math.PI, 0);
   document.getElementById('hangar').style.display = 'flex';
+  setView(false);
+  { const _vt = document.getElementById('view-toggle'); if (_vt) _vt.style.display = 'none'; }
   if (armyLogoGroup) armyLogoGroup.visible = true;
   // Clean up ground tanks
   for (const t of groundTanks) { scene.remove(t.mesh); t.fillMat.dispose(); t.wireMat.dispose(); }
@@ -3321,13 +3462,25 @@ function animate(ts) {
     const _warpLine = warpActive ? Math.max(0, 1 - warpT * 2) * 0.5 : 0;
     lineMat.opacity = Math.min(1, 0.5 + (overdrive - 1.0) * 0.18 + _warpLine);
 
-    // Camera follows drone (fixed offset + shake)
-    camera.position.set(
-      dronePos.x + CAM_OFFSET.x + _camShake.x,
-      dronePos.y + CAM_OFFSET.y + _camShake.y,
-      dronePos.z + CAM_OFFSET.z + _camShake.z
-    );
-    camera.lookAt(dronePos.x, dronePos.y + rcCamPitch, dronePos.z - 8);
+    if (fpvMode) {
+      // ── First-person nose cam ──
+      camera.position.set(
+        dronePos.x + _camShake.x,
+        dronePos.y + 0.12 + _camShake.y,
+        dronePos.z - 0.35 + _camShake.z
+      );
+      camera.lookAt(dronePos.x, dronePos.y + 0.12 + rcCamPitch * 0.5, dronePos.z - 14);
+      camera.rotateZ(droneRoll * 0.6);   // roll with the drone's steering bank
+    } else {
+      // Camera follows drone (fixed offset + shake)
+      camera.position.set(
+        dronePos.x + CAM_OFFSET.x + _camShake.x,
+        dronePos.y + CAM_OFFSET.y + _camShake.y,
+        dronePos.z + CAM_OFFSET.z + _camShake.z
+      );
+      camera.lookAt(dronePos.x, dronePos.y + rcCamPitch, dronePos.z - 8);
+    }
+    updateFpvHud(dt);
 
     // ── Update all particle effects ────────────────────────────────────────────
     for (let i = passEffects.length - 1; i >= 0; i--) {
