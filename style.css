@@ -500,8 +500,20 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
 .hero__scroll-line {
   width: 1px;
   height: 48px;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+  /* brighter toward the bottom so the eye is led down to the arrow tip */
+  background: linear-gradient(to bottom, rgba(255,255,255,0.12), rgba(255,255,255,0.55));
   animation: scroll-line 2s ease-in-out infinite;
+}
+
+/* Arrow tip at the end of the line — a clear, elegant downward cue */
+.hero__scroll-hint::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin-top: -7px;
+  border-right: 1px solid rgba(255,255,255,0.55);
+  border-bottom: 1px solid rgba(255,255,255,0.55);
+  transform: rotate(45deg);
 }
 
 @keyframes scroll-line {

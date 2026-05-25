@@ -59,6 +59,7 @@
     }
     .project-hero--playing .project-hero__bg video { opacity: 0; }
     .project-hero--playing .project-hero__bg::after { opacity: 0; }
+    .project-hero--playing .project-hero__scroll-hint { opacity: 0; pointer-events: none; }
 
     /* ── Game iframe ── */
     #glo-game {
@@ -266,6 +267,10 @@
       </div>
     </div>
 
+    <div class="project-hero__scroll-hint" aria-hidden="true">
+      <span>Scroll</span>
+      <div class="project-hero__scroll-line"></div>
+    </div>
   </section>
 
   <!-- PROJECT BODY -->

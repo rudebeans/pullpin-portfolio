@@ -277,6 +277,50 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
   color: var(--off-white);
 }
 
+/* Scroll-down conveyance — mirrors the landing-page hero cue.
+   Anchored bottom-right so it clears the bottom-left hero content band. */
+.project-hero__scroll-hint {
+  position: absolute;
+  bottom: 80px;
+  right: 40px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.project-hero__scroll-line {
+  width: 1px;
+  height: 48px;
+  /* brighter toward the bottom so the eye is led down to the arrow tip */
+  background: linear-gradient(to bottom, rgba(255,255,255,0.12), rgba(255,255,255,0.55));
+  animation: scroll-line 2s ease-in-out infinite;
+}
+
+/* Arrow tip at the end of the line — a clear, elegant downward cue */
+.project-hero__scroll-hint::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin-top: -7px;
+  border-right: 1px solid rgba(255,255,255,0.55);
+  border-bottom: 1px solid rgba(255,255,255,0.55);
+  transform: rotate(45deg);
+}
+
+@keyframes scroll-line {
+  0%   { transform: scaleY(0); transform-origin: top;    opacity: 0; }
+  30%  { transform: scaleY(1); transform-origin: top;    opacity: 1; }
+  70%  { transform: scaleY(1); transform-origin: bottom; opacity: 1; }
+  100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+}
+
 /* ============================================
    PROJECT BODY — Sticky Sidebar + Image Feed
    ============================================ */
@@ -542,4 +586,5 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
   .nav__status { display: none; }
 
   .project-hero { padding: 0 24px 60px; }
+  .project-hero__scroll-hint { display: none; }
 }
