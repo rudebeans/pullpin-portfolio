@@ -433,7 +433,7 @@ canvas { display: block; }
   box-shadow:0 0 14px rgba(255,40,40,0.5);animation:fpv-lock-pulse 0.7s ease-in-out infinite;}
 @keyframes fpv-lock-pulse{50%{box-shadow:0 0 22px rgba(255,40,40,0.9);border-color:#ff6b6b;}}
 .fpv-lock-label{margin-top:9px;color:#ff3b3b;font-size:18px;letter-spacing:4px;text-shadow:0 0 8px rgba(255,40,40,0.6);}
-#view-toggle{position:fixed;top:84px;right:18px;z-index:40;display:none;
+#view-toggle{position:fixed;top:128px;right:18px;z-index:40;display:none;
   background:rgba(10,10,10,0.6);border:1px solid rgba(232,232,232,0.4);color:#cfcfcf;
   font-family:monospace;font-size:11px;letter-spacing:2px;padding:7px 14px;cursor:pointer;
   pointer-events:all;transition:all 0.15s;}
@@ -1982,7 +1982,7 @@ function setView(on) {
   const hud = document.getElementById('fpv-hud');
   const btn = document.getElementById('view-toggle');
   if (hud) hud.classList.toggle('fpv-on', fpvMode);
-  if (btn) btn.textContent = fpvMode ? 'VIEW: FPV    [V]' : 'VIEW: CHASE  [V]';
+  if (btn) btn.textContent = (fpvMode ? 'VIEW: FPV' : 'VIEW: CHASE') + (isTouchDevice ? '' : '  [V]');
   droneGroup.visible = !fpvMode;            // hide own drone at the nose cam
   if (fpvMode) { _camTime = 0; _fpvAcc = 0; _fpvPrevY = dronePos.y; }
 }
