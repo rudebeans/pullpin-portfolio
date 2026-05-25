@@ -2092,7 +2092,8 @@ if (isTouchDevice) {
     // arrow/control buttons) so the first swipe or tap produces the select SFX.
     _primeSelectAudio();
     if (e.target.id === 'h-prev' || e.target.id === 'h-next' ||
-        e.target.id === 'ctrl-touch' || e.target.id === 'ctrl-gyro') return;
+        e.target.id === 'ctrl-touch' || e.target.id === 'ctrl-gyro' ||
+        e.target.id === 'view-toggle') return;
     e.preventDefault();
     const t = e.touches[0];
     tOX = t.clientX; tOY = t.clientY;
@@ -2112,7 +2113,8 @@ if (isTouchDevice) {
 
   document.addEventListener('touchend', e => {
     if (e.target.id === 'h-prev' || e.target.id === 'h-next' ||
-        e.target.id === 'ctrl-touch' || e.target.id === 'ctrl-gyro') return;
+        e.target.id === 'ctrl-touch' || e.target.id === 'ctrl-gyro' ||
+        e.target.id === 'view-toggle') return;
     e.preventDefault();
     joystickEl.style.display = 'none';
     if (selectionMode) {
