@@ -1843,6 +1843,15 @@ function triggerEmpBlast() {
   bossTank.fillMat.dispose(); bossTank.wireMat.dispose();
   bossTank = null;
 
+  // EMP shockwave clears the whole field — flying enemies, ground tanks, and
+  // obstacles — but deliberately leaves the rings (the player still scores them).
+  for (const e of enemies)     { scene.remove(e.mesh); e.mat.dispose(); }
+  enemies.length = 0;
+  for (const t of groundTanks) { scene.remove(t.mesh); t.fillMat.dispose(); t.wireMat.dispose(); }
+  groundTanks.length = 0;
+  for (const ob of obstacles)  { scene.remove(ob.mesh); ob.edges.dispose(); ob.mat.dispose(); }
+  obstacles.length = 0;
+
   shakeTimer = 0.9; shakeAmt = 0.40;
 
   empBlast = { icoMesh, icoEdges, icoMat, innerMesh, innerEdge, innerMat, arcObjs, bossPos, t: 0, dur: 1.8, scored: false };
@@ -2891,6 +2900,8 @@ function _nearestEnemy() {
   return best;
 }
 
+const _BOLT_UP = new THREE.Vector3(0, 1, 0);
+const _bvTmp   = new THREE.Vector3();
 function fireHomingMissile() {
   const target = _nearestEnemy();
   if (!target) return;
@@ -2907,13 +2918,14 @@ function fireHomingMissile() {
   const mat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false });
   const mesh = new THREE.Line(geo, mat);
   scene.add(mesh);
-  // Bolt — a small spinning wireframe octahedron. Matches the wireframe + bloom
-  // aesthetic (same line rendering as enemies/rings) and reads from any angle.
-  const _boltGeo = new THREE.OctahedronGeometry(0.42);
+  // Bolt — a small hexagonal missile (wireframe) with a tapered nose, oriented
+  // along its flight path. Same line + bloom rendering as the rest of the world.
+  const _boltGeo = new THREE.CylinderGeometry(0.06, 0.18, 1.1, 6);
   const bolt = new THREE.LineSegments(new THREE.EdgesGeometry(_boltGeo),
     new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.95 }));
   _boltGeo.dispose();
   bolt.position.copy(pos);
+  bolt.quaternion.setFromUnitVectors(_BOLT_UP, vel.clone().normalize()); // nose toward target at launch
   mesh.add(bolt);
   missiles.push({ mesh, geo, mat, bolt, arr, pos, vel, target, life: 0 });
 }
@@ -3745,7 +3757,7 @@ function animate(ts) {
       }
       // Move
       m.pos.x += m.vel.x * dt; m.pos.y += m.vel.y * dt; m.pos.z += m.vel.z * dt;
-      if (m.bolt) { m.bolt.position.copy(m.pos); m.bolt.rotation.x += dt * 6; m.bolt.rotation.y += dt * 8; }
+      if (m.bolt) { m.bolt.position.copy(m.pos); m.bolt.quaternion.setFromUnitVectors(_BOLT_UP, _bvTmp.copy(m.vel).normalize()); }
       // Update streak visual (tail → nose along velocity)
       const vn = m.vel.clone().normalize().multiplyScalar(-5.0); // long laser tracer streak
       m.arr[0] = m.pos.x; m.arr[1] = m.pos.y; m.arr[2] = m.pos.z;
