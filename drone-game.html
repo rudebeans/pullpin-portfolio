@@ -1854,7 +1854,10 @@ function tryFire() {
   const now = performance.now() / 1000;
   if (now - lastFireTime < FIRE_RATE) return;
   lastFireTime = now;
-  fireBullet();
+  // Heat-seeking: fire a homing shot at the nearest hostile (enemy/tank);
+  // fall back to a straight bullet only when there's no target to lock onto.
+  if (_nearestEnemy()) fireHomingMissile();
+  else fireBullet();
 }
 
 document.addEventListener('keydown', e => {
@@ -2895,14 +2898,24 @@ function fireHomingMissile() {
   const len = Math.sqrt(dx*dx + dy*dy + dz*dz) || 1;
   const vel = new THREE.Vector3(dx/len*MISSILE_SPEED, dy/len*MISSILE_SPEED, dz/len*MISSILE_SPEED);
   const pos = new THREE.Vector3(dronePos.x, dronePos.y, dronePos.z - 0.6);
-  // Visual: bright orange streak (tail → nose encoded as vertex pair)
+  // Tracer trail — a thin line streak (reads as the shot curves while homing).
   const arr = new Float32Array(6);
+  const col = new Float32Array([1, 1, 1,  0.25, 0.25, 0.25]); // bright nose → dim tail
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(arr, 3));
-  const mat = new THREE.LineBasicMaterial({ color: 0xFF2020, transparent: true, opacity: 1.0 });
+  geo.setAttribute('color',    new THREE.BufferAttribute(col, 3));
+  const mat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false });
   const mesh = new THREE.Line(geo, mat);
   scene.add(mesh);
-  missiles.push({ mesh, geo, mat, arr, pos, vel, target, life: 0 });
+  // Bolt — a small spinning wireframe octahedron. Matches the wireframe + bloom
+  // aesthetic (same line rendering as enemies/rings) and reads from any angle.
+  const _boltGeo = new THREE.OctahedronGeometry(0.42);
+  const bolt = new THREE.LineSegments(new THREE.EdgesGeometry(_boltGeo),
+    new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.95 }));
+  _boltGeo.dispose();
+  bolt.position.copy(pos);
+  mesh.add(bolt);
+  missiles.push({ mesh, geo, mat, bolt, arr, pos, vel, target, life: 0 });
 }
 
 // ── Obstacle spawner ──────────────────────────────────────────────────────────
@@ -3629,6 +3642,7 @@ function animate(ts) {
       e.z += e.vz * dt;
       const ex = Math.max(-8, Math.min(8, e.baseX + Math.sin(e.t * e.freqX + e.phase) * e.ampX));
       const ey = e.baseY + Math.sin(e.t * e.freqY + e.phase * 1.3) * e.ampY;
+      e.x = ex; e.y = ey; // expose current pos so homing shots can lock flying enemies
       e.mesh.position.set(ex, ey, e.z);
       e.mesh.rotation.x += e.spinX * dt;
       e.mesh.rotation.y += e.spinY * dt;
@@ -3702,8 +3716,7 @@ function animate(ts) {
     }
 
     // ── Homing missiles ──────────────────────────────────────────────────────
-    missileAutoT -= dt;
-    if (missileAutoT <= 0 && (enemies.length > 0 || groundTanks.length > 0)) { fireHomingMissile(); missileAutoT = MISSILE_AUTO_INT; }
+    // Homing shots are MANUAL only now — fired by the player's fire button (no auto-fire).
     for (let mi = missiles.length - 1; mi >= 0; mi--) {
       const m = missiles[mi];
       m.life += dt;
@@ -3732,8 +3745,9 @@ function animate(ts) {
       }
       // Move
       m.pos.x += m.vel.x * dt; m.pos.y += m.vel.y * dt; m.pos.z += m.vel.z * dt;
+      if (m.bolt) { m.bolt.position.copy(m.pos); m.bolt.rotation.x += dt * 6; m.bolt.rotation.y += dt * 8; }
       // Update streak visual (tail → nose along velocity)
-      const vn = m.vel.clone().normalize().multiplyScalar(-0.9);
+      const vn = m.vel.clone().normalize().multiplyScalar(-5.0); // long laser tracer streak
       m.arr[0] = m.pos.x; m.arr[1] = m.pos.y; m.arr[2] = m.pos.z;
       m.arr[3] = m.pos.x+vn.x; m.arr[4] = m.pos.y+vn.y; m.arr[5] = m.pos.z+vn.z;
       m.geo.attributes.position.needsUpdate = true;
@@ -3753,7 +3767,7 @@ function animate(ts) {
         }
       }
       if (hit || m.life > MISSILE_MAX_LIFE || !_tAlive) {
-        scene.remove(m.mesh); m.geo.dispose(); m.mat.dispose(); missiles.splice(mi, 1);
+        scene.remove(m.mesh); m.geo.dispose(); m.mat.dispose(); if (m.bolt) { m.bolt.geometry.dispose(); m.bolt.material.dispose(); } missiles.splice(mi, 1);
       }
     }
 
