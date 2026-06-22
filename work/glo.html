@@ -188,6 +188,53 @@
     @media (max-width: 900px) {
       .hero-exit-btn { right: 16px; }
     }
+
+    /* ── Playable feed items (TMAtris) — hover reveals PLAY NOW ── */
+    .project-feed__item--play .feed-play-link {
+      display: block;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .project-feed__item--play .feed-play-link img {
+      display: block;
+      transition: transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94), filter 0.4s ease;
+    }
+    .project-feed__item--play .feed-play-link:hover img {
+      transform: scale(1.04);
+      filter: brightness(0.55);
+    }
+    .feed-play-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    .project-feed__item--play .feed-play-link:hover .feed-play-overlay { opacity: 1; }
+    .feed-play-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #fff;
+      background: #ff1f8f;
+      padding: 15px 30px;
+      transform: translateY(10px) scale(0.96);
+      transition: transform 0.35s cubic-bezier(0.25,0.46,0.45,0.94);
+      box-shadow: 0 10px 36px rgba(255,31,143,0.45);
+    }
+    .project-feed__item--play .feed-play-link:hover .feed-play-badge {
+      transform: translateY(0) scale(1);
+    }
+    .feed-play-badge svg { width: 13px; height: 13px; }
   </style>
 </head>
 <body>
@@ -319,16 +366,32 @@
         </div>
       </div>
 
-      <div class="project-feed__item">
-        <img src="../media/work/campaigns/GLO/2.png" alt="GLO — 02" loading="lazy" />
+      <div class="project-feed__item project-feed__item--play">
+        <a class="feed-play-link" href="glo/tmatris/index.html" target="_blank" rel="noopener" data-cursor="Play TMAtris">
+          <img src="../media/work/campaigns/GLO/2.png" alt="GLO — 02 · TMAtris (play the game)" loading="lazy" />
+          <div class="feed-play-overlay">
+            <span class="feed-play-badge">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+              Play Now
+            </span>
+          </div>
+        </a>
         <div class="project-feed__caption">
           <span class="project-feed__caption-text">Visual System</span>
           <span class="project-feed__caption-num">02 / 09</span>
         </div>
       </div>
 
-      <div class="project-feed__item">
-        <img src="../media/work/campaigns/GLO/3.gif" alt="GLO — 03" loading="lazy" />
+      <div class="project-feed__item project-feed__item--play">
+        <a class="feed-play-link" href="glo/tmatris/index.html" target="_blank" rel="noopener" data-cursor="Play TMAtris">
+          <img src="../media/work/campaigns/GLO/3.gif" alt="GLO — 03 · TMAtris gameplay (play the game)" loading="lazy" />
+          <div class="feed-play-overlay">
+            <span class="feed-play-badge">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+              Play Now
+            </span>
+          </div>
+        </a>
         <div class="project-feed__caption">
           <span class="project-feed__caption-text">Motion Language</span>
           <span class="project-feed__caption-num">03 / 09</span>
