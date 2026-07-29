@@ -14,8 +14,10 @@
   --muted: rgba(255,255,255,0.65);
   --accent: #fff;
   --accent-dim: rgba(255,255,255,0.06);
-  --font-sans: 'Space Grotesk', sans-serif;
+  --font-sans: 'Instrument Sans', sans-serif;
   --font-body: 'Inter', sans-serif;
+  --fw-display: 600;
+  --fw-header: 600;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
   --nav-h: 64px;
@@ -139,7 +141,7 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
 .nav__name {
   font-family: var(--font-sans);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: -0.01em;
   color: var(--white);
 }
@@ -293,7 +295,7 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
 .hero__title {
   font-family: var(--font-sans);
   font-size: clamp(56px, 8vw, 120px);
-  font-weight: 700;
+  font-weight: var(--fw-display);
   line-height: 0.92;
   letter-spacing: -0.04em;
   color: var(--white);
@@ -769,7 +771,7 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
 .module__title {
   font-family: var(--font-sans);
   font-size: 18px;
-  font-weight: 700;
+  font-weight: var(--fw-header);
   letter-spacing: -0.02em;
   color: var(--white);
   line-height: 1.2;
@@ -888,7 +890,7 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
 
 .module__title--cinema {
   font-size: 22px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .module__cinema-right {
@@ -975,7 +977,7 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
 .about__heading {
   font-family: var(--font-sans);
   font-size: clamp(36px, 4vw, 60px);
-  font-weight: 700;
+  font-weight: var(--fw-display);
   line-height: 1.05;
   letter-spacing: -0.03em;
   color: var(--white);
@@ -1063,7 +1065,7 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
   display: block;
   font-family: var(--font-sans);
   font-size: clamp(28px, 5vw, 80px);
-  font-weight: 700;
+  font-weight: var(--fw-display);
   letter-spacing: -0.04em;
   color: var(--white);
   line-height: 1;
