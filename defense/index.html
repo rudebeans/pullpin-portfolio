@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Defense · PullPin</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="../media/favicon/PullPin_Favicon_32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="../media/favicon/PullPin_Favicon_16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../media/favicon/PullPin_Favicon_180x180.png" />
+  <meta name="description" content="PullPin helps defense and dual-use teams turn complex technologies into clear, credible brands, products, and experiences." />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="PullPin" />
+  <meta property="og:title" content="Defense — Creative systems for mission-critical technology" />
+  <meta property="og:description" content="PullPin helps defense and dual-use teams turn complex technologies into clear, credible brands, products, and experiences." />
+  <meta property="og:image" content="https://pullpin.com/media/og/pullpin-og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:url" content="https://pullpin.com/defense/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://pullpin.com/media/og/pullpin-og.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../project.css" />
+  <style>
+    /* ============================================
+       DEFENSE — page-scoped
+       Built on project.css tokens; no overrides of shared components.
+       ============================================ */
+
+    /* ---- HERO ---- */
+    .defense-hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-end;
+      padding: 0 40px 80px;
+      overflow: hidden;
+      background: var(--black);
+    }
+
+    /* Abstract field rather than photography — no imagery implying a
+       specific program, unit, or customer. */
+    .defense-hero__field {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.13) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: radial-gradient(ellipse 75% 65% at 30% 55%, black 10%, transparent 95%);
+      -webkit-mask-image: radial-gradient(ellipse 75% 65% at 30% 55%, black 10%, transparent 95%);
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    .defense-hero__glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 22% 45%, rgba(255,255,255,0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .defense-hero__content {
+      position: relative;
+      z-index: 2;
+      max-width: 1000px;
+    }
+
+    .defense-hero__eyebrow {
+      font-family: var(--font-sans);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .defense-hero__eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 28px; height: 1px;
+      background: var(--muted);
+    }
+
+    .defense-hero__title {
+      font-family: var(--font-sans);
+      font-size: clamp(42px, 7vw, 96px);
+      font-weight: var(--fw-display);
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      color: var(--white);
+      margin-bottom: 32px;
+      max-width: 15ch;
+    }
+
+    .defense-hero__desc {
+      font-size: 16px;
+      line-height: 1.75;
+      color: rgba(255,255,255,0.6);
+      max-width: 62ch;
+    }
+
+    /* ---- CAPABILITIES ---- */
+    .capabilities {
+      border-top: 1px solid var(--border);
+      padding: 120px 40px;
+      background: var(--black);
+    }
+
+    .capabilities__inner {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .capabilities__label {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 56px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 24px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+    }
+
+    .capabilities__count {
+      color: rgba(255,255,255,0.28);
+      letter-spacing: 0.06em;
+    }
+
+    .capabilities__grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .cap {
+      background: var(--black);
+      padding: 40px 32px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 200px;
+      position: relative;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out), background 0.35s;
+    }
+
+    .cap.visible { opacity: 1; transform: translateY(0); }
+    .cap:hover { background: var(--surface); }
+
+    .cap__num {
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.25);
+      transition: color 0.35s;
+    }
+
+    .cap:hover .cap__num { color: rgba(255,255,255,0.5); }
+
+    .cap__title {
+      font-family: var(--font-sans);
+      font-size: 20px;
+      font-weight: var(--fw-header);
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      color: var(--white);
+      margin-top: auto;
+    }
+
+    /* ---- CONTACT ---- */
+    .defense-contact {
+      border-top: 1px solid var(--border);
+      padding: 120px 40px;
+      background: var(--black);
+    }
+
+    .defense-contact__inner {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .defense-contact__label {
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+
+    .defense-contact__email {
+      display: inline-block;
+      font-family: var(--font-sans);
+      font-size: clamp(28px, 5vw, 80px);
+      font-weight: var(--fw-display);
+      letter-spacing: -0.04em;
+      color: var(--white);
+      line-height: 1;
+      margin-bottom: 56px;
+      transition: opacity 0.3s;
+    }
+
+    .defense-contact__email:hover { opacity: 0.65; }
+    .defense-contact__domain { opacity: 0.4; }
+
+    .defense-contact__arrow {
+      font-size: 0.5em;
+      vertical-align: super;
+      opacity: 0.5;
+    }
+
+    .defense-contact__back {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color 0.25s;
+    }
+
+    .defense-contact__back:hover { color: var(--white); }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 1024px) {
+      .capabilities__grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 680px) {
+      .defense-hero { padding: 0 24px 64px; min-height: 88vh; }
+      .defense-hero__title { max-width: none; }
+      .defense-hero__desc { font-size: 15px; }
+      .capabilities,
+      .defense-contact { padding: 80px 24px; }
+      .capabilities__grid { grid-template-columns: 1fr; }
+      .cap { min-height: 0; padding: 32px 24px 36px; }
+      .capabilities__label { margin-bottom: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CUSTOM CURSOR -->
+  <div class="cursor" id="cursor">
+    <div class="cursor__dot"></div>
+    <div class="cursor__ring"></div>
+  </div>
+  <div class="cursor__label" id="cursorLabel"></div>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <a href="../interactive.html" class="nav__logo" data-cursor="Home">
+      <span class="nav__name">PullPin.com</span>
+      <span class="nav__role">Creative Direction</span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="../projects.html">Work</a></li>
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+    <div class="nav__status">
+      <a href="../defense/" class="nav__defense is-active" aria-current="page">Defense</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="defense-hero">
+    <div class="defense-hero__field"></div>
+    <div class="defense-hero__glow"></div>
+    <div class="defense-hero__content">
+      <p class="defense-hero__eyebrow">Defense &amp; Dual-Use</p>
+      <h1 class="defense-hero__title">Creative systems for mission-critical technology.</h1>
+      <p class="defense-hero__desc">PullPin helps defense and dual-use teams turn complex technologies into clear, credible brands, products, and experiences.</p>
+    </div>
+  </section>
+
+  <!-- CAPABILITIES -->
+  <section class="capabilities" id="capabilities">
+    <div class="capabilities__inner">
+      <p class="capabilities__label">
+        <span>Defense Capabilities</span>
+        <span class="capabilities__count">07</span>
+      </p>
+      <div class="capabilities__grid">
+        <article class="cap">
+          <span class="cap__num">01</span>
+          <h2 class="cap__title">Brand positioning and identity systems</h2>
+        </article>
+        <article class="cap">
+          <span class="cap__num">02</span>
+          <h2 class="cap__title">Technical and product storytelling</h2>
+        </article>
+        <article class="cap">
+          <span class="cap__num">03</span>
+          <h2 class="cap__title">3D visualization and motion</h2>
+        </article>
+        <article class="cap">
+          <span class="cap__num">04</span>
+          <h2 class="cap__title">Digital and interactive experiences</h2>
+        </article>
+        <article class="cap">
+          <span class="cap__num">05</span>
+          <h2 class="cap__title">Recruiting and talent campaigns</h2>
+        </article>
+        <article class="cap">
+          <span class="cap__num">06</span>
+          <h2 class="cap__title">Experiential demonstrations and environments</h2>
+        </article>
+        <article class="cap">
+          <span class="cap__num">07</span>
+          <h2 class="cap__title">Human Optimization</h2>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="defense-contact">
+    <div class="defense-contact__inner">
+      <p class="defense-contact__label">Start a conversation</p>
+      <a href="mailto:reuben@pullpin.com" class="defense-contact__email" data-cursor="Email">
+        reuben@pullpin<span class="defense-contact__domain">.com</span>
+        <span class="defense-contact__arrow">↗</span>
+      </a>
+      <div>
+        <a href="../index.html" class="defense-contact__back" data-cursor="Back">← Back to PullPin</a>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    (function () {
+      /* ---- NAV SCROLL STATE ---- */
+      const nav = document.getElementById('nav');
+      window.addEventListener('scroll', () => {
+        nav.classList.toggle('scrolled', window.scrollY > 40);
+      }, { passive: true });
+
+      /* ---- CUSTOM CURSOR ---- */
+      const cursor      = document.getElementById('cursor');
+      const cursorDot   = cursor.querySelector('.cursor__dot');
+      const cursorRing  = cursor.querySelector('.cursor__ring');
+      const cursorLabel = document.getElementById('cursorLabel');
+
+      let mx = -100, my = -100;
+      let rx = -100, ry = -100;
+
+      document.addEventListener('mousemove', e => {
+        mx = e.clientX; my = e.clientY;
+        cursorDot.style.transform = `translate3d(${mx - 3}px, ${my - 3}px, 0)`;
+      }, { passive: true });
+
+      (function animateCursor() {
+        rx += (mx - rx) * 0.12;
+        ry += (my - ry) * 0.12;
+        const tx = (rx - 18) | 0;
+        const ty = (ry - 18) | 0;
+        cursorRing.style.transform  = `translate3d(${tx}px, ${ty}px, 0)`;
+        cursorLabel.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+        requestAnimationFrame(animateCursor);
+      })();
+
+      document.querySelectorAll('[data-cursor]').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          cursor.classList.add('cursor--hover');
+          cursorLabel.textContent = el.dataset.cursor;
+        });
+        el.addEventListener('mouseleave', () => {
+          cursor.classList.remove('cursor--hover');
+          cursorLabel.textContent = '';
+        });
+      });
+
+      document.querySelectorAll('a, button').forEach(el => {
+        el.addEventListener('mouseenter', () => cursor.classList.add('cursor--hover'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('cursor--hover'));
+      });
+
+      /* ---- SCROLL REVEAL ---- */
+      const caps = document.querySelectorAll('.cap');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.06, rootMargin: '0px 0px -60px 0px' });
+
+      caps.forEach((el, i) => {
+        el.style.transitionDelay = `${i * 0.05}s`;
+        observer.observe(el);
+      });
+    })();
+  </script>
+
+</body>
+</html>

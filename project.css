@@ -173,6 +173,33 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
 
 .nav__dot { display: none; }
 
+/* DEFENSE gateway — top-right nav slot */
+.nav__defense {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: color 0.25s;
+  position: relative;
+}
+
+.nav__defense::after {
+  content: '';
+  position: absolute;
+  bottom: -3px; left: 0;
+  width: 0; height: 1px;
+  background: var(--white);
+  transition: width 0.3s var(--ease-out);
+}
+
+.nav__defense:hover { color: var(--white); }
+.nav__defense:hover::after { width: 100%; }
+.nav__defense.is-active { color: var(--white); }
+.nav__defense.is-active::after { width: 100%; }
+
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.4; }
@@ -589,4 +616,28 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
 
   .project-hero { padding: 0 24px 60px; }
   .project-hero__scroll-hint { display: none; }
+}
+
+
+/* ============================================
+   DEFENSE GATEWAY — responsive
+   The nav__status slot was hidden below 900px when it held decorative
+   text. It now holds navigation, so it stays visible; space is reclaimed
+   from the logo subtitle and link gaps instead.
+   ============================================ */
+@media (max-width: 900px) {
+  .nav__status { display: block; }
+  .nav__defense { font-size: 12px; letter-spacing: 0.10em; }
+}
+
+@media (max-width: 600px) {
+  .nav__role { display: none; }
+  .nav__links { gap: 18px; }
+  .nav__links a { font-size: 12px; }
+  .nav__defense { font-size: 11px; letter-spacing: 0.08em; }
+}
+
+@media (max-width: 400px) {
+  .nav__links { gap: 13px; }
+  .nav__links a { font-size: 11px; }
 }
