@@ -214,9 +214,16 @@
     .defense-contact__domain { opacity: 0.4; }
 
     .defense-contact__arrow {
-      font-size: 0.5em;
+      display: inline-block;
+      font-size: 0.6em;
       vertical-align: super;
       opacity: 0.5;
+      transition: transform 0.3s var(--ease-out), opacity 0.3s;
+    }
+
+    .defense-contact__email:hover .defense-contact__arrow {
+      transform: translate(6px, -6px);
+      opacity: 1;
     }
 
     .defense-contact__back {
@@ -333,7 +340,7 @@
       <p class="defense-contact__label">Start a conversation</p>
       <a href="mailto:reuben@pullpin.com" class="defense-contact__email" data-cursor="Email">
         reuben@pullpin<span class="defense-contact__domain">.com</span>
-        <span class="defense-contact__arrow">↗</span>
+        <span class="defense-contact__arrow"><svg width="20" height="20" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 11.5L11.5 1.5M11.5 1.5H4.5M11.5 1.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </a>
       <div>
         <a href="../index.html" class="defense-contact__back" data-cursor="Back">← Back to PullPin</a>
