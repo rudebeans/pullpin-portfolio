@@ -39,23 +39,31 @@
       background: var(--black);
     }
 
-    /* Abstract field rather than photography — no imagery implying a
-       specific program, unit, or customer. */
-    .defense-hero__field {
+    .defense-hero__media {
       position: absolute;
       inset: 0;
-      background-image: radial-gradient(circle, rgba(255,255,255,0.13) 1px, transparent 1px);
-      background-size: 28px 28px;
-      mask-image: radial-gradient(ellipse 75% 65% at 30% 55%, black 10%, transparent 95%);
-      -webkit-mask-image: radial-gradient(ellipse 75% 65% at 30% 55%, black 10%, transparent 95%);
-      opacity: 0.55;
-      pointer-events: none;
+      overflow: hidden;
+      background: var(--off-black);
     }
 
-    .defense-hero__glow {
+    .defense-hero__video {
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse 60% 50% at 22% 45%, rgba(255,255,255,0.05) 0%, transparent 70%);
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+    }
+
+    /* Legibility scrim — darkens the bottom and left where the eyebrow,
+       headline and copy sit, keeping the footage readable behind them.
+       Mirrors the layered gradient used on the homepage hero. */
+    .defense-hero__scrim {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 45%, rgba(0,0,0,0.15) 100%),
+        linear-gradient(to right, rgba(0,0,0,0.55) 0%, transparent 55%);
       pointer-events: none;
     }
 
@@ -285,8 +293,12 @@
 
   <!-- HERO -->
   <section class="defense-hero">
-    <div class="defense-hero__field"></div>
-    <div class="defense-hero__glow"></div>
+    <div class="defense-hero__media">
+      <video class="defense-hero__video" autoplay muted loop playsinline preload="auto" poster="defense-hero-poster.jpg">
+        <source src="defense-hero.mp4" type="video/mp4" />
+      </video>
+    </div>
+    <div class="defense-hero__scrim"></div>
     <div class="defense-hero__content">
       <p class="defense-hero__eyebrow">Defense &amp; Dual-Use</p>
       <h1 class="defense-hero__title">Creative systems for mission-critical technology.</h1>
