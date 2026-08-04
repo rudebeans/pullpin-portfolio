@@ -235,6 +235,14 @@
       transform: translateY(0) scale(1);
     }
     .feed-play-badge svg { width: 13px; height: 13px; }
+
+    /* Touch devices can't hover — show the Play Now pill by default there,
+       while hover-capable (desktop) keeps the reveal-on-hover interaction. */
+    @media (hover: none), (pointer: coarse) {
+      .project-feed__item--play .feed-play-link img { filter: brightness(0.6); }
+      .feed-play-overlay { opacity: 1; }
+      .feed-play-badge { transform: translateY(0) scale(1); }
+    }
   </style>
 </head>
 <body>
