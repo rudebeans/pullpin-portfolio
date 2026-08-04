@@ -10,6 +10,18 @@
   const onScroll = () => nav.classList.toggle('scrolled', window.scrollY > 60);
   window.addEventListener('scroll', onScroll, { passive: true });
 
+  /* ---- Hide the fixed scroll cue once the user reaches the bottom ---- */
+  const scrollHint = document.querySelector('.hero__scroll-hint');
+  if (scrollHint) {
+    const toggleScrollHint = () => {
+      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 80;
+      scrollHint.classList.toggle('is-hidden', atBottom);
+    };
+    window.addEventListener('scroll', toggleScrollHint, { passive: true });
+    window.addEventListener('resize', toggleScrollHint, { passive: true });
+    toggleScrollHint();
+  }
+
   /* ---- CUSTOM CURSOR ---- */
   const cursor     = document.getElementById('cursor');
   const cursorDot  = cursor.querySelector('.cursor__dot');

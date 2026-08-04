@@ -524,6 +524,13 @@ button { background: none; border: none; cursor: none; color: inherit; font: inh
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  transition: opacity 0.4s ease;
+}
+
+/* Hidden once the user reaches the bottom of the page (toggled in main.js) */
+.hero__scroll-hint.is-hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .hero__scroll-line {
