@@ -186,6 +186,29 @@
       margin-top: auto;
     }
 
+    /* Panel with a background visual (Human Optimization) */
+    .cap--media { overflow: hidden; }
+    .cap__media {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: transform 0.6s var(--ease-out), filter 0.4s ease;
+    }
+    /* Legibility scrim — darker at the bottom (title) and top (number) */
+    .cap__media::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.55) 100%);
+    }
+    .cap--media .cap__num,
+    .cap--media .cap__title { position: relative; z-index: 1; }
+    .cap--media .cap__num { color: rgba(255,255,255,0.6); }
+    .cap--media:hover .cap__media { transform: scale(1.05); filter: brightness(1.12); }
+
     /* ---- CONTACT ---- */
     .defense-contact {
       border-top: 1px solid var(--border);
@@ -338,7 +361,8 @@
           <span class="cap__num">06</span>
           <h2 class="cap__title">Experiential demonstrations and environments</h2>
         </article>
-        <article class="cap">
+        <article class="cap cap--media">
+          <span class="cap__media" style="background-image:url('human-optimization.jpg');" aria-hidden="true"></span>
           <span class="cap__num">07</span>
           <h2 class="cap__title">Human Optimization</h2>
         </article>
