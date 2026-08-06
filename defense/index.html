@@ -186,28 +186,35 @@
       margin-top: auto;
     }
 
-    /* Panel with a background visual (Human Optimization) */
+    /* Panels with a background visual (image or looping video) */
     .cap--media { overflow: hidden; }
-    .cap__media {
+    .cap__media,
+    .cap__video {
       position: absolute;
       inset: 0;
+      width: 100%;
+      height: 100%;
       z-index: 0;
+      object-fit: cover;
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
       transition: transform 0.6s var(--ease-out), filter 0.4s ease;
     }
-    /* Legibility scrim — darker at the bottom (title) and top (number) */
-    .cap__media::after {
+    /* Legibility scrim over the media, beneath the number/title */
+    .cap--media::after {
       content: '';
       position: absolute;
       inset: 0;
+      z-index: 1;
+      pointer-events: none;
       background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.55) 100%);
     }
     .cap--media .cap__num,
-    .cap--media .cap__title { position: relative; z-index: 1; }
+    .cap--media .cap__title { position: relative; z-index: 2; }
     .cap--media .cap__num { color: rgba(255,255,255,0.6); }
-    .cap--media:hover .cap__media { transform: scale(1.05); filter: brightness(1.12); }
+    .cap--media:hover .cap__media,
+    .cap--media:hover .cap__video { transform: scale(1.05); filter: brightness(1.12); }
 
     /* ---- CONTACT ---- */
     .defense-contact {
@@ -347,7 +354,10 @@
           <span class="cap__num">02</span>
           <h2 class="cap__title">Technical and product storytelling</h2>
         </article>
-        <article class="cap">
+        <article class="cap cap--media">
+          <video class="cap__video" autoplay muted loop playsinline preload="auto" poster="viz-motion-poster.jpg">
+            <source src="viz-motion.mp4" type="video/mp4" />
+          </video>
           <span class="cap__num">03</span>
           <h2 class="cap__title">3D visualization and motion</h2>
         </article>
